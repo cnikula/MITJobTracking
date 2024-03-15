@@ -1,9 +1,103 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@using MITJobTracker.Data
 
-<h1>Hello, world!</h1>
+<PageTitle>Add Job</PageTitle>
 
-Welcome to your new app.
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">Welcome to the Job Tracker</h3>
+    </div>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="row">
+    <br />
+    <br/>
+</div>
+
+<div class="Row">
+    <div class="col">
+        <EditForm Model= "@JobModel" asp-page="Prospect" class="form">
+            <div class="form-group mb-3">
+                <label for="title">Job Title</label>
+                <label for="jobno" class="mitcustom-margin-left-350">Job No.</label>
+                <label for="dateApplied" class="mitcustom-margin-left-150">Date Applied</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="title" class="form-control mit-input-widht-400" id="title" @bind-value="JobModel.JobTitle" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="jobno" class="form-control mit-input-widht-200" id="jobno" @bind-value="JobModel.JobNo" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="date" asp-for="dateApplied" class="form-control mit-input-widht-200" id="date" name="dateApplied" @bind-value="JobModel.ResumeSendDate" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="location">Job Location</label>
+                <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
+                <label for="salary" class="mitcustom-margin-left-112">Salary</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="location" id="location" class="form-control mit-input-widht-400" @bind-value="JobModel.JobLocation" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-widht-200" @bind-value="JobModel.Duration" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-widht-200" @bind-value="JobModel.Salary" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="hybridhoofdays" class="mitcustom-margin-left-175">Hybrid Days</label>
+                <label for="companyName" class="mitcustom-margin-left-110">Company Name</label>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="option1" name="option" @bind-value="JobModel.Remote" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option1">Remote</label>
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="radio" id="option2" name="option" @bind-value="JobModel.Hybrid" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option2">Hybrid</label>
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-widht-200" @bind-value="JobModel.HybridNoOfDays" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="companyName" id="companyName" class="form-control mit-input-widht-400" @bind-value="JobModel.CompanyName" />
+
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="recruitingAgency">Recruiting Agency</label>
+                <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
+                <label for="salary" class="mitcustom-margin-left-112">Salary</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-widht-400" @bind-value="JobModel.RecruitingAgency" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-widht-200" @bind-value="JobModel.Duration" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-widht-200" @bind-value="JobModel.Salary" />
+                </div>
+            </div>
+    
+            <div class="form-group mb-3">
+                <label for="description">Job Description</label>
+                <textarea asp-for="description" class="form-control w-75" rows="8" id="description" wrap="on"></textarea>
+            </div>
+            
+           
+            
+           
+           
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    
+    
+    public Job JobModel { get; set; } = new Job();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+}
+
+

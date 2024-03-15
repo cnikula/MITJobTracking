@@ -96,6 +96,11 @@ namespace MITJobTracker.Data
         [Required(ErrorMessage = "Employment Type is required")]
         public string EmploymentType { get; set; }
 
+        [Comment("Duration, how long the job is for.")]
+        [DataMember]
+        [MaxLength(25)]
+        public string? Duration { get; set; }
+
         [Comment("Sub-Contract, if you contract through another company. Example Head-hunter")]
         [DataMember]
         public bool SubContract { get; set; }
@@ -104,9 +109,9 @@ namespace MITJobTracker.Data
         [DataMember]
         public bool ResumeSend { get; set; }
 
-        [Comment("Resume Send Date, the date you send the resume out")]
+        [Comment("Resume Send Date, the date you send the resume out or applied for the job. If resume send then ResumeSend is set to 1 (true)")]
         [DataMember]
-        public DateTime? ResumeSendDate { get; set; }
+        public DateOnly? ResumeSendDate { get; set; }
 
         //Table Relationship 
         public virtual ICollection<Interview> Interviews { get; set; }

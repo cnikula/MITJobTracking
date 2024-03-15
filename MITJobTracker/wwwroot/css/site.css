@@ -66,3 +66,59 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+/***************************The following styles are UD specific***********************/
+
+.mitsidebar {
+    background-color: #44689e;
+}
+
+       /***** Margin *******/
+.mitcustom-margin-left-350 {
+    margin-left: 350px;
+}
+
+.mitcustom-margin-left-314 {
+    margin-left: 314px;
+}
+
+.mitcustom-margin-left-300 {
+    margin-left: 300px;
+}
+
+.mitcustom-margin-left-350 {
+    margin-left: 150px;
+}
+
+.mitcustom-margin-left-200 {
+    margin-left: 200px;
+}
+
+.mitcustom-margin-left-175 {
+    margin-left: 175px;
+}
+
+.mitcustom-margin-left-160 {
+    margin-left: 160px;
+}
+
+.mitcustom-margin-left-112 {
+    margin-left: 112px;
+}
+
+.mitcustom-margin-left-110 {
+    margin-left: 110px;
+}
+
+     /*mit input*/
+.mit-input-widht-400 {
+    width: 400px;
+}
+
+.mit-input-widht-200 {
+    width: 200px;
+}
+
+.mit-input-widht-50 {
+    width: 50px;
+}
