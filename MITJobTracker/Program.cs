@@ -19,6 +19,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
+using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ var configuration = builder.Configuration;
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSyncfusionBlazor();
 
 #region Connection String
 
@@ -41,6 +43,9 @@ builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configurat
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzE4NTY5OUAzMjM1MmUzMDJlMzBlMUhoT1ByL0NOczVtcDV4OUprQ3pZT09DbmNPeXR2MU1vUlhzdjJXNC9RPQ==;Mgo+DSMBPh8sVXJxS0d+X1RPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9nSX1RcERgXX9fd3ZcRWc=;ORg4AjUWIQA/Gnt2UFhhQlJBfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX5QdENiWntecXNXT2Nb;Mgo+DSMBMAY9C3t2UFhhQlJBfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX5QdENiWntecXNWRmlY;MzE4NTcwM0AzMjM1MmUzMDJlMzBYSW81eHMzb1hQMXF4Z0pYS3NDMDI2ZnA0Skdqc1ZyRVJHcklieVNHMVdRPQ==");
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

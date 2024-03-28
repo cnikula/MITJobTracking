@@ -90,7 +90,7 @@ namespace MITJobTracker.Data
         [MaxLength(75)]
         public string? Salary { get; set; }
 
-        [Comment("Employment Type, W2, 1099 Part-Time, Full-Time.")]
+        [Comment("Employment Type, W2, 1099, Part-Time, Full-Time.")]
         [DataMember]
         [MaxLength(25)]
         [Required(ErrorMessage = "Employment Type is required")]

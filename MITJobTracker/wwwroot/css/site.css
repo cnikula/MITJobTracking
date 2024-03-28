@@ -122,3 +122,37 @@ a, .btn-link {
 .mit-input-widht-50 {
     width: 50px;
 }
+
+.mit-dropdown {
+    width: 200px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.mit-control-section {
+    min-height: 370px;
+}
+
+.mit-control-wrapper {
+    max-width: 250px;
+    margin: 0 auto;
+    padding: 50px 0px 0px;
+}
+
+.mit-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.mit-property-panel-section .mit-property-value {
+    padding: 5px 0px 10px;
+    font-size: 14px;
+}
+
+.mit-property-panel-content {
+    padding: 0px 0px 15px 0px;
+}
+
+.mit-property-panel-content:last-child {
+    padding: 0px 0px 40px 0px;
+}

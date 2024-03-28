@@ -1,7 +1,5 @@
 ﻿@page "/"
 
-@using MITJobTracker.Data
-
 <PageTitle>Add Job</PageTitle>
 
 <div class="row">
@@ -75,6 +73,19 @@
                     <input type="text" asp-for="salary" id="salary" class="form-control mit-input-widht-200" @bind-value="JobModel.Salary" />
                 </div>
             </div>
+            
+            <div class="form-group mb-3">
+                <label for="recruitingAgency">Employment Type</label>
+                <div class="col-lg-8 mit-control-section sb-property-border">
+                    <div class="mit-control-wrapper">
+                        <SfDropDownList TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" ValueChange="EmpOnValueChange"/>
+                            <DropDownListFieldSettings Text="Text" Value="ID"/>
+                        </SfDropDownList>
+                    </div>
+                </div>
+                
+            </div>
     
             <div class="form-group mb-3">
                 <label for="description">Job Description</label>
@@ -92,11 +103,29 @@
 @code {
     
     
-    public Job JobModel { get; set; } = new Job();
+    protected Job JobModel { get; set; } = new Job();
+    protected string selectJobType;
 
     protected override async Task OnInitializedAsync()
     {
         
+    }
+
+    
+    // Hardcoded list of job types
+    List<EmploymentType>jobTypes = new List<EmploymentType>
+    {
+        new EmploymentType { Id = "fullTime", Text = "Full Time" },
+        new EmploymentType { Id = "partTime", Text = "Part Time" },
+        new EmploymentType { Id = "contract", Text = "Contract" },
+        new EmploymentType { Id = "internship", Text = "Internship" },
+        new EmploymentType { Id = "temporary", Text = "Temporary" },
+        new EmploymentType { Id = "freelance", Text = "Freelance" }
+    };
+
+    public void EmpOnValueChange(ChangeEventArgs<string, EmploymentType> args)
+    {
+        JobModel.EmploymentType = args.ItemData.Text;
     }
 }
 
