@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
 using Syncfusion.Blazor;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Initialize the Configuration object

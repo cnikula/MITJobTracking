@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Syncfusion.Blazor.Buttons
 
 <PageTitle>Add Job</PageTitle>
 
@@ -76,15 +77,14 @@
             
             <div class="form-group mb-3">
                 <label for="recruitingAgency">Employment Type</label>
-                <div class="col-lg-8 mit-control-section sb-property-border">
+                <div class="col-lg-2 mit-control-section sb-property-border">
                     <div class="mit-control-wrapper">
-                        <SfDropDownList TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
-                            <DropDownListEvents TItem="EmploymentType" TValue="string" ValueChange="EmpOnValueChange"/>
+                        <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelect(e.ItemData.Text))"/>
                             <DropDownListFieldSettings Text="Text" Value="ID"/>
                         </SfDropDownList>
                     </div>
                 </div>
-                
             </div>
     
             <div class="form-group mb-3">
@@ -92,10 +92,7 @@
                 <textarea asp-for="description" class="form-control w-75" rows="8" id="description" wrap="on"></textarea>
             </div>
             
-           
             
-           
-           
         </EditForm>
     </div>
 </div>
@@ -123,10 +120,12 @@
         new EmploymentType { Id = "freelance", Text = "Freelance" }
     };
 
-    public void EmpOnValueChange(ChangeEventArgs<string, EmploymentType> args)
+   
+    private void OnSelect(string e)
     {
-        JobModel.EmploymentType = args.ItemData.Text;
+        JobModel.EmploymentType = e;
     }
+ 
 }
 
 
