@@ -74,9 +74,18 @@ a, .btn-link {
 }
 
        /***** Margin *******/
-.mitcustom-margin-left-350 {
-    margin-left: 350px;
+.mitcustom-margin-left-900 {
+    margin-left: 900px;
 }
+
+.mitcustom-margin-left-600 {
+    margin-left: 600px;
+}
+
+.mitcustom-margin-left-420 {
+    margin-left: 420px;
+}
+
 
 .mitcustom-margin-left-314 {
     margin-left: 314px;
@@ -87,7 +96,7 @@ a, .btn-link {
 }
 
 .mitcustom-margin-left-350 {
-    margin-left: 150px;
+    margin-left: 350px;
 }
 
 .mitcustom-margin-left-200 {
@@ -102,6 +111,10 @@ a, .btn-link {
     margin-left: 160px;
 }
 
+.mitcustom-margin-left-150 {
+    margin-left: 150px;
+}
+
 .mitcustom-margin-left-112 {
     margin-left: 112px;
 }
@@ -111,6 +124,10 @@ a, .btn-link {
 }
 
      /*mit input*/
+.mit-input-widht-800 {
+    width: 800px;
+}
+
 .mit-input-widht-400 {
     width: 400px;
 }
@@ -155,4 +172,32 @@ a, .btn-link {
 
 .mit-property-panel-content:last-child {
     padding: 0px 0px 40px 0px;
+}
+
+.mit-propertyTitle {
+    display: block;
+    text-transform: uppercase;
+    width: auto;
+}
+
+.mit-titleWrap {
+    display: inline-block;
+}
+
+.mit-propertyValue {
+    display: block;
+    width: auto;
+}
+
+.mit-valueWrap {
+    display: inline-block;
+}
+
+.mit-label-container {
+    display: flex;
+    justify-content: space-around; /* Adjust this according to your alignment preference */
+}
+
+.mit-label {
+    white-space: nowrap; /* Prevents the text from wrapping */
 }
