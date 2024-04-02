@@ -124,19 +124,22 @@ a, .btn-link {
 }
 
      /*mit input*/
-.mit-input-widht-800 {
+.mit-input-width-1600 {
+    width: 2400px;
+}
+.mit-input-width-800 {
     width: 800px;
 }
 
-.mit-input-widht-400 {
+.mit-input-width-400 {
     width: 400px;
 }
 
-.mit-input-widht-200 {
+.mit-input-width-200 {
     width: 200px;
 }
 
-.mit-input-widht-50 {
+.mit-input-width-50 {
     width: 50px;
 }
 

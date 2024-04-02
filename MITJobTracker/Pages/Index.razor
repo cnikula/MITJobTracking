@@ -22,11 +22,11 @@
                 <label for="jobno" class="mitcustom-margin-left-350">Job No.</label>
                 <label for="dateApplied" class="mitcustom-margin-left-150">Date Applied</label>
                 <div class="d-flex align-items-center">
-                    <input type="text" asp-for="title" class="form-control mit-input-widht-400" id="title" @bind-value="JobModel.JobTitle" />
+                    <input type="text" asp-for="title" class="form-control mit-input-width-400" id="title" @bind-value="JobModel.JobTitle" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="jobno" class="form-control mit-input-widht-200" id="jobno" @bind-value="JobModel.JobNo" />
+                    <input type="text" asp-for="jobno" class="form-control mit-input-width-200" id="jobno" @bind-value="JobModel.JobNo" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="date" asp-for="dateApplied" class="form-control mit-input-widht-200" id="date" name="dateApplied" @bind-value="JobModel.ResumeSendDate" />
+                    <input type="date" asp-for="dateApplied" class="form-control mit-input-width-200" id="date" name="dateApplied" @bind-value="JobModel.ResumeSendDate" />
                 </div>
             </div>
             
@@ -35,11 +35,11 @@
                 <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
                 <label for="salary" class="mitcustom-margin-left-112">Salary</label>
                 <div class="d-flex align-items-center">
-                    <input type="text" asp-for="location" id="location" class="form-control mit-input-widht-400" @bind-value="JobModel.JobLocation" />
+                    <input type="text" asp-for="location" id="location" class="form-control mit-input-width-400" @bind-value="JobModel.JobLocation" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-widht-200" @bind-value="JobModel.Duration" />
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-width-200" @bind-value="JobModel.Duration" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-widht-200" @bind-value="JobModel.Salary" />
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-width-200" @bind-value="JobModel.Salary" />
                 </div>
             </div>
             
@@ -55,9 +55,9 @@
                     <span>&nbsp;&nbsp;</span>
                     <label for="option2">Hybrid</label>
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-widht-200" @bind-value="JobModel.HybridNoOfDays" />
+                    <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-width-200" @bind-value="JobModel.HybridNoOfDays" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="companyName" id="companyName" class="form-control mit-input-widht-400" @bind-value="JobModel.CompanyName" />
+                    <input type="text" asp-for="companyName" id="companyName" class="form-control mit-input-width-400" @bind-value="JobModel.CompanyName" />
 
                 </div>
             </div>
@@ -67,11 +67,11 @@
                 <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
                 <label for="salary" class="mitcustom-margin-left-112">Salary</label>
                 <div class="d-flex align-items-center">
-                    <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-widht-400" @bind-value="JobModel.RecruitingAgency" />
+                    <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-width-400" @bind-value="JobModel.RecruitingAgency" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-widht-200" @bind-value="JobModel.Duration" />
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-width-200" @bind-value="JobModel.Duration" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-widht-200" @bind-value="JobModel.Salary" />
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-width-200" @bind-value="JobModel.Salary" />
                 </div>
             </div>
             
@@ -95,13 +95,14 @@
                         <label for="recruiterEmail" class="mitcustom-margin-left-350">Recruiter Email</label>
                     </div>
                     <div class="form-group p-3">
-                        <input type="text" asp-for="recruitertName" class="form-control mit-input-widht-200" id="recruitert1" name="recruitertName" @bind-value="JobModel.RecruitertName" />
-                        <span>&nbsp;&nbsp;</span>
-                        <input type="text" asp-for="recruiterPhone" class="form-control mit-input-widht-200" id="recruitert2" name="recruiterPhone" @bind-value="JobModel.RecruiterPhone" />
-                        <input type="text" asp-for="recruiterEmail" class="form-control mit-input-widht-800" id="recruitert3" name="recruiterEmail" @bind-value="JobModel.RecruiterEmail" />
+                        <div class="d-flex align-items-center">
+                            <input type="text" asp-for="recruitertName" class="form-control mit-input-width-400" id="recruitert1" name="recruitertName" @bind-value="JobModel.RecruitertName" />
+                            <span>&nbsp;&nbsp;</span>
+                            <input type="text" asp-for="recruiterPhone" class="form-control mit-input-width-400" id="recruitert2" name="recruiterPhone" @bind-value="JobModel.RecruiterPhone" />
+                            <span>&nbsp;&nbsp;</span>
+                            <input type="email" asp-for="recruiterEmail" class="form-control" style="width: 2400px" id="recruitert3" name="recruiterEmail" @bind-value="JobModel.RecruiterEmail" />
+                        </div>
                     </div>
-                   
-                   
                 </div>
             </div>
             
