@@ -123,10 +123,19 @@ a, .btn-link {
     margin-left: 110px;
 }
 
-     /*mit input*/
-.mit-input-width-1600 {
-    width: 2400px;
+.mitcustom-margin-left-85 {
+    margin-left: 85px;
 }
+
+.mitcustom-margin-left-60 {
+    margin-left: 60px;
+}
+
+     /*mit input*/
+.mit-input-width-600 {
+    width: 600px;
+}
+
 .mit-input-width-800 {
     width: 800px;
 }
@@ -155,7 +164,7 @@ a, .btn-link {
 
 .mit-control-wrapper {
     max-width: 250px;
-    margin: 0 auto;
+    margin: 0;
     padding: 0px 0px 0px;
 }
 
@@ -201,6 +210,6 @@ a, .btn-link {
     justify-content: space-around; /* Adjust this according to your alignment preference */
 }
 
-.mit-label {
+.mit-label-norap {
     white-space: nowrap; /* Prevents the text from wrapping */
 }
