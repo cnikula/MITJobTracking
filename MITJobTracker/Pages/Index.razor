@@ -1,5 +1,6 @@
 ﻿@page "/"
-@using Syncfusion.Blazor.Buttons
+@using MITJobTracker.Factory
+@inject JobsFactory JobsFactory
 
 <PageTitle>Add Job</PageTitle>
 
@@ -44,16 +45,23 @@
             </div>
             
             <div class="form-group mb-3">
-                <label for="hybridhoofdays" class="mitcustom-margin-left-175">Hybrid Days</label>
-                <label for="companyName" class="mitcustom-margin-left-110">Company Name</label>
+                <label for="hybridhoofdays" class="mitcustom-margin-left-250">Hybrid Days</label>
+                <label for="companyName" class="mitcustom-margin-left-116">Company Name</label>
                 <div class="d-flex align-items-center">
                     <input type="radio" id="option1" name="option" @bind-value="JobModel.Remote" />
                     <span>&nbsp;&nbsp;</span>
                     <label for="option1">Remote</label>
                     <span>&nbsp;&nbsp;</span>
+                   
                     <input type="radio" id="option2" name="option" @bind-value="JobModel.Hybrid" />
                     <span>&nbsp;&nbsp;</span>
                     <label for="option2">Hybrid</label>
+                    <span>&nbsp;&nbsp;</span>
+                   
+                    <input type="radio" id="option3" name="option" @bind-value="JobModel.OnSite" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option3">On Site</label>
+                   
                     <span>&nbsp;&nbsp;</span>
                     <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-width-200" @bind-value="JobModel.HybridNoOfDays" />
                     <span>&nbsp;&nbsp;</span>
@@ -64,7 +72,7 @@
             
             <div class="form-group mb-3">
                 <label for="recruitingAgency">Recruiting Agency</label>
-                <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
+                <label for="duration" class="mitcustom-margin-left-280">Job Duration</label>
                 <label for="salary" class="mitcustom-margin-left-112">Salary</label>
                 <div class="d-flex align-items-center">
                     <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-width-400" @bind-value="JobModel.RecruitingAgency" />
@@ -77,21 +85,32 @@
             
             <div class="form-group mb-3">
                 <label for="recruitingAgency">Employment Type</label>
-                <div class="col-lg-2 mit-control-section sb-property-border">
+                <div class="col-lg-2 sb-property-border">
                     <div class="mit-control-wrapper">
                         <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
                             <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))"/>
                             <DropDownListFieldSettings Text="Text" Value="ID"/>
                         </SfDropDownList>
+  
                     </div>
-                    <div class="form-group p-3">
-                        <label for="description">Job Description</label>
-                        <textarea asp-for="description" class="form-control" style="height: 150px; width: 600px" id="description" wrap="on"></textarea>
+                    <br/>
+                    @*  <div class="d-flex align-items-center mitcustom-margin-left-300"> *@
+                    <div>
+                        <div class="checkbox-control">
+                            <SfCheckBox @bind-Checked="@JobModel.SubContract" Label="SubContract"></SfCheckBox>
+                            <SfCheckBox @bind-Checked="@JobModel.ResumeSend" Label="ResumeSend"></SfCheckBox>
+                        </div>
+                    </div>
+                   
+                    <div class="form-group mb-3">
+                        <br/>
+                        <label for="requirements">Job Requirements</label>
+                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="on" @bind="@JobModel.Requirements"></textarea>
                     </div>
                 </div>
             </div>
             
-            <div class="form-group mb-3">
+            <div class="form-group mb-3" style="margin-top: 0px">
                 <label for="recruitertName">Recruiter Name</label>
                 <label for="recruiterPhone" class="mitcustom-margin-left-300">Recruiter Phone No</label>
                 <label for="recruiterEmail" class="mitcustom-margin-left-60">Recruiter Email</label>
@@ -104,25 +123,29 @@
                 </div>
             </div>
             
-           
-            
-           
+            <div class="form-group mb-3">
+                <SfButton CssClass="e-primary" @onclick="SaveToDBC">Save To Database</SfButton>
+                <SfButton CssClass="e-success" @onclick="AddNew">Add New</SfButton>
+            </div>
+       
         </EditForm>
     </div>
 </div>
 
 @code {
-    
-    
+
+
     protected Job JobModel { get; set; } = new Job();
     protected string selectJobType;
+    protected bool isChecked = true;
+    protected bool isDisabledChecked = false;
 
     protected override async Task OnInitializedAsync()
     {
-        
+
     }
 
-    
+
     // Hardcoded list of job types
     List<EmploymentType>jobTypes = new List<EmploymentType>
     {
@@ -134,12 +157,28 @@
         new EmploymentType { Id = "freelance", Text = "Freelance" }
     };
 
-   
-    private void OnSelectJobType(string e)
+
+    protected void OnSelectJobType(string e)
     {
         JobModel.EmploymentType = e;
     }
- 
+
+    protected async Task SaveToDBC()
+    {
+        int returnValue = 0;
+
+        // Save to database
+        returnValue = await JobsFactory.AddJob(JobModel);
+
+    }
+
+    protected void AddNew()
+    {
+        JobModel = new Job();
+    }
+
+
+
 }
 
 

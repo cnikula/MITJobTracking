@@ -75,6 +75,10 @@ namespace MITJobTracker.Data
         [DataMember]
         public bool Hybrid { get; set; }
 
+        [Comment("OnSite, if the job is on site.")]
+        [DataMember]
+        public bool OnSite { get; set; }
+
         [Comment("Hybrid No Of Days, how may days on-site")]
         [DataMember]
         [MaxLength(25)]

@@ -99,6 +99,14 @@ a, .btn-link {
     margin-left: 350px;
 }
 
+.mitcustom-margin-left-280 {
+    margin-left: 280px;
+}
+
+.mitcustom-margin-left-250{
+    margin-left: 250px;
+}
+
 .mitcustom-margin-left-200 {
     margin-left: 200px;
 }
@@ -117,6 +125,10 @@ a, .btn-link {
 
 .mitcustom-margin-left-112 {
     margin-left: 112px;
+}
+
+.mitcustom-margin-left-116 {
+    margin-left: 116px;
 }
 
 .mitcustom-margin-left-110 {
@@ -213,3 +225,9 @@ a, .btn-link {
 .mit-label-norap {
     white-space: nowrap; /* Prevents the text from wrapping */
 }
+
+.mit-text-ara {
+    width: 600px;
+    height: 150px;
+}
+

@@ -19,6 +19,10 @@
 
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
+using MITJobTracker.Factory;
+using MITJobTracker.Factory.Interfaces;
+using MITJobTracker.Services;
+using MITJobTracker.Services.Interfaces;
 using Syncfusion.Blazor;
 
 
@@ -32,6 +36,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSyncfusionBlazor();
+
+builder.Services.AddTransient<IJobsFactory, JobsFactory>();
+builder.Services.AddTransient<IJobsServices, JobsServices>();
 
 #region Connection String
 
