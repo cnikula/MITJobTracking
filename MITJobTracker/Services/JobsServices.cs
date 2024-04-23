@@ -21,6 +21,13 @@ namespace MITJobTracker.Services
 {
     public class JobsServices : IJobsServices
     {
+        private readonly AppDBContext _context;
+
+        public JobsServices(AppDBContext context)
+        {
+            _context = context;
+        }
+
 
         public Task<Job> GetJobById(int id)
         {
@@ -32,21 +39,20 @@ namespace MITJobTracker.Services
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Add a new job to the database
-        /// </summary>
-        /// <param name="job"></param>
-        /// <returns></returns>
+
+        /// <summary>Adds the job.</summary>
+        /// <param name="job">The job.</param>
+        /// <returns>System.Int32.</returns>
+        /// <remarks>Add new record to the Database table Jobs</remarks>
         public async Task<int> AddJob(Job job)
         {
             int returnValue = 0;
 
             try
             {
-                using (var context = new AppDBContext(new DbContextOptions<AppDBContext>()))
-                {
-                    context.Jobs.Add(job);
-                    returnValue = await context.SaveChangesAsync();
+               
+                    _context.Jobs.Add(job);
+                    returnValue = await _context.SaveChangesAsync();
 
                     if (returnValue > 0)
                     {
@@ -56,7 +62,7 @@ namespace MITJobTracker.Services
                     {
                         return 0;
                     }
-                }
+
             }
             catch (Exception e)
             {

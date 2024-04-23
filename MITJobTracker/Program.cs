@@ -1,30 +1,11 @@
-// ***********************************************************************
-// Assembly         : MITJobTracker
-// Author           : techn : Claude Nikula
-// Created          : 03-13-2024
-//
-// Last Modified By : techn : Claude Nikula
-// Last Modified On : 03-13-2024
-// ***********************************************************************
-// <copyright file="Program.cs" company="Mesquite IT">
-//     Copyright (c) . All rights reserved.
-// </copyright>
-// <summary> This C# code is the main entry point of an ASP.NET Core
-// application. It sets up the web server, configures the HTTP request
-// pipeline, and starts the application. Here's a breakdown of what the
-// code does:
-// </summary>
-// ***********************************************************************
-
-
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MITJobTracker.Data;
 using MITJobTracker.Factory;
 using MITJobTracker.Factory.Interfaces;
 using MITJobTracker.Services;
 using MITJobTracker.Services.Interfaces;
 using Syncfusion.Blazor;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,16 +18,28 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSyncfusionBlazor();
 
-builder.Services.AddTransient<IJobsFactory, JobsFactory>();
-builder.Services.AddTransient<IJobsServices, JobsServices>();
-
 #region Connection String
 
 // Retrieve the connection string using the Configuration object
+void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext<AppDBContext>(options =>
+        options.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
+}
+
 builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
+
+//builder.Services.Add<IJobsFactory, JobsFactory>();
+builder.Services.AddTransient<IJobsFactory, JobsFactory>();
+//builder.Services.AddSingleton<IJobsServices, JobsServices>();
+builder.Services.AddTransient<IJobsServices, JobsServices>();
+
 
 // ...
 #endregion
+
+
+
 
 var app = builder.Build();
 
@@ -71,3 +64,4 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
+

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data.Common;
@@ -13,6 +14,8 @@ namespace MITJobTracker.Data
             Hybrid = false;
             SubContract = false;
             ResumeSend = false;
+            OnSite = false;
+            DateApplied = DateTime.Now;
         }
 
         [Comment("Table primary key")]
@@ -115,7 +118,11 @@ namespace MITJobTracker.Data
 
         [Comment("Resume Send Date, the date you send the resume out or applied for the job. If resume send then ResumeSend is set to 1 (true)")]
         [DataMember]
-        public DateOnly? ResumeSendDate { get; set; }
+        public DateTime? ResumeSendDate { get; set; }
+
+        [Comment("DateApplied, the date you Applied for the job or send bid.")]
+        [DataMember]
+        public DateTime DateApplied { get; set; }
 
         //Table Relationship 
         public virtual ICollection<Interview> Interviews { get; set; }

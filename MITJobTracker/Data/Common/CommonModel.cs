@@ -10,6 +10,7 @@ namespace MITJobTracker.Data.Common
         public CommonModel()
         {
             CreatedDate = DateTime.Now;
+            CreatedById = "cnikula";
         }
 
         [Comment("External foreign.")]

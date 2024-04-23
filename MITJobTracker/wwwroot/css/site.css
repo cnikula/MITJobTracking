@@ -231,3 +231,18 @@ a, .btn-link {
     height: 150px;
 }
 
+.mit-dialog-content {
+    display: block;
+    font-size: 15px;
+    word-wrap: break-word;
+    text-align: center;
+    font-style: italic;
+    top: 16px;
+}
+
+.mit-dialogText {
+    background-color: #D3D3D3;
+    padding-right: 4px;
+    color: blue;
+    font-family: sans-serif !important;
+}
