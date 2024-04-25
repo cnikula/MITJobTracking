@@ -53,7 +53,7 @@ namespace MITJobTracker.Data
         [Comment("Recruiter Phone, the agency person you are communicating with phone number.")]
         [DataMember]
         [MaxLength(15)]
-        public string RecruiterPhone { get; set; }
+        public string? RecruiterPhone { get; set; }
 
         [Comment("Recruiter Email, the agency person you are communicating with email.")]
         [DataMember]
