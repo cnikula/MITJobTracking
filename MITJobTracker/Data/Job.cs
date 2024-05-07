@@ -1,4 +1,18 @@
-﻿using System.ComponentModel;
+﻿// ***********************************************************************
+// Assembly         : MITJobTracker
+// Author           : techn
+// Created          : 03-13-2024
+//
+// Last Modified By : techn
+// Last Modified On : 04-24-2024
+// ***********************************************************************
+// <copyright file="Job.cs" company="MITJobTracker">
+//     Copyright (c) . All rights reserved.
+// </copyright>
+// <summary>POKO Data class</summary>
+// ***********************************************************************
+
+
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +30,9 @@ namespace MITJobTracker.Data
             ResumeSend = false;
             OnSite = false;
             DateApplied = DateTime.Now;
+            JobNo = "0";
+            Salary = "0";
+            Duration = "N/A";
         }
 
         [Comment("Table primary key")]
