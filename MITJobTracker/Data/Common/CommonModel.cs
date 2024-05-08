@@ -11,6 +11,7 @@ namespace MITJobTracker.Data.Common
         {
             CreatedDate = DateTime.Now;
             CreatedById = "cnikula";
+            IsDeleted = false;
         }
 
         [Comment("External foreign.")]
@@ -31,6 +32,10 @@ namespace MITJobTracker.Data.Common
         [Comment("Date and Time record was create.")]
         [DataMember]
         public DateTime? ModifiedDate { get; set; }
+
+        [Comment(" IsDeleted, Is record deleted.")]
+        [DataMember]
+        public bool IsDeleted { get; set; }
 
         [Comment("External foreign.")]
         [DataMember]
