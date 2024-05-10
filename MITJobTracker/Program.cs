@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MITJobTracker.Data;
 using MITJobTracker.Factory;
 using MITJobTracker.Factory.Interfaces;
