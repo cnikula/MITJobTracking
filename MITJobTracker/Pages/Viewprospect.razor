@@ -1,13 +1,43 @@
 ﻿@page "/viewJobProspect"
+@inject IJobsFactory JobsFactory
 
 <PageTitle>View Job Prospect</PageTitle>
 
 <div class="row">
     <div class="col">
-        <h3 class="display-8">Welcome to the Job Prospect Listing</h3>
+        <h3 class="display-8">Job Prospect Listing</h3>
     </div>
 </div>
 
-@code {
+<br/>
+<br/>
 
+<body>
+    <div class="row">
+        <SfGrid DataSource="@rospectListDTO" />
+    </div>
+</body>
+
+
+@code {
+    protected List<ProspectListDTO> rospectListDTO { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PpopulateGrid("N/A", true);
+    }
+
+    protected async Task PpopulateGrid(string sreachVlaude, bool fullList)
+    {
+        try
+        {
+            rospectListDTO = (await JobsFactory.GetJobList(sreachVlaude, fullList)).ToList();
+        }
+        catch (InvalidCastException ex)
+        {
+            // Handle the DBNull exception here or object null reference exception (no record found)
+            // You can assign a default value to rospectListDTO or handle the exception in a different way
+            rospectListDTO = new List<ProspectListDTO>();
+        }
+    }
 }

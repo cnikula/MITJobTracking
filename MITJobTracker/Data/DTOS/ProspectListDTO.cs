@@ -13,6 +13,8 @@
 // ***********************************************************************
 
 
+using Microsoft.EntityFrameworkCore;
+
 namespace MITJobTracker.Data.DTOS
 {
     public class ProspectListDTO
@@ -21,6 +23,7 @@ namespace MITJobTracker.Data.DTOS
             public string JobTitle { get; set; }
             public string JobNo { get; set; }
             public DateTime DateApplied { get; set; }
+            public string Status { get; set; }
             public string JobLocation { get; set; }
             public string RecruitingAgency { get; set; }
             public string RecruitertName { get; set; }

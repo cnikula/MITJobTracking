@@ -22,6 +22,59 @@ namespace MITJobTracker.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("MITJobTracker.Data.DTOS.ProspectListDTO", b =>
+                {
+                    b.Property<DateTime>("DateApplied")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("InterviewDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InterviewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InterviewType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JobLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecruiterEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecruiterPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecruitertName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecruitingAgency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("ProspectListDTO");
+                });
+
             modelBuilder.Entity("MITJobTracker.Data.Interview", b =>
                 {
                     b.Property<int>("InterviewId")

@@ -12,34 +12,37 @@
 // <summary>Jobs Services Class CRUD operations</summary>
 // ***********************************************************************
 
-
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
+using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
+using MITJobTracker.Data.Common;
 
 namespace MITJobTracker.Services
 {
     public class JobsServices : IJobsServices
     {
-        private readonly AppDBContext _context;
+        protected readonly AppDBContext _context;
+        private CommonSP _commonSP;
 
-        public JobsServices(AppDBContext context)
+        public JobsServices(AppDBContext context, IConfiguration configuration)
         {
             _context = context;
+            _commonSP = new CommonSP(configuration);
         }
-
 
         public Task<Job> GetJobById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Job>> GetJobs()
+        public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
-            throw new NotImplementedException();
+           return await _commonSP.GetJobList(searchValue, fullList);
         }
 
-
+       
         /// <summary>Adds the job.</summary>
         /// <param name="job">The job.</param>
         /// <returns>System.Int32.</returns>
@@ -50,23 +53,20 @@ namespace MITJobTracker.Services
 
             try
             {
-               
-                    _context.Jobs.Add(job);
-                    returnValue = await _context.SaveChangesAsync();
+                _context.Jobs.Add(job);
+                returnValue = await _context.SaveChangesAsync();
 
-                    if (returnValue > 0)
-                    {
-                        return returnValue;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
-
+                if (returnValue > 0)
+                {
+                    return returnValue;
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (Exception e)
             {
-
                 return 0;
             }
         }
@@ -80,7 +80,6 @@ namespace MITJobTracker.Services
         {
             throw new NotImplementedException();
         }
-
     }
 
 

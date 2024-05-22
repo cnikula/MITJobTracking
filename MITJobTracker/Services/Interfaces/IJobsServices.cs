@@ -12,7 +12,7 @@
 // <summary>Interfaces Jobs Services Class CRUD operations</summary>
 // ***********************************************************************
 
-
+using MITJobTracker.Data.DTOS;
 using MITJobTracker.Data;
 
 namespace MITJobTracker.Services.Interfaces
@@ -20,7 +20,7 @@ namespace MITJobTracker.Services.Interfaces
     public interface IJobsServices
     {
         Task<Job> GetJobById(int id);
-        Task<List<Job>> GetJobs();
+        Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList);
         Task<int> AddJob(Job job);
         Task<Job> UpdateJobById(Job job);
         Task<Job> DeleteJob(int id);

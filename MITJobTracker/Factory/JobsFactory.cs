@@ -13,6 +13,7 @@
 // ***********************************************************************
 
 using MITJobTracker.Data;
+using MITJobTracker.Data.DTOS;
 using MITJobTracker.Factory.Interfaces;
 using MITJobTracker.Services.Interfaces;
 
@@ -33,12 +34,12 @@ namespace MITJobTracker.Factory
             throw new NotImplementedException();
         }
 
-        public Task<List<Job>> GetJobs()
+        public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
-            throw new NotImplementedException();
+           return await _jobsServices.GetJobList(searchValue, fullList);
         }
 
-        public async Task<int> AddJob(Job job)
+       public async Task<int> AddJob(Job job)
         {
             if (job is null) throw new ArgumentNullException(nameof(job));
             return await _jobsServices.AddJob(job);

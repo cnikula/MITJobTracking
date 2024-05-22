@@ -14,13 +14,14 @@
 
 
 using MITJobTracker.Data;
+using MITJobTracker.Data.DTOS;
 
 namespace MITJobTracker.Factory.Interfaces
 {
     public interface IJobsFactory
     {
         Task<Job> GetJobById(int id);
-        Task<List<Job>> GetJobs();
+        Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList);
         Task<int> AddJob(Job job);
         Task<Job> UpdateJobById(Job job);
         Task<Job> DeleteJob(int id);
