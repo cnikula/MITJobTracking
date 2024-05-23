@@ -36,7 +36,6 @@ namespace MITJobTracker.Data
 
         public virtual DbSet<Job> Jobs { get; set; }
         public virtual DbSet<Interview> Interviews { get; set; }
-        public virtual DbSet<ProspectListDTO> ProspectListDTO { get; set; }
 
         public void OnModelCreating(ModelBuilder modelBuilder)
         {

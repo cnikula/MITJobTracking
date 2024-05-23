@@ -32,6 +32,8 @@ namespace MITJobTracker.Services
             _commonSP = new CommonSP(configuration);
         }
 
+       
+        
         public Task<Job> GetJobById(int id)
         {
             throw new NotImplementedException();
@@ -53,7 +55,10 @@ namespace MITJobTracker.Services
 
             try
             {
+                //_context.Entry(job).State = EntityState.Added;
+
                 _context.Jobs.Add(job);
+                
                 returnValue = await _context.SaveChangesAsync();
 
                 if (returnValue > 0)
@@ -67,6 +72,8 @@ namespace MITJobTracker.Services
             }
             catch (Exception e)
             {
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
                 return 0;
             }
         }
