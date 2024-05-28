@@ -1,4 +1,5 @@
 ﻿@page "/viewJobProspect"
+@using System.Dynamic
 @inject IJobsFactory JobsFactory
 
 <PageTitle>View Job Prospect</PageTitle>
@@ -13,14 +14,92 @@
 <br/>
 
 <body>
-    <div class="row">
-        <SfGrid DataSource="@rospectListDTO" />
+<div class="row">
+    <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle">
+        <GridPageSettings PageSize="10"></GridPageSettings>
+        <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
+        <GridColumns>
+            <GridColumn Field="@nameof(ProspectListDTO.JobNo)"
+                        HeaderText="Job No"
+                        TextAlign="TextAlign.Center"
+                        Width="120">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.JobTitle)"
+                        HeaderText="Job Title"
+                        TextAlign="TextAlign.Center"
+                        Width="150">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.DateApplied)"
+                        HeaderText="Date Applied"
+                        TextAlign="TextAlign.Right"
+                        Format="d"
+                        Type="ColumnType.Date"
+                        Width="100">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.Status)"
+                        HeaderText="Status"
+                        TextAlign="TextAlign.Center"
+                        Width="120">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.JobLocation)"
+                        HeaderText="Job Location"
+                        TextAlign="TextAlign.Center"
+                        Width="150">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
+                        HeaderText="Recruiting Agencyn"
+                        TextAlign="TextAlign.Center"
+                        Width="150">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.RecruitertName)"
+                        HeaderText="Recruitert Name"
+                        TextAlign="TextAlign.Left"
+                        Width="150">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
+                        HeaderText="Recruitert Phone No."
+                        TextAlign="TextAlign.Left"
+                        Width="150">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
+                        HeaderText="Recruitert EMail"
+                        TextAlign="TextAlign.Left"
+                        Width="225">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.InterviewDate)"
+                        HeaderText="Interview Date"
+                        TextAlign="TextAlign.Center"
+                        Format="d"
+                        Type="ColumnType.Date"
+                        Width="100">
+            </GridColumn>
+            <GridColumn Field="@nameof(ProspectListDTO.InterviewType)"
+                        HeaderText="Interview Type"
+                        TextAlign="TextAlign.Right"
+                        Width="100">
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+<div>
+    <div>
+        <br/>
+        <br/>
     </div>
+    <div class="row">
+        <SfButtonGroup>
+            <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
+                <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
+            <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
+        </SfButtonGroup>
+    </div>
+    
+</div>
 </body>
 
 
 @code {
-    protected List<ProspectListDTO> rospectListDTO { get; set; }
+    protected List<ProspectListDTO> prospectListDTO { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,13 +110,23 @@
     {
         try
         {
-            rospectListDTO = (await JobsFactory.GetJobList(sreachVlaude, fullList)).ToList();
+            prospectListDTO = (await JobsFactory.GetJobList(sreachVlaude, fullList)).ToList();
         }
         catch (InvalidCastException ex)
         {
             // Handle the DBNull exception here or object null reference exception (no record found)
             // You can assign a default value to rospectListDTO or handle the exception in a different way
-            rospectListDTO = new List<ProspectListDTO>();
+            prospectListDTO = new List<ProspectListDTO>();
         }
     }
+
+    protected void QueryCellInfoHandler(QueryCellInfoEventArgs<ProspectListDTO> args)
+    {
+        if (args.Column.Field == nameof(ProspectListDTO.Status) && args.Data.Status == "Expired")
+        {
+            args.Cell.AddClass(new string[] { "mit-e-attr" });
+        }
+    }
+
+    
 }

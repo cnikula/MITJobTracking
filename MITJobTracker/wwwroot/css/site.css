@@ -246,3 +246,16 @@ a, .btn-link {
     color: blue;
     font-family: sans-serif !important;
 }
+
+/*custome datagrid cell style*/
+.mit-e-attr {
+    background: red;
+    font-family: "Bell MT";
+    color: yellow;
+    font-size: 5px;
+}
+
+.mit-d-attr {
+    font-family: "Bell MT";
+    font-size: 10px;
+}
