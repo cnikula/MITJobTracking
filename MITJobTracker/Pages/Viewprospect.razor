@@ -14,6 +14,18 @@
 <br/>
 
 <body>
+
+<div class="row">
+    <div class="form-group mb-3">
+        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+            <SfTextBox Placeholder="Entert your search" Width="500px" @bind-Value="searchValue"></SfTextBox>
+                &nbsp;
+            <SfIcon Name="IconName.Search" Size="IconSize.Large" Title="Search" @onclick="doSearch"></SfIcon>
+        </div>
+    </div>
+
+</div>
+
 <div class="row">
     <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle">
         <GridPageSettings PageSize="10"></GridPageSettings>
@@ -89,18 +101,41 @@
     <div class="row">
         <SfButtonGroup>
             <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
-                <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
+            &nbsp;&nbsp;
+            <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
+            &nbsp;&nbsp;
             <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
         </SfButtonGroup>
     </div>
-    
+
 </div>
+
+<div id="addJob">
+    <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
+        <DialogTemplates>
+            <Header> @dialogHeader</Header>
+            <Content>
+                <div class="mit-dialog-content"></div>
+                <spam class="mit-dialogText">@dialogText</spam>
+            </Content>
+        </DialogTemplates>
+    </SfDialog>
+</div>
+
 </body>
 
 
 @code {
+
+    protected string searchValue = string.Empty;
+    protected bool Visibility { get; set; } = false;
+    protected string dialogText = "No Match Found";
+    protected string dialogHeader = "Database Search";
+
     protected List<ProspectListDTO> prospectListDTO { get; set; }
 
+   
+    
     protected override async Task OnInitializedAsync()
     {
         await PpopulateGrid("N/A", true);
@@ -128,5 +163,19 @@
         }
     }
 
-    
+   protected void doSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(searchValue))
+        {
+            PpopulateGrid(searchValue, false);
+        }
+        else
+        {
+            dialogText = "Please enter a search value";
+            Visibility = true;
+        }
+        
+    }
+
+
 }
