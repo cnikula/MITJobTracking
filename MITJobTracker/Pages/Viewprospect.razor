@@ -10,117 +10,119 @@
     </div>
 </div>
 
-<br/>
-<br/>
+<br />
+<br />
 
 <body>
 
-<div class="row">
-    <div class="form-group mb-3">
-        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
-            <SfTextBox Placeholder="Entert your search" Width="500px" @bind-Value="searchValue"></SfTextBox>
-                &nbsp;
-            <SfIcon Name="IconName.Search" Size="IconSize.Large" Title="Search" @onclick="doSearch"></SfIcon>
-        </div>
-    </div>
-
-</div>
-
-<div class="row">
-    <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle">
-        <GridPageSettings PageSize="10"></GridPageSettings>
-        <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
-        <GridColumns>
-            <GridColumn Field="@nameof(ProspectListDTO.JobNo)"
-                        HeaderText="Job No"
-                        TextAlign="TextAlign.Center"
-                        Width="120">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.JobTitle)"
-                        HeaderText="Job Title"
-                        TextAlign="TextAlign.Center"
-                        Width="150">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.DateApplied)"
-                        HeaderText="Date Applied"
-                        TextAlign="TextAlign.Right"
-                        Format="d"
-                        Type="ColumnType.Date"
-                        Width="100">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.Status)"
-                        HeaderText="Status"
-                        TextAlign="TextAlign.Center"
-                        Width="120">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.JobLocation)"
-                        HeaderText="Job Location"
-                        TextAlign="TextAlign.Center"
-                        Width="150">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
-                        HeaderText="Recruiting Agencyn"
-                        TextAlign="TextAlign.Center"
-                        Width="150">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.RecruitertName)"
-                        HeaderText="Recruitert Name"
-                        TextAlign="TextAlign.Left"
-                        Width="150">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
-                        HeaderText="Recruitert Phone No."
-                        TextAlign="TextAlign.Left"
-                        Width="150">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
-                        HeaderText="Recruitert EMail"
-                        TextAlign="TextAlign.Left"
-                        Width="225">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.InterviewDate)"
-                        HeaderText="Interview Date"
-                        TextAlign="TextAlign.Center"
-                        Format="d"
-                        Type="ColumnType.Date"
-                        Width="100">
-            </GridColumn>
-            <GridColumn Field="@nameof(ProspectListDTO.InterviewType)"
-                        HeaderText="Interview Type"
-                        TextAlign="TextAlign.Right"
-                        Width="100">
-            </GridColumn>
-        </GridColumns>
-    </SfGrid>
-</div>
-<div>
-    <div>
-        <br/>
-        <br/>
-    </div>
     <div class="row">
-        <SfButtonGroup>
-            <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
-            &nbsp;&nbsp;
-            <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
-            &nbsp;&nbsp;
-            <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
-        </SfButtonGroup>
+        <div class="form-group mb-3">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Entert your search, JobNo, Job Title, Satus, Job Loc" Width="500px" @bind-Value="searchValue" @onkeypress="EnterKey"></SfTextBox>
+                &nbsp;
+                <SfIcon Name="IconName.Search" Size="IconSize.Large" Title="Search" @onclick="DoSearch"></SfIcon>
+                &nbsp;
+                <SfIcon Name="IconName.CircleRemove" Size="IconSize.Large" Title="Clear" @onclick="ClearSearch"></SfIcon>
+            </div>
+        </div>
+
     </div>
 
-</div>
+    <div class="row">
+        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle">
+            <GridPageSettings PageSize="10"></GridPageSettings>
+            <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field="@nameof(ProspectListDTO.JobNo)"
+                            HeaderText="Job No"
+                            TextAlign="TextAlign.Center"
+                            Width="120">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.JobTitle)"
+                            HeaderText="Job Title"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.DateApplied)"
+                            HeaderText="Date Applied"
+                            TextAlign="TextAlign.Right"
+                            Format="d"
+                            Type="ColumnType.Date"
+                            Width="100">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.Status)"
+                            HeaderText="Status"
+                            TextAlign="TextAlign.Center"
+                            Width="120">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.JobLocation)"
+                            HeaderText="Job Location"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
+                            HeaderText="Recruiting Agencyn"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruitertName)"
+                            HeaderText="Recruitert Name"
+                            TextAlign="TextAlign.Left"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
+                            HeaderText="Recruitert Phone No."
+                            TextAlign="TextAlign.Left"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
+                            HeaderText="Recruitert EMail"
+                            TextAlign="TextAlign.Left"
+                            Width="225">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.InterviewDate)"
+                            HeaderText="Interview Date"
+                            TextAlign="TextAlign.Center"
+                            Format="d"
+                            Type="ColumnType.Date"
+                            Width="100">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.InterviewType)"
+                            HeaderText="Interview Type"
+                            TextAlign="TextAlign.Right"
+                            Width="100">
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+    <div>
+        <div>
+            <br />
+            <br />
+        </div>
+        <div class="row">
+            <SfButtonGroup>
+                <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
+                &nbsp;&nbsp;
+                <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
+                &nbsp;&nbsp;
+                <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
+            </SfButtonGroup>
+        </div>
 
-<div id="addJob">
-    <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
-        <DialogTemplates>
-            <Header> @dialogHeader</Header>
-            <Content>
-                <div class="mit-dialog-content"></div>
-                <spam class="mit-dialogText">@dialogText</spam>
-            </Content>
-        </DialogTemplates>
-    </SfDialog>
-</div>
+    </div>
+
+    <div id="addJob">
+        <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
+            <DialogTemplates>
+                <Header> @dialogHeader</Header>
+                <Content>
+                    <div class="mit-dialog-content"></div>
+                    <spam class="mit-dialogText">@dialogText</spam>
+                </Content>
+            </DialogTemplates>
+        </SfDialog>
+    </div>
 
 </body>
 
@@ -134,8 +136,8 @@
 
     protected List<ProspectListDTO> prospectListDTO { get; set; }
 
-   
-    
+
+
     protected override async Task OnInitializedAsync()
     {
         await PpopulateGrid("N/A", true);
@@ -163,7 +165,7 @@
         }
     }
 
-   protected void doSearch()
+    protected void DoSearch()
     {
         if (!string.IsNullOrWhiteSpace(searchValue))
         {
@@ -174,7 +176,21 @@
             dialogText = "Please enter a search value";
             Visibility = true;
         }
-        
+
+    }
+
+    protected void ClearSearch()
+    {
+        searchValue = string.Empty;
+        PpopulateGrid("N/A", true);
+    }
+
+    protected void EnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            DoSearch();
+        }
     }
 
 
