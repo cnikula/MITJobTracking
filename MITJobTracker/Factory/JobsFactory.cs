@@ -54,6 +54,13 @@ namespace MITJobTracker.Factory
         {
             throw new NotImplementedException();
         }
+
+        public Task RemoveExpiredJobsAsync(List<int> jobIds)
+        {
+            if (jobIds is null) throw new ArgumentNullException(nameof(jobIds));
+
+            throw new NotImplementedException();
+        }
     }
 
     

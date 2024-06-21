@@ -25,5 +25,6 @@ namespace MITJobTracker.Factory.Interfaces
         Task<int> AddJob(Job job);
         Task<Job> UpdateJobById(Job job);
         Task<Job> DeleteJob(int id);
+        Task RemoveExpiredJobsAsync(List<int> jobIds);
     }
 }

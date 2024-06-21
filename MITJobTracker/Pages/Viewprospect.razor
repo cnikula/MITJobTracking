@@ -193,5 +193,27 @@
         }
     }
 
+    protected async Task RemoveExpired()
+    {
+        int expired = 0;        // Count the number of expired jobs
+
+        List<int> jobIdList = new List<int>();
+        foreach (var item in prospectListDTO)
+        {
+            if (item.Status == "Expired")
+            {
+                expired++;
+                jobIdList.Add(item.JobId);
+            }
+        }
+
+        if (jobIdList.Count >= 1)
+        {
+           
+        }
+
+        // Call the factory to remove the expired jobs
+    }
+
 
 }
