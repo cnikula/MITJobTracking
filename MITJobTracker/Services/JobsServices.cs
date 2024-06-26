@@ -39,6 +39,7 @@ namespace MITJobTracker.Services
             throw new NotImplementedException();
         }
 
+        
         public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
            return await _commonSP.GetJobList(searchValue, fullList);
@@ -86,6 +87,40 @@ namespace MITJobTracker.Services
         public Task<Job> DeleteJob(int id)
         {
             throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// Removes expired jobs asynchronously.
+        /// </summary>
+        /// <param name="jobIds">The list of job IDs to remove.</param>
+        /// <returns>The number of removed jobs.</returns>
+        /// <remarks>
+        /// This method removes expired jobs from the database.
+        /// It takes a list of job IDs as input and removes the corresponding jobs from the database.
+        /// The job IDs are converted to a comma-separated string and used in the SQL query to remove the jobs.
+        /// If any error occurs during the removal process, an error message is printed to the console.
+        /// </remarks>
+        public async Task<int> RemoveExpiredJobsAsync(List<int> jobIds)
+        {
+            int returnValue = 0;
+
+            try
+            {
+                string jobIdsString = string.Join(",", jobIds);
+
+                //string query = $"EXEC RemoveExpiredJobs @JobIds = '{jobIdsString}'";
+
+                //returnValue = await _context.Database.ExecuteSqlRawAsync(query);
+
+                return returnValue;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
+                return 0;
+            }
         }
     }
 

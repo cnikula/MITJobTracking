@@ -104,14 +104,15 @@
             <SfButtonGroup>
                 <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
                 &nbsp;&nbsp;
-                <ButtonGroupButton CssClass="e-success">Remove Expired</ButtonGroupButton>
+                <ButtonGroupButton @onclick="RemoveExpired" CssClass="e-success">Remove Expired</ButtonGroupButton>
                 &nbsp;&nbsp;
                 <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
             </SfButtonGroup>
         </div>
 
     </div>
-
+    
+    @* Display a status dialog window when New record add successfully or failed. Display no match is found in the database search *@
     <div id="addJob">
         <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
             <DialogTemplates>
@@ -143,6 +144,13 @@
         await PpopulateGrid("N/A", true);
     }
 
+
+    /// <summary>
+    /// Get a list of job prospects from the database and indicate the status of the job
+    /// </summary>
+    /// <param name="sreachVlaude"></param>
+    /// <param name="fullList"></param>
+    /// <returns>A list prospects</returns>
     protected async Task PpopulateGrid(string sreachVlaude, bool fullList)
     {
         try
@@ -157,6 +165,13 @@
         }
     }
 
+
+
+    /// <param name="args"></param>
+    /// <summary>
+    /// Handles the QueryCellInfo event and adds a CSS class to the cell if the status of the prospect is "Expired".
+    /// </summary>
+    /// <param name="args">The QueryCellInfoEventArgs containing information about the cell and the data.</param>
     protected void QueryCellInfoHandler(QueryCellInfoEventArgs<ProspectListDTO> args)
     {
         if (args.Column.Field == nameof(ProspectListDTO.Status) && args.Data.Status == "Expired")
@@ -165,6 +180,10 @@
         }
     }
 
+
+    /// <summary>
+    /// Re-PpopulateGrid the grid with the search value
+    /// </summary>
     protected void DoSearch()
     {
         if (!string.IsNullOrWhiteSpace(searchValue))
@@ -193,6 +212,11 @@
         }
     }
 
+
+    /// <summary>
+    /// Method for removing expired jobs from the database
+    /// </summary>
+    /// <returns></returns>
     protected async Task RemoveExpired()
     {
         int expired = 0;        // Count the number of expired jobs
@@ -209,10 +233,19 @@
 
         if (jobIdList.Count >= 1)
         {
-           
+            int result = await JobsFactory.RemoveExpiredJobsAsync(jobIdList);
+            if (result > 0)
+            {
+                dialogText = $"{expired} Expired Jobs Removed";
+                Visibility = true;
+            }
+            else
+            {
+                dialogText = "No Expired Jobs Found";
+                Visibility = true;
+            }
         }
-
-        // Call the factory to remove the expired jobs
+  
     }
 
 

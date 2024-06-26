@@ -55,11 +55,12 @@ namespace MITJobTracker.Factory
             throw new NotImplementedException();
         }
 
-        public Task RemoveExpiredJobsAsync(List<int> jobIds)
+
+        public async Task<int> RemoveExpiredJobsAsync(List<int> jobIds)
         {
             if (jobIds is null) throw new ArgumentNullException(nameof(jobIds));
 
-            throw new NotImplementedException();
+           return await  _jobsServices.RemoveExpiredJobsAsync(jobIds);
         }
     }
 
