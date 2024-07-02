@@ -109,9 +109,8 @@ namespace MITJobTracker.Services
             {
                 string jobIdsString = string.Join(",", jobIds);
 
-                //string query = $"EXEC RemoveExpiredJobs @JobIds = '{jobIdsString}'";
-
-                //returnValue = await _context.Database.ExecuteSqlRawAsync(query);
+                // Call the appropriate method to remove expired jobs using the jobIdsString
+                returnValue = await _commonSP.RemoveExpiredJobsByIdAsync(jobIdsString);
 
                 return returnValue;
             }

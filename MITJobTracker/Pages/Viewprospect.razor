@@ -29,7 +29,7 @@
     </div>
 
     <div class="row">
-        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle">
+        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle" EnableStickyHeader="true">
             <GridPageSettings PageSize="10"></GridPageSettings>
             <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
             <GridColumns>
@@ -60,6 +60,11 @@
                             TextAlign="TextAlign.Center"
                             Width="150">
                 </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.CompanyName)"
+                            HeaderText="Company Name"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
                             HeaderText="Recruiting Agencyn"
                             TextAlign="TextAlign.Center"
@@ -72,12 +77,12 @@
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
                             HeaderText="Recruitert Phone No."
-                            TextAlign="TextAlign.Left"
+                            TextAlign="TextAlign.Center"
                             Width="150">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
                             HeaderText="Recruitert EMail"
-                            TextAlign="TextAlign.Left"
+                            TextAlign="TextAlign.Center"
                             Width="225">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.InterviewDate)"
@@ -87,11 +92,7 @@
                             Type="ColumnType.Date"
                             Width="100">
                 </GridColumn>
-                <GridColumn Field="@nameof(ProspectListDTO.InterviewType)"
-                            HeaderText="Interview Type"
-                            TextAlign="TextAlign.Right"
-                            Width="100">
-                </GridColumn>
+                
             </GridColumns>
         </SfGrid>
     </div>

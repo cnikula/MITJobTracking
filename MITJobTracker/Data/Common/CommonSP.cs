@@ -33,6 +33,13 @@ namespace MITJobTracker.Data.Common
 
 
 
+
+        /// <summary>
+        /// Retrieves a list of job prospects based on the search value and full list flag.
+        /// </summary>
+        /// <param name="searchValue">The search value to filter the job prospects.</param>
+        /// <param name="fullList">A flag indicating whether to retrieve the full list of job prospects.</param>
+        /// <returns>A list of ProspectListDTO objects representing the job prospects.</returns>
         public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
             if (string.IsNullOrWhiteSpace(searchValue)) throw new ArgumentNullException(nameof(searchValue));
@@ -78,7 +85,8 @@ namespace MITJobTracker.Data.Common
                                 RecruiterEmail = reader["RecruiterEmail"] != DBNull.Value ? reader["RecruiterEmail"].ToString() : null,
                                 InterviewId = reader["InterviewId"] != DBNull.Value ? Convert.ToInt32(reader["InterviewId"]) : 0,
                                 InterviewDate = reader["InterviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["InterviewDate"]) : DateTime.MinValue,
-                                InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null
+                                InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null,
+                                CompanyName = reader["CompanyName"] != DBNull.Value ? reader["CompanyName"].ToString() : null
 
                             };
 
@@ -89,6 +97,47 @@ namespace MITJobTracker.Data.Common
                 }
             }
             return dt;
+        }
+
+        public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds)
+        {
+            //RemoveExpiredJobsByIdAsync
+            if (string.IsNullOrWhiteSpace(jobIds)) throw new ArgumentNullException(nameof(jobIds));
+
+            int returnValue = 0;
+
+            await using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                if (con.State != ConnectionState.Open)
+                {
+                    throw new Exception("Connection to database failed.");
+                }
+
+                await using (SqlCommand command = new SqlCommand("dbo.sp_SoftDeleteJobs", con))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@JobIds", jobIds);
+                    command.Parameters.AddWithValue("@UserId", "CNikula");
+
+                    await using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        // check if reader has rows
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                returnValue = reader["ReturnValue"] != DBNull.Value ? Convert.ToInt32(reader["ReturnValue"]) : 0;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            return returnValue;
+
         }
     }
 }
