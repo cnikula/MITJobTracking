@@ -99,45 +99,57 @@ namespace MITJobTracker.Data.Common
             return dt;
         }
 
+
+
+        /// <summary>
+        /// Removes expired jobs from the database based on the provided job IDs.
+        /// </summary>
+        /// <param name="jobIds">The IDs of the jobs to be removed.</param>
+        /// <returns>The number of jobs that were successfully removed.</returns>
+        /// <remarks>jobIds is a list of comma seprated of ID's</remarks>
         public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds)
         {
-            //RemoveExpiredJobsByIdAsync
+            // Check if jobIds is null or empty
             if (string.IsNullOrWhiteSpace(jobIds)) throw new ArgumentNullException(nameof(jobIds));
 
             int returnValue = 0;
 
+            // Open a connection to the database
             await using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
 
+                // Check if the connection is open
                 if (con.State != ConnectionState.Open)
                 {
                     throw new Exception("Connection to database failed.");
                 }
 
+                // Create a new SqlCommand to call the stored procedure
                 await using (SqlCommand command = new SqlCommand("dbo.sp_SoftDeleteJobs", con))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@JobIds", jobIds);
                     command.Parameters.AddWithValue("@UserId", "CNikula");
 
+                    // Execute the command and retrieve the results
                     await using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        // check if reader has rows
+                        // Check if the reader has rows
                         if (reader.HasRows)
                         {
                             while (reader.Read())
                             {
-                                returnValue = reader["ReturnValue"] != DBNull.Value ? Convert.ToInt32(reader["ReturnValue"]) : 0;
+                                // Retrieve the return value from the reader
+                                returnValue = reader["DeletedCount"] != DBNull.Value ? Convert.ToInt32(reader["DeletedCount"]) : 0;
                             }
                         }
-
                     }
                 }
             }
 
+            // Return the number of jobs that were successfully removed
             return returnValue;
-
         }
     }
 }
