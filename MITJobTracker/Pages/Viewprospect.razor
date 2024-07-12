@@ -1,0 +1,254 @@
+﻿@page "/viewJobProspect"
+@using System.Dynamic
+@inject IJobsFactory JobsFactory
+
+<PageTitle>View Job Prospect</PageTitle>
+
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">Job Prospect Listing</h3>
+    </div>
+</div>
+
+<br />
+<br />
+
+<body>
+
+    <div class="row">
+        <div class="form-group mb-3">
+            <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                <SfTextBox Placeholder="Entert your search, JobNo, Job Title, Satus, Job Loc" Width="500px" @bind-Value="searchValue" @onkeypress="EnterKey"></SfTextBox>
+                &nbsp;
+                <SfIcon Name="IconName.Search" Size="IconSize.Large" Title="Search" @onclick="DoSearch"></SfIcon>
+                &nbsp;
+                <SfIcon Name="IconName.CircleRemove" Size="IconSize.Large" Title="Clear" @onclick="ClearSearch"></SfIcon>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle" EnableStickyHeader="true">
+            <GridPageSettings PageSize="10"></GridPageSettings>
+            <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
+            <GridColumns>
+                <GridColumn Field="@nameof(ProspectListDTO.JobNo)"
+                            HeaderText="Job No"
+                            TextAlign="TextAlign.Center"
+                            Width="120">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.JobTitle)"
+                            HeaderText="Job Title"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.DateApplied)"
+                            HeaderText="Date Applied"
+                            TextAlign="TextAlign.Right"
+                            Format="d"
+                            Type="ColumnType.Date"
+                            Width="100">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.Status)"
+                            HeaderText="Status"
+                            TextAlign="TextAlign.Center"
+                            Width="120">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.JobLocation)"
+                            HeaderText="Job Location"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.CompanyName)"
+                            HeaderText="Company Name"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
+                            HeaderText="Recruiting Agencyn"
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruitertName)"
+                            HeaderText="Recruitert Name"
+                            TextAlign="TextAlign.Left"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
+                            HeaderText="Recruitert Phone No."
+                            TextAlign="TextAlign.Center"
+                            Width="150">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
+                            HeaderText="Recruitert EMail"
+                            TextAlign="TextAlign.Center"
+                            Width="225">
+                </GridColumn>
+                <GridColumn Field="@nameof(ProspectListDTO.InterviewDate)"
+                            HeaderText="Interview Date"
+                            TextAlign="TextAlign.Center"
+                            Format="d"
+                            Type="ColumnType.Date"
+                            Width="100">
+                </GridColumn>
+                
+            </GridColumns>
+        </SfGrid>
+    </div>
+    <div>
+        <div>
+            <br />
+            <br />
+        </div>
+        <div class="row">
+            <SfButtonGroup>
+                <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
+                &nbsp;&nbsp;
+                <ButtonGroupButton @onclick="RemoveExpired" CssClass="e-success">Remove Expired</ButtonGroupButton>
+                &nbsp;&nbsp;
+                <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
+            </SfButtonGroup>
+        </div>
+
+    </div>
+    
+    @* Display a status dialog window when New record add successfully or failed. Display no match is found in the database search *@
+    <div id="addJob">
+        <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
+            <DialogTemplates>
+                <Header> @dialogHeader</Header>
+                <Content>
+                    <div class="mit-dialog-content"></div>
+                    <spam class="mit-dialogText">@dialogText</spam>
+                </Content>
+            </DialogTemplates>
+        </SfDialog>
+    </div>
+
+</body>
+
+
+@code {
+
+    protected string searchValue = string.Empty;
+    protected bool Visibility { get; set; } = false;
+    protected string dialogText = "No Match Found";
+    protected string dialogHeader = "Database Search";
+
+    protected List<ProspectListDTO> prospectListDTO { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PpopulateGrid("N/A", true);
+    }
+
+
+    /// <summary>
+    /// Get a list of job prospects from the database and indicate the status of the job
+    /// </summary>
+    /// <param name="sreachVlaude"></param>
+    /// <param name="fullList"></param>
+    /// <returns>A list prospects</returns>
+    protected async Task PpopulateGrid(string sreachVlaude, bool fullList)
+    {
+        try
+        {
+            prospectListDTO = (await JobsFactory.GetJobList(sreachVlaude, fullList)).ToList();
+        }
+        catch (InvalidCastException ex)
+        {
+            // Handle the DBNull exception here or object null reference exception (no record found)
+            // You can assign a default value to rospectListDTO or handle the exception in a different way
+            prospectListDTO = new List<ProspectListDTO>();
+        }
+    }
+
+
+
+    /// <param name="args"></param>
+    /// <summary>
+    /// Handles the QueryCellInfo event and adds a CSS class to the cell if the status of the prospect is "Expired".
+    /// </summary>
+    /// <param name="args">The QueryCellInfoEventArgs containing information about the cell and the data.</param>
+    protected void QueryCellInfoHandler(QueryCellInfoEventArgs<ProspectListDTO> args)
+    {
+        if (args.Column.Field == nameof(ProspectListDTO.Status) && args.Data.Status == "Expired")
+        {
+            args.Cell.AddClass(new string[] { "mit-e-attr" });
+        }
+    }
+
+
+    /// <summary>
+    /// Re-PpopulateGrid the grid with the search value
+    /// </summary>
+    protected void DoSearch()
+    {
+        if (!string.IsNullOrWhiteSpace(searchValue))
+        {
+            PpopulateGrid(searchValue, false);
+        }
+        else
+        {
+            dialogText = "Please enter a search value";
+            Visibility = true;
+        }
+
+    }
+
+    protected void ClearSearch()
+    {
+        searchValue = string.Empty;
+        PpopulateGrid("N/A", true);
+    }
+
+    protected void EnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            DoSearch();
+        }
+    }
+
+
+    /// <summary>
+    /// Method for removing expired jobs from the database
+    /// </summary>
+    /// <returns></returns>
+    protected async Task RemoveExpired()
+    {
+        int expired = 0;        // Count the number of expired jobs
+
+        List<int> jobIdList = new List<int>();
+        foreach (var item in prospectListDTO)
+        {
+            if (item.Status == "Expired")
+            {
+                expired++;
+                jobIdList.Add(item.JobId);
+            }
+        }
+
+        if (jobIdList.Count >= 1)
+        {
+            int result = await JobsFactory.RemoveExpiredJobsAsync(jobIdList);
+            if (result > 0)
+            {
+                dialogText = $"{expired} Expired Jobs Removed";
+                Visibility = true;
+                await PpopulateGrid("N/A", true);
+            }
+            else
+            {
+                dialogText = "No Expired Jobs Found";
+                Visibility = true;
+            }
+        }
+  
+    }
+
+
+}

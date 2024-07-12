@@ -1,9 +1,246 @@
 ﻿@page "/"
+@inject IJobsFactory JobsFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Add Job</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">Welcome to the Job Tracker</h3>
+    </div>
+</div>
 
-Welcome to your new app.
+<div class="row">
+    <br />
+    <br/>
+</div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="row">
+    <div class="col">
+        <EditForm Model= "@JobModel" asp-page="Prospect" class="form">
+            <div class="form-group mb-3">
+                <label for="title">Job Title</label>
+                <label for="jobno" class="mitcustom-margin-left-350">Job No.</label>
+                <label for="dateApplied" class="mitcustom-margin-left-150">Date Applied</label>
+                <label for="resumeSendDate" class="mitcustom-margin-left-1">Date Resume SendDate</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="title" class="form-control mit-input-width-400" id="title" @bind-value="JobModel.JobTitle" />
+                    <ValidationMessage For="@(() => JobModel.JobTitle)" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="jobno" class="form-control mit-input-width-200" id="jobno" @bind-value="JobModel.JobNo" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="date" asp-for="dateApplied" class="form-control mit-input-width-200" id="date" name="dateApplied" @bind-value="JobModel.DateApplied" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="date" asp-for="resumeSendDate" class="form-control mit-input-width-200" id="date" name="resumeSendDate" @bind-value="JobModel.ResumeSendDate" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="location">Job Location</label>
+                <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
+                <label for="salary" class="mitcustom-margin-left-112">Salary</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="location" id="location" class="form-control mit-input-width-400" @bind-value="JobModel.JobLocation" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-width-200" @bind-value="JobModel.Duration" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-width-200" @bind-value="JobModel.Salary" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="hybridhoofdays" class="mitcustom-margin-left-250">Hybrid Days</label>
+                <label for="companyName" class="mitcustom-margin-left-116">Company Name</label>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="option1" name="option" @onchange="OnChaneRadioValue" value="remote" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option1">Remote</label>
+                    <span>&nbsp;&nbsp;</span>
+                   
+                    <input type="radio" id="option2" name="option" @onchange="OnChaneRadioValue" value="hybrid" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option2">Hybrid</label>
+                    <span>&nbsp;&nbsp;</span>
+                   
+                    <input type="radio" id="option3" name="option" @onchange="OnChaneRadioValue" value="onSite" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option3">On Site</label>
+                   
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-width-200" @bind-value="JobModel.HybridNoOfDays" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="companyName" id="companyName" class="form-control mit-input-width-400" @bind-value="JobModel.CompanyName" />
+
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="recruitingAgency">Recruiting Agency</label>
+                <label for="recruitingAgency" class="mitcustom-margin-left-280">Employment Type</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-width-400" @bind-value="JobModel.RecruitingAgency" />
+                    <span>&nbsp;&nbsp;</span>
+                    <div class="mit-control-wrapper col-lg-2 sb-property-border">
+                        <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))"/>
+                            <DropDownListFieldSettings Text="Text" Value="ID"/>
+                        </SfDropDownList>
+  
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="form-group mb-3">
+               <div class="col-lg-2 sb-property-border">
+                    <br/>
+                    <div>
+                        <div class="checkbox-control">
+                            <SfCheckBox @bind-Checked="@JobModel.SubContract" Label="SubContract"></SfCheckBox>
+                            <SfCheckBox @bind-Checked="@JobModel.ResumeSend" Label="ResumeSend"></SfCheckBox>
+                        </div>
+                    </div>
+                   
+                    <div class="form-group mb-3">
+                        <br/>
+                        <label for="requirements">Job Requirements</label>
+                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="on" @bind="@JobModel.Requirements"></textarea>
+                        <validationmessage for="@(() => JobModel.Requirements)" />
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <br />
+                        <label for="jobDescription">Job Description</label>
+                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="on" @bind="@JobModel.JobDescription"></textarea>
+                        <validationmessage for="@(() => JobModel.JobDescription)" />
+                    </div>
+               </div>
+            </div>
+            
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <label for="recruitertName">Recruiter Name</label>
+                <label for="recruiterPhone" class="mitcustom-margin-left-300">Recruiter Phone No</label>
+                <label for="recruiterEmail" class="mitcustom-margin-left-60">Recruiter Email</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="recruitertName" id="recruitertName" class="form-control mit-input-width-400" @bind-value="JobModel.RecruitertName" />
+                    <ValidationMessage For="@(() => JobModel.RecruitertName)" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="recruiterPhone" id="recruiterPhone" class="form-control mit-input-width-200" @bind-value="JobModel.RecruiterPhone" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="recruiterEmail" id="recruiterEmail" class="form-control mit-input-width-400" @bind-value="JobModel.RecruiterEmail" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <SfButton CssClass="e-primary" @onclick="SaveToDBC">Save To Database</SfButton>
+                <SfButton CssClass="e-success" @onclick="AddNew">Add New</SfButton>
+            </div>
+           
+            <div id="addJob">
+               <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="Visibility" AllowPrerender="true" IsModal="true">
+                    <DialogTemplates>
+                        <Header> @dialogHeader</Header>
+                        <Content>
+                            <div class="mit-dialog-content"></div>
+                            <spam class="mit-dialogText">@dialogText</spam>
+                        </Content>
+                    </DialogTemplates>
+                </SfDialog>
+            </div>
+     
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    protected Job JobModel { get; set; } = new Job();
+    protected string selectJobType;
+    protected bool isChecked = true;
+    protected bool isDisabledChecked = false;
+    protected bool Visibility { get; set; } = false;
+    protected string dialogText = "Job Record was added successfully";
+    protected string dialogHeader = "Database Update";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+    // Hardcoded list of job types
+    List<EmploymentType>jobTypes = new List<EmploymentType>
+    {
+        new EmploymentType { Id = "fullTime", Text = "Full Time" },
+        new EmploymentType { Id = "partTime", Text = "Part Time" },
+        new EmploymentType { Id = "contract", Text = "Contract" },
+        new EmploymentType { Id = "internship", Text = "Internship" },
+        new EmploymentType { Id = "temporary", Text = "Temporary" },
+        new EmploymentType { Id = "freelance", Text = "Freelance" }
+    };
+
+
+    protected void OnSelectJobType(string e)
+    {
+        JobModel.EmploymentType = e;
+    }
+
+    protected async Task SaveToDBC()
+    {
+        int returnValue = 0;
+
+        if (!string.IsNullOrWhiteSpace(JobModel.ResumeSendDate.ToString()))
+        {
+            JobModel.ResumeSend = true;
+        }
+
+        // Save to database
+        returnValue = await JobsFactory.AddJob(JobModel);
+
+        if (returnValue > 0)
+        {
+            Visibility = true;
+            AddNew();
+            StateHasChanged();
+        }
+        else
+        {
+            dialogText = "Job Record was not added successfully";
+            Visibility = true;
+        }
+
+    }
+
+    protected void AddNew()
+    {
+        JobModel = new Job();
+    }
+
+    protected void OnChaneRadioValue(ChangeEventArgs e)
+    {
+        if (e.Value.ToString() == "onSite")
+        {
+            JobModel.OnSite = true;
+            JobModel.Hybrid = false;
+            JobModel.Remote = false;
+        }
+        else if (e.Value.ToString() == "hybrid")
+        {
+            JobModel.OnSite = false;
+            JobModel.Hybrid = true;
+            JobModel.Remote = false;
+        }
+        else if (e.Value.ToString() == "remote")
+        {
+            JobModel.OnSite = false;
+            JobModel.Hybrid = false;
+            JobModel.Remote = true;
+        }
+    }
+
+    
+
+
+
+}
+
+

@@ -1,4 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// ***********************************************************************
+// Assembly         : MITJobTracker
+// Author           : techn
+// Created          : 03-13-2024
+//
+// Last Modified By : techn
+// Last Modified On : 04-24-2024
+// ***********************************************************************
+// <copyright file="Job.cs" company="MITJobTracker">
+//     Copyright (c) . All rights reserved.
+// </copyright>
+// <summary>POKO Data class</summary>
+// ***********************************************************************
+
+
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data.Common;
@@ -13,6 +28,11 @@ namespace MITJobTracker.Data
             Hybrid = false;
             SubContract = false;
             ResumeSend = false;
+            OnSite = false;
+            DateApplied = DateTime.Now;
+            JobNo = "0";
+            Salary = "0";
+            Duration = "N/A";
         }
 
         [Comment("Table primary key")]
@@ -49,8 +69,8 @@ namespace MITJobTracker.Data
 
         [Comment("Recruiter Phone, the agency person you are communicating with phone number.")]
         [DataMember]
-        [MaxLength(15)]
-        public string RecruiterPhone { get; set; }
+        [MaxLength(50)]
+        public string? RecruiterPhone { get; set; }
 
         [Comment("Recruiter Email, the agency person you are communicating with email.")]
         [DataMember]
@@ -75,6 +95,10 @@ namespace MITJobTracker.Data
         [DataMember]
         public bool Hybrid { get; set; }
 
+        [Comment("OnSite, if the job is on site.")]
+        [DataMember]
+        public bool OnSite { get; set; }
+
         [Comment("Hybrid No Of Days, how may days on-site")]
         [DataMember]
         [MaxLength(25)]
@@ -90,11 +114,16 @@ namespace MITJobTracker.Data
         [MaxLength(75)]
         public string? Salary { get; set; }
 
-        [Comment("Employment Type, W2, 1099 Part-Time, Full-Time.")]
+        [Comment("Employment Type, W2, 1099, Part-Time, Full-Time.")]
         [DataMember]
         [MaxLength(25)]
         [Required(ErrorMessage = "Employment Type is required")]
         public string EmploymentType { get; set; }
+
+        [Comment("Duration, how long the job is for.")]
+        [DataMember]
+        [MaxLength(25)]
+        public string? Duration { get; set; }
 
         [Comment("Sub-Contract, if you contract through another company. Example Head-hunter")]
         [DataMember]
@@ -104,9 +133,13 @@ namespace MITJobTracker.Data
         [DataMember]
         public bool ResumeSend { get; set; }
 
-        [Comment("Resume Send Date, the date you send the resume out")]
+        [Comment("Resume Send Date, the date you send the resume out or applied for the job. If resume send then ResumeSend is set to 1 (true)")]
         [DataMember]
         public DateTime? ResumeSendDate { get; set; }
+
+        [Comment("DateApplied, the date you Applied for the job or send bid.")]
+        [DataMember]
+        public DateTime DateApplied { get; set; }
 
         //Table Relationship 
         public virtual ICollection<Interview> Interviews { get; set; }

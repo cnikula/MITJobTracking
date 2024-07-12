@@ -66,3 +66,196 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+/***************************The following styles are UD specific***********************/
+
+.mitsidebar {
+    background-color: #44689e;
+}
+
+       /***** Margin *******/
+.mitcustom-margin-left-900 {
+    margin-left: 900px;
+}
+
+.mitcustom-margin-left-600 {
+    margin-left: 600px;
+}
+
+.mitcustom-margin-left-420 {
+    margin-left: 420px;
+}
+
+
+.mitcustom-margin-left-314 {
+    margin-left: 314px;
+}
+
+.mitcustom-margin-left-300 {
+    margin-left: 300px;
+}
+
+.mitcustom-margin-left-350 {
+    margin-left: 350px;
+}
+
+.mitcustom-margin-left-280 {
+    margin-left: 280px;
+}
+
+.mitcustom-margin-left-250{
+    margin-left: 250px;
+}
+
+.mitcustom-margin-left-200 {
+    margin-left: 200px;
+}
+
+.mitcustom-margin-left-175 {
+    margin-left: 175px;
+}
+
+.mitcustom-margin-left-160 {
+    margin-left: 160px;
+}
+
+.mitcustom-margin-left-150 {
+    margin-left: 150px;
+}
+
+.mitcustom-margin-left-112 {
+    margin-left: 112px;
+}
+
+.mitcustom-margin-left-116 {
+    margin-left: 116px;
+}
+
+.mitcustom-margin-left-110 {
+    margin-left: 110px;
+}
+
+.mitcustom-margin-left-85 {
+    margin-left: 85px;
+}
+
+.mitcustom-margin-left-60 {
+    margin-left: 60px;
+}
+
+     /*mit input*/
+.mit-input-width-600 {
+    width: 600px;
+}
+
+.mit-input-width-800 {
+    width: 800px;
+}
+
+.mit-input-width-400 {
+    width: 400px;
+}
+
+.mit-input-width-200 {
+    width: 200px;
+}
+
+.mit-input-width-50 {
+    width: 50px;
+}
+
+.mit-dropdown {
+    width: 200px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.mit-control-section {
+    min-height: 370px;
+}
+
+.mit-control-wrapper {
+    max-width: 250px;
+    margin: 0;
+    padding: 0px 0px 0px;
+}
+
+.mit-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.mit-property-panel-section .mit-property-value {
+    padding: 5px 0px 10px;
+    font-size: 14px;
+}
+
+.mit-property-panel-content {
+    padding: 0px 0px 15px 0px;
+}
+
+.mit-property-panel-content:last-child {
+    padding: 0px 0px 40px 0px;
+}
+
+.mit-propertyTitle {
+    display: block;
+    text-transform: uppercase;
+    width: auto;
+}
+
+.mit-titleWrap {
+    display: inline-block;
+}
+
+.mit-propertyValue {
+    display: block;
+    width: auto;
+}
+
+.mit-valueWrap {
+    display: inline-block;
+}
+
+.mit-label-container {
+    display: flex;
+    justify-content: space-around; /* Adjust this according to your alignment preference */
+}
+
+.mit-label-norap {
+    white-space: nowrap; /* Prevents the text from wrapping */
+}
+
+.mit-text-ara {
+    width: 600px;
+    height: 150px;
+}
+
+.mit-dialog-content {
+    display: block;
+    font-size: 15px;
+    word-wrap: break-word;
+    text-align: center;
+    font-style: italic;
+    top: 16px;
+}
+
+.mit-dialogText {
+    background-color: #D3D3D3;
+    padding-right: 4px;
+    color: blue;
+    font-family: sans-serif !important;
+}
+
+/*custome datagrid cell style*/
+.mit-e-attr {
+    background: red;
+    font-family: "Bell MT";
+    color: yellow;
+    font-size: 5px;
+}
+
+.mit-d-attr {
+    font-family: "Bell MT";
+    font-size: 10px;
+}

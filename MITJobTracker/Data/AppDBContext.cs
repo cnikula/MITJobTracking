@@ -20,18 +20,29 @@
 // ***********************************************************************
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MITJobTracker.Data.DTOS;
 
 
 namespace MITJobTracker.Data
 {
     public class AppDBContext : DbContext
     {
+       // internal readonly object ProspectListDTOs;
+
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options)
         {
         }
 
         public virtual DbSet<Job> Jobs { get; set; }
         public virtual DbSet<Interview> Interviews { get; set; }
+
+        public void OnModelCreating(ModelBuilder modelBuilder)
+        {
+           modelBuilder.Entity<ProspectListDTO>().HasNoKey();
+        }
+
+
     }
 
 }
