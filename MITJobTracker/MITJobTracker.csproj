@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\MyTest.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <PrivateAssets>all</PrivateAssets>
@@ -18,7 +22,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
     <PackageReference Include="Syncfusion.Blazor.Buttons" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.DataForm" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Blazor.Grid" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Blazor.Inputs" Version="26.1.41" />
@@ -26,6 +32,18 @@
     <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Licensing" Version="26.1.41" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\MyTest.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\MyTest.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\MyTest.cshtml" />
   </ItemGroup>
 
 </Project>
