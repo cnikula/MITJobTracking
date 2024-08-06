@@ -17,7 +17,6 @@ namespace MITJobTracker.Data.DTOS
 {
     public class JobsInterviewDTO
     {
-
             public int JobId { get; set; }
             public string JobTitle { get; set; }
             public string JobNo { get; set; }
@@ -48,7 +47,48 @@ namespace MITJobTracker.Data.DTOS
             public string InterviewerEmail { get; set; }
             public string InterviewerNotes { get; set; }
             public string InterviewerResulte { get; set; }
-        
+
+        /// <summary>
+        /// Clones the JobsInterviewDTO object by value.
+        /// </summary>
+        /// <returns>A new instance of JobsInterviewDTO with the same property values as the original object.</returns>
+        public JobsInterviewDTO Clone()
+        {
+            return new JobsInterviewDTO
+            {
+                JobId = this.JobId,
+                JobTitle = this.JobTitle,
+                JobNo = this.JobNo,
+                DateApplied = this.DateApplied,
+                ResumeSendDate = this.ResumeSendDate,
+                JobLocation = this.JobLocation,
+                Duration = this.Duration,
+                Salary = this.Salary,
+                Remote = this.Remote,
+                Hybrid = this.Hybrid,
+                OnSite = this.OnSite,
+                HybridNoOfDays = this.HybridNoOfDays,
+                CompanyName = this.CompanyName,
+                RecruitingAgency = this.RecruitingAgency,
+                EmploymentType = this.EmploymentType,
+                SubContract = this.SubContract,
+                ResumeSend = this.ResumeSend,
+                Requirements = this.Requirements,
+                JobDescription = this.JobDescription,
+                RecruitertName = this.RecruitertName,
+                RecruiterPhone = this.RecruiterPhone,
+                RecruiterEmail = this.RecruiterEmail,
+                InterviewId = this.InterviewId,
+                InterviewDate = this.InterviewDate,
+                InterviewType = this.InterviewType,
+                InterviewerName = this.InterviewerName,
+                InterviewerPhone = this.InterviewerPhone,
+                InterviewerEmail = this.InterviewerEmail,
+                InterviewerNotes = this.InterviewerNotes,
+                InterviewerResulte = this.InterviewerResulte
+            };
+        }
+
 
     }
 }

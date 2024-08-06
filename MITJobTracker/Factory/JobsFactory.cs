@@ -16,6 +16,7 @@ using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Factory.Interfaces;
 using MITJobTracker.Services.Interfaces;
+using NuGet.Packaging.Signing;
 
 namespace MITJobTracker.Factory
 {
@@ -61,6 +62,12 @@ namespace MITJobTracker.Factory
             if (jobIds is null) throw new ArgumentNullException(nameof(jobIds));
 
            return await  _jobsServices.RemoveExpiredJobsAsync(jobIds);
+        }
+
+        public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
+        {
+            if (id == 0) throw new ArgumentNullException(nameof(id));
+            return await _jobsServices.GetJobInterviewById(id);
         }
     }
 

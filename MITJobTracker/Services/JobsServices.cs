@@ -18,6 +18,7 @@ using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
 using MITJobTracker.Data.Common;
+using System.Buffers;
 
 namespace MITJobTracker.Services
 {
@@ -119,6 +120,19 @@ namespace MITJobTracker.Services
                 Console.WriteLine("");
                 Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
                 return 0;
+            }
+        }
+
+        public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
+        {
+            try
+            {
+                return await _commonSP.GetJobInterviewById(id);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }

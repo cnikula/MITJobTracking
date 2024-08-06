@@ -80,7 +80,7 @@
                     <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-width-400" @bind-value="JobModel.RecruitingAgency" />
                     <span>&nbsp;&nbsp;</span>
                     <div class="mit-control-wrapper col-lg-2 sb-property-border">
-                        <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Job Site" DataSource="@jobTypes">
+                        <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Employment Type" DataSource="@jobTypes">
                             <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))"/>
                             <DropDownListFieldSettings Text="Text" Value="ID"/>
                         </SfDropDownList>
@@ -153,13 +153,13 @@
 
 @code {
 
-    protected Job JobModel { get; set; } = new Job();
+    private Job JobModel { get; set; } = new Job();
     protected string selectJobType;
     protected bool isChecked = true;
     protected bool isDisabledChecked = false;
     protected bool Visibility { get; set; } = false;
-    protected string dialogText = "Job Record was added successfully";
-    protected string dialogHeader = "Database Update";
+    private string dialogText = "Job Record was added successfully";
+    private string dialogHeader = "Database Update";
 
     protected override async Task OnInitializedAsync()
     {
@@ -179,7 +179,7 @@
     };
 
 
-    protected void OnSelectJobType(string e)
+    private void OnSelectJobType(string e)
     {
         JobModel.EmploymentType = e;
     }
@@ -215,7 +215,7 @@
         JobModel = new Job();
     }
 
-    protected void OnChaneRadioValue(ChangeEventArgs e)
+    private void OnChaneRadioValue(ChangeEventArgs e)
     {
         if (e.Value.ToString() == "onSite")
         {
