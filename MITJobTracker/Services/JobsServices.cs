@@ -19,6 +19,7 @@ using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
 using MITJobTracker.Data.Common;
 using System.Buffers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MITJobTracker.Services
 {
@@ -134,6 +135,30 @@ namespace MITJobTracker.Services
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public async Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
+        {
+            bool returnValue = false;
+
+            if (job && interview)
+            {
+                
+            }
+            else if (job && !interview)
+            {
+                
+            }
+            else if (interview && !job)
+            {
+                
+            }
+            else
+            {
+                returnValue = false;
+            }
+
+            return returnValue;
         }
     }
 

@@ -2,6 +2,7 @@
 @using System.Dynamic
 @using Microsoft.Identity.Client
 @using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq
 @inject IJobsFactory JobsFactory
 @inject NavigationManager NavigationManager
 
@@ -195,6 +196,7 @@
     private string dialogHeader = "Application Error";
     private bool visibility = false;
     private string selectedJobType = string.Empty;
+    private List<string> differences = new List<string>();
 
     List<EmploymentType>jobTypes = new List<EmploymentType>
     {
@@ -263,14 +265,36 @@
 
     protected async Task SaveToDBC()
     {
+        bool interview = false;
+        bool job = false;
+        
+
         if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
         {
-            
+            // Save the data to the database, eighter to the Jobs or Interview table or both.
+            interview = differences.Any(s => s.Contains("Interview", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("job", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("recruiter", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("CompanyName", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Remote", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Requirements", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Salary", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Employment", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("SubContract", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Resume", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("DateApplied", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("Duration", StringComparison.OrdinalIgnoreCase));
+            job = differences.Any(s => s.Contains("OnSite", StringComparison.OrdinalIgnoreCase));
+
+
+         var test =  await JobsFactory.UpdateJobAndInterview(JobsInterview, job, interview);
+
         }
         else
         {
-            dialogText = "No changes to save";
-            dialogHeader = "Save Warning";
+            dialogText = "There were no changes to save";
+            dialogHeader = "Saving Data";
             visibility = true;
         }
     }
@@ -281,11 +305,39 @@
     }
 
     
-    public bool AreObjectsEqual(JobsInterviewDTO obj1, JobsInterviewDTO obj2)
+    private bool AreObjectsEqual(JobsInterviewDTO obj1, JobsInterviewDTO obj2)
     {
         string json1 = JsonConvert.SerializeObject(obj1);
         string json2 = JsonConvert.SerializeObject(obj2);
+
+        if (json1 != json2)
+        {
+            GetObjectDifferences(json1, json2);
+        }
+
         return json1 == json2;
+    }
+
+
+    private void GetObjectDifferences(string json1, string json2)
+    {
+        
+        JObject jObject1 = JObject.Parse(json1);
+        JObject jObject2 = JObject.Parse(json2);
+
+        foreach (var property in jObject1.Properties())
+        {
+            var propertyName = property.Name;
+            var propertyValue1 = property.Value.ToString();
+            var propertyValue2 = jObject2[propertyName]?.ToString();
+
+            if (propertyValue1 != propertyValue2)
+            {
+                string difference = $"{propertyName}: {propertyValue1} (original) vs {propertyValue2} (modified)";
+                differences.Add(difference);
+            }
+        }
+  
     }
 
 

@@ -17,6 +17,7 @@ using MITJobTracker.Data.DTOS;
 using MITJobTracker.Factory.Interfaces;
 using MITJobTracker.Services.Interfaces;
 using NuGet.Packaging.Signing;
+using NuGet.Protocol;
 
 namespace MITJobTracker.Factory
 {
@@ -68,6 +69,15 @@ namespace MITJobTracker.Factory
         {
             if (id == 0) throw new ArgumentNullException(nameof(id));
             return await _jobsServices.GetJobInterviewById(id);
+        }
+
+        public Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
+        {
+            if (JobsInterview is null) throw new ArgumentNullException(nameof(JobsInterview));
+            if (job.ToString() is null) throw new ArgumentNullException(nameof(job));
+            if (interview.ToString() is null) throw new ArgumentNullException(nameof(interview));
+
+            return _jobsServices.UpdateJobAndInterview(JobsInterview, job, interview);
         }
     }
 

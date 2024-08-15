@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\MyTest.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <PrivateAssets>all</PrivateAssets>
@@ -33,18 +29,6 @@
     <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.41" />
     <PackageReference Include="Syncfusion.Licensing" Version="26.1.41" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Pages\MyTest.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\MyTest.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Pages\MyTest.cshtml" />
   </ItemGroup>
 
 </Project>
