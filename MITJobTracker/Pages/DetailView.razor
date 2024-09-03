@@ -267,28 +267,94 @@
     {
         bool interview = false;
         bool job = false;
+        bool returnValue = false;
         
 
         if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
         {
             // Save the data to the database, eighter to the Jobs or Interview table or both.
             interview = differences.Any(s => s.Contains("Interview", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("job", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("recruiter", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("CompanyName", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Remote", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Requirements", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Salary", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Employment", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("SubContract", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Resume", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("DateApplied", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("Duration", StringComparison.OrdinalIgnoreCase));
-            job = differences.Any(s => s.Contains("OnSite", StringComparison.OrdinalIgnoreCase));
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("job", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("recruiter", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("CompanyName", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Remote", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Requirements", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Salary", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Employment", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("SubContract", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Resume", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("DateApplied", StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Duration", StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("OnSite", StringComparison.OrdinalIgnoreCase));
+            }
 
 
-         var test =  await JobsFactory.UpdateJobAndInterview(JobsInterview, job, interview);
+            returnValue =  await JobsFactory.UpdateJobAndInterview(JobsInterview, job, interview);
+
+            if (!returnValue)
+            {
+                dialogText = "Saving to the Database failed";
+                dialogHeader = "Saving Data";
+                visibility = true;
+            }
+            else
+            {
+                dialogText = "Database was update successfully";
+                dialogHeader = "Saving Data";
+                visibility = true;
+            }
 
         }
         else
@@ -297,6 +363,9 @@
             dialogHeader = "Saving Data";
             visibility = true;
         }
+
+        StateHasChanged();
+
     }
 
     protected void Cancel()

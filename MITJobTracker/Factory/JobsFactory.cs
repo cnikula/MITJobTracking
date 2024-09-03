@@ -72,7 +72,7 @@ namespace MITJobTracker.Factory
         }
 
         public Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
-        {
+          {
             if (JobsInterview is null) throw new ArgumentNullException(nameof(JobsInterview));
             if (job.ToString() is null) throw new ArgumentNullException(nameof(job));
             if (interview.ToString() is null) throw new ArgumentNullException(nameof(interview));
