@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
-using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 
 

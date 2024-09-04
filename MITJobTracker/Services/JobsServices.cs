@@ -12,14 +12,10 @@
 // <summary>Jobs Services Class CRUD operations</summary>
 // ***********************************************************************
 
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
 using MITJobTracker.Data.Common;
-using System.Buffers;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MITJobTracker.Services
 {
@@ -136,8 +132,9 @@ namespace MITJobTracker.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
+                return null;
             }
         }
 

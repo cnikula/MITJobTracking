@@ -155,6 +155,13 @@ namespace MITJobTracker.Data.Common
             return returnValue;
         }
 
+        /// <summary>
+        /// Get detail data from Jobs and Interview tables
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
         {
             if (id == 0) throw new ArgumentNullException(nameof(id));

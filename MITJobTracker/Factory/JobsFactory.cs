@@ -16,8 +16,6 @@ using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Factory.Interfaces;
 using MITJobTracker.Services.Interfaces;
-using NuGet.Packaging.Signing;
-using NuGet.Protocol;
 
 namespace MITJobTracker.Factory
 {
