@@ -303,6 +303,56 @@ namespace MITJobTracker.Data.Common
 
             return returnValue;
         }
+
+        public async Task<int> DeleteJobById(int jobId)
+        {
+            int returnValue = 0;
+
+            try
+            {
+                Interview interviewEntity = await _context.Interviews
+                                    .Where(i => i.JobId == jobId)
+                                    .FirstOrDefaultAsync();
+
+                if (interviewEntity != null)
+                {
+                    // soft delete interview record
+                    interviewEntity.IsDeleted = true;
+                    interviewEntity.DeleteDate = DateTime.Now;
+                    interviewEntity.DeleteByID= "CNikula";
+                    interviewEntity.ModifiedById = "CNikula";
+                    interviewEntity.ModifiedDate = DateTime.Now;
+
+                    _context.Entry(interviewEntity).State = EntityState.Modified;
+                }
+
+                // Retrieve the existing Job entity
+                Job jobEntity = await _context.Jobs.FindAsync(jobId);
+
+                if (jobEntity != null)
+                {
+                    // soft delete job record
+                    jobEntity.IsDeleted = true;
+                    jobEntity.DeleteDate = DateTime.Now;
+                    jobEntity.DeleteByID = "CNikula";
+                    jobEntity.ModifiedById = "CNikula";
+                    jobEntity.ModifiedDate = DateTime.Now;
+
+                    _context.Entry(jobEntity).State = EntityState.Modified;
+                }
+
+                var countChangesAsync =  await _context.SaveChangesAsync();
+                returnValue = countChangesAsync;
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult}");
+                return 0;
+            }
+
+            return returnValue;
+        }
     }
 
 }

@@ -85,11 +85,7 @@ namespace MITJobTracker.Services
             throw new NotImplementedException();
         }
 
-        public Task<Job> DeleteJob(int id)
-        {
-            throw new NotImplementedException();
-        }
-
+       
 
         /// <summary>
         /// Removes expired jobs asynchronously.
@@ -188,6 +184,15 @@ namespace MITJobTracker.Services
             {
                 returnValue = false;
             }
+
+            return returnValue;
+        }
+
+        public async Task<int> DeleteJobAsysnc(int id)
+        {
+            int returnValue = 0;
+
+            returnValue = await efTableManagement.DeleteJobById(id);
 
             return returnValue;
         }

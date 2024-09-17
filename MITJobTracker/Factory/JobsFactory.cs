@@ -45,17 +45,7 @@ namespace MITJobTracker.Factory
             return await _jobsServices.AddJob(job);
         }
 
-        public Task<Job> UpdateJobById(Job job)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Job> DeleteJob(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-
+       
         public async Task<int> RemoveExpiredJobsAsync(List<int> jobIds)
         {
             if (jobIds is null) throw new ArgumentNullException(nameof(jobIds));
@@ -76,6 +66,12 @@ namespace MITJobTracker.Factory
             if (interview.ToString() is null) throw new ArgumentNullException(nameof(interview));
 
             return _jobsServices.UpdateJobAndInterview(JobsInterview, job, interview);
+        }
+
+        public async Task<int> DeleteJobAsync(int id)
+        {
+            if (id == 0 || string.IsNullOrEmpty(id.ToString())) throw new ArgumentNullException(nameof(id));
+            return await _jobsServices.DeleteJobAsysnc(id);
         }
     }
 

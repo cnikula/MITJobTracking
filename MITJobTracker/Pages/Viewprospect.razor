@@ -130,7 +130,7 @@
                 &nbsp;&nbsp;
                 <ButtonGroupButton @onclick="RemoveExpired" CssClass="e-success">Remove Expired</ButtonGroupButton>
                 &nbsp;&nbsp;
-                <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
+                <ButtonGroupButton @onclick="DeleteJob" CssClass="e-info">Delete</ButtonGroupButton>
             </SfButtonGroup>
         </div>
 
@@ -267,6 +267,30 @@
             }
         }
 
+    }
+
+    protected async Task DeleteJob()
+    {
+        if (recordKey > 0)
+        {
+            int result = await JobsFactory.DeleteJobAsync(recordKey);
+            if (result > 0)
+            {
+                dialogText = "Job Deleted";
+                Visibility = true;
+                await PpopulateGrid("N/A", true);
+            }
+            else
+            {
+                dialogText = "Job Not Deleted";
+                Visibility = true;
+            }
+        }
+        else
+        {
+            dialogText = "Please select a job to delete";
+            Visibility = true;
+        }
     }
 
     protected void GetDetailView()
