@@ -1,8 +1,4 @@
 ﻿@page "/viewJobProspect"
-@using System.Dynamic
-@using System.Security.Cryptography
-@using Microsoft.CodeAnalysis.CSharp.Syntax
-@using Microsoft.Data.SqlClient
 @inject IJobsFactory JobsFactory
 @inject NavigationManager NavigationManager
 
@@ -204,7 +200,7 @@
     /// <summary>
     /// Re-PpopulateGrid the grid with the search value
     /// </summary>
-    protected void DoSearch()
+    private void DoSearch()
     {
         if (!string.IsNullOrWhiteSpace(searchValue))
         {
@@ -218,7 +214,7 @@
 
     }
 
-    protected void ClearSearch()
+    private void ClearSearch()
     {
         searchValue = string.Empty;
         PpopulateGrid("N/A", true);
@@ -237,7 +233,7 @@
     /// Method for removing expired jobs from the database
     /// </summary>
     /// <returns></returns>
-    protected async Task RemoveExpired()
+    private async Task RemoveExpired()
     {
         int expired = 0;        // Count the number of expired jobs
 
@@ -269,7 +265,7 @@
 
     }
 
-    protected async Task DeleteJob()
+    private async Task DeleteJob()
     {
         if (recordKey > 0)
         {
@@ -293,7 +289,7 @@
         }
     }
 
-    protected void GetDetailView()
+    private void GetDetailView()
     {
         NavigationManager.NavigateTo($"/DetailView/{recordKey}");
     }

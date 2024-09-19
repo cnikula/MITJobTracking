@@ -341,8 +341,8 @@ namespace MITJobTracker.Data.Common
                     _context.Entry(jobEntity).State = EntityState.Modified;
                 }
 
-                var countChangesAsync =  await _context.SaveChangesAsync();
-                returnValue = countChangesAsync;
+                var countDeled =  await _context.SaveChangesAsync();
+                returnValue = countDeled;
 
             }
             catch (Exception e)
