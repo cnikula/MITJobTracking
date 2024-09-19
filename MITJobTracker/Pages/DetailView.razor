@@ -1,0 +1,440 @@
+﻿@page "/DetailView/{jobId}"
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq
+@inject IJobsFactory JobsFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>DetailView</PageTitle>
+
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">Detail View</h3>
+    </div>
+</div>
+
+<br />
+<br />
+
+<h1>@jobId</h1>
+
+<div class="row">
+    <div class="col">
+        <EditForm Model="@JobsInterview" asp-page="Prospect" class="form">
+            <div class="form-group mb-3">
+                <label for="title">Job Title</label>
+                <label for="jobno" class="mitcustom-margin-left-350">Job No.</label>
+                <label for="dateApplied" class="mitcustom-margin-left-150">Date Applied</label>
+                <label for="resumeSendDate" class="mitcustom-margin-left-1">Date Resume SendDate</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="title" class="form-control mit-input-width-400" id="title" @bind-value="JobsInterview.JobTitle" />
+                    <ValidationMessage For="@(() => JobsInterview.JobTitle)" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="jobno" class="form-control mit-input-width-200" id="jobno" @bind-value="JobsInterview.JobNo" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="date" asp-for="dateApplied" class="form-control mit-input-width-200" id="date" name="dateApplied" @bind-value="JobsInterview.DateApplied" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="date" asp-for="resumeSendDate" class="form-control mit-input-width-200" id="date" name="resumeSendDate" @bind-value="JobsInterview.ResumeSendDate" />
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="location">Job Location</label>
+                <label for="duration" class="mitcustom-margin-left-314">Job Duration</label>
+                <label for="salary" class="mitcustom-margin-left-112">Salary</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="location" id="location" class="form-control mit-input-width-400" @bind-value="JobsInterview.JobLocation" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="duration" id="Duration" class="form-control mit-input-width-200" @bind-value="JobsInterview.Duration" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="salary" id="salary" class="form-control mit-input-width-200" @bind-value="JobsInterview.Salary" />
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="hybridhoofdays" class="mitcustom-margin-left-250">Hybrid Days</label>
+                <label for="companyName" class="mitcustom-margin-left-116">Company Name</label>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="option1" name="option" @onchange="OnChaneRadioValue" value="remote" checked="@JobsInterview.Remote" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option1">Remote</label>
+                    <span>&nbsp;&nbsp;</span>
+
+                    <input type="radio" id="option2" name="option" @onchange="OnChaneRadioValue" value="hybrid" checked="@JobsInterview.Hybrid" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option2">Hybrid</label>
+                    <span>&nbsp;&nbsp;</span>
+
+                    <input type="radio" id="option3" name="option" @onchange="OnChaneRadioValue" value="onSite" checked="@JobsInterview.OnSite" />
+                    <span>&nbsp;&nbsp;</span>
+                    <label for="option3">On Site</label>
+
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="hybridhoofdays" id="hybridhoofdays" class="form-control mit-input-width-200" @bind-value="JobsInterview.HybridNoOfDays" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="companyName" id="companyName" class="form-control mit-input-width-400" @bind-value="JobsInterview.CompanyName" />
+
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="recruitingAgency">Recruiting Agency</label>
+                <label for="recruitingAgency" class="mitcustom-margin-left-280">Employment Type</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="recruitingAgency" id="recruitingAgency" class="form-control mit-input-width-400" @bind-value="JobsInterview.RecruitingAgency" />
+                    <span>&nbsp;&nbsp;</span>
+                    <div class="mit-control-wrapper col-lg-2 sb-property-border">
+                        <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Employment Type" DataSource="@jobTypes"
+                                        @bind-Value="@selectedJobType">
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))" />
+                            <DropDownListFieldSettings Value="Text" />
+                        </SfDropDownList>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="col-lg-2 sb-property-border">
+                    <br />
+                    <div>
+                        <div class="checkbox-control">
+                            <SfCheckBox @bind-Checked="@JobsInterview.SubContract" Label="SubContract"></SfCheckBox>
+                            <SfCheckBox @bind-Checked="@JobsInterview.ResumeSend" Label="ResumeSend"></SfCheckBox>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <br />
+                        <label for="requirements">Job Requirements</label>
+                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="on" @bind="@JobsInterview.Requirements"></textarea>
+                        <validationmessage for="@(() => JobsInterview.Requirements)" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <br />
+                        <label for="jobDescription">Job Description</label>
+                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="on" @bind="@JobsInterview.JobDescription"></textarea>
+                        <validationmessage for="@(() => JobsInterview.JobDescription)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <label for="recruitertName">Recruiter Name</label>
+                <label for="recruiterPhone" class="mitcustom-margin-left-300">Recruiter Phone No</label>
+                <label for="recruiterEmail" class="mitcustom-margin-left-60">Recruiter Email</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" asp-for="recruitertName" id="recruitertName" class="form-control mit-input-width-400" @bind-value="JobsInterview.RecruitertName" />
+                    <ValidationMessage For="@(() => JobsInterview.RecruitertName)" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="recruiterPhone" id="recruiterPhone" class="form-control mit-input-width-200" @bind-value="JobsInterview.RecruiterPhone" />
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="text" asp-for="recruiterEmail" id="recruiterEmail" class="form-control mit-input-width-400" @bind-value="JobsInterview.RecruiterEmail" />
+                </div>
+            </div>
+            
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <label for="InterviewDatee">Interview Date</label>
+                <label for="InterviewType" class="mitcustom-margin-left-100">Interview Type</label>
+                <label for="InterviewerName" class="mitcustom-margin-left-100">Interview Name</label>
+                <label for="InterviewerPhone" class="mitcustom-margin-left-90">Interviewer Phone</label>
+                <label for="InterviewerEmail" class="mitcustom-margin-left-65">Interviewer EMail</label>
+                <div class="d-flex align-items-center">
+                    <input type="date" asp-for="InterviewDatee" id="InterviewDatee" class="form-control mit-input-width-200" @bind-value="JobsInterview.InterviewDate" />
+                    <ValidationMessage For="@(() => JobsInterview.RecruitertName)" />
+                    <span>&nbsp;</span>
+                    <input type="text" asp-for="InterviewType" id="InterviewType" class="form-control mit-input-width-200" @bind-value="JobsInterview.InterviewType" />
+                    <span>&nbsp;</span>
+                    <input type="text" asp-for="InterviewerName" id="InterviewerName" class="form-control mit-input-width-200" @bind-value="JobsInterview.InterviewerName" />
+                    <span>&nbsp;</span>
+                    <input type="text" asp-for="InterviewerPhone" id="InterviewerPhone" class="form-control mit-input-width-200" @bind-value="JobsInterview.InterviewerPhone" />
+                    <span>&nbsp;</span>
+                    <input type="text" asp-for="InterviewerEmail" id="InterviewerEmail" class="form-control mit-input-width-400" @bind-value="JobsInterview.InterviewerEmail" />
+                  
+                </div>
+            </div>
+
+            
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <br/>
+                <label for="InterviewerNotes">Interviewer Notes</label>
+                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="on" @bind="@JobsInterview.InterviewerNotes"></textarea>
+                <validationmessage for="@(() => JobsInterview.InterviewerNotes)"/>
+            </div>
+            
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <br />
+                <label for="InterviewerNotes">Interviewer Result</label>
+                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerResulte" wrap="on" @bind="@JobsInterview.InterviewerResulte"></textarea>
+                <validationmessage for="@(() => JobsInterview.InterviewerResulte)" />
+            </div>
+            
+            @* 
+            
+            <div class="form-group mb-3" style="margin-top: 0px">
+                <br />
+                <div class="d-flex align-items-center">
+                    <label for="InterviewerNotes">Interviewer Notes</label>
+                    <label for="InterviewerNotes" class="mitcustom-margin-left-425">Interviewer Result</label>
+
+                </div>
+                <div class="d-flex align-items-center">
+                    <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="on" @bind="@JobsInterview.InterviewerNotes"></textarea>
+                    <validationmessage for="@(() => JobsInterview.InterviewerNotes)" />
+                    <span>&nbsp;</span>
+                    <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerResulte" wrap="on" @bind="@JobsInterview.InterviewerResulte"></textarea>
+                    <validationmessage for="@(() => JobsInterview.InterviewerResulte)" />
+                </div>
+            </div>
+            
+ *@
+
+            <div class="form-group mb-3">
+                 <SfButton CssClass="e-primary" @onclick="SaveToDBC">Save To Database</SfButton>
+                 <SfButton CssClass="e-success" @onclick="Cancel">Cancel</SfButton>
+            </div>
+                   
+            
+            @* Display a status dialog window when there is an App Error. Display error message *@
+            <div id="addJob">
+                <SfDialog Target="#target" Width="300px" ShowCloseIcon="true" @bind-Visible="visibility" AllowPrerender="true" IsModal="true">
+                    <DialogTemplates>
+                        <Header> @dialogHeader</Header>
+                        <Content>
+                            <div class="mit-dialog-content"></div>
+                            <spam class="mit-dialogText">@dialogText</spam>
+                        </Content>
+                    </DialogTemplates>
+                </SfDialog>
+            </div>
+
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string jobId { get; set; }
+
+    private JobsInterviewDTO JobsInterview = new JobsInterviewDTO();
+    private JobsInterviewDTO ClonedJobsInterview;
+    private string dialogText = string.Empty;
+    private string dialogHeader = "Application Error";
+    private bool visibility = false;
+    private string selectedJobType = string.Empty;
+    private List<string> differences = new List<string>();
+
+    List<EmploymentType>jobTypes = new List<EmploymentType>
+    {
+        new EmploymentType { Id = "fullTime", Text = "Full Time" },
+        new EmploymentType { Id = "partTime", Text = "Part Time" },
+        new EmploymentType { Id = "contract", Text = "Contract" },
+        new EmploymentType { Id = "internship", Text = "Internship" },
+        new EmploymentType { Id = "temporary", Text = "Temporary" },
+        new EmploymentType { Id = "freelance", Text = "Freelance" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        int key = Convert.ToInt32(jobId);
+        await PpopulateDetailView(key);
+    }
+
+
+
+    private async Task PpopulateDetailView(int key)
+    {
+        try
+        {
+            JobsInterview = (await JobsFactory.GetJobInterviewById(key));
+            selectedJobType = JobsInterview.EmploymentType;
+            
+            ClonedJobsInterview = JobsInterview.Clone();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            dialogText = e.Message;
+            visibility = true;
+
+        }
+
+    }
+
+    
+    private void OnChaneRadioValue(ChangeEventArgs e)
+    {
+        if (e.Value.ToString() == "onSite")
+        {
+            JobsInterview.OnSite = true;
+            JobsInterview.Hybrid = false;
+            JobsInterview.Remote = false;
+        }
+        else if (e.Value.ToString() == "hybrid")
+        {
+            JobsInterview.OnSite = false;
+            JobsInterview.Hybrid = true;
+            JobsInterview.Remote = false;
+        }
+        else if (e.Value.ToString() == "remote")
+        {
+            JobsInterview.OnSite = false;
+            JobsInterview.Hybrid = false;
+            JobsInterview.Remote = true;
+        }
+    }
+
+    private void OnSelectJobType(string e)
+    {
+        JobsInterview.EmploymentType = e;
+    }
+
+    protected async Task SaveToDBC()
+    {
+        bool interview = false;
+        bool job = false;
+        bool returnValue = false;
+        
+
+        if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
+        {
+            // Save the data to the database, eighter to the Jobs or Interview table or both.
+            interview = differences.Any(s => s.Contains("Interview", StringComparison.OrdinalIgnoreCase));
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("job", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("recruiter", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("CompanyName", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Remote", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Requirements", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Salary", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Employment", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("SubContract", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Resume", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("DateApplied", StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("Duration", StringComparison.OrdinalIgnoreCase));
+            }
+            
+            if (!job)
+            {
+                job = differences.Any(s => s.Contains("OnSite", StringComparison.OrdinalIgnoreCase));
+            }
+
+
+            returnValue =  await JobsFactory.UpdateJobAndInterview(JobsInterview, job, interview);
+
+            if (!returnValue)
+            {
+                dialogText = "Saving to the Database failed";
+                dialogHeader = "Saving Data";
+                visibility = true;
+            }
+            else
+            {
+                dialogText = "Database was update successfully";
+                dialogHeader = "Saving Data";
+                visibility = true;
+            }
+
+        }
+        else
+        {
+            dialogText = "There were no changes to save";
+            dialogHeader = "Saving Data";
+            visibility = true;
+        }
+
+        StateHasChanged();
+
+    }
+
+    protected void Cancel()
+    {
+        NavigationManager.NavigateTo("/viewJobProspect");
+    }
+
+    
+    private bool AreObjectsEqual(JobsInterviewDTO obj1, JobsInterviewDTO obj2)
+    {
+        string json1 = JsonConvert.SerializeObject(obj1);
+        string json2 = JsonConvert.SerializeObject(obj2);
+
+        if (json1 != json2)
+        {
+            GetObjectDifferences(json1, json2);
+        }
+
+        return json1 == json2;
+    }
+
+
+    private void GetObjectDifferences(string json1, string json2)
+    {
+        
+        JObject jObject1 = JObject.Parse(json1);
+        JObject jObject2 = JObject.Parse(json2);
+
+        foreach (var property in jObject1.Properties())
+        {
+            var propertyName = property.Name;
+            var propertyValue1 = property.Value.ToString();
+            var propertyValue2 = jObject2[propertyName]?.ToString();
+
+            if (propertyValue1 != propertyValue2)
+            {
+                string difference = $"{propertyName}: {propertyValue1} (original) vs {propertyValue2} (modified)";
+                differences.Add(difference);
+            }
+        }
+  
+    }
+
+
+    
+}

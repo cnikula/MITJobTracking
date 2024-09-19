@@ -23,8 +23,9 @@ namespace MITJobTracker.Factory.Interfaces
         Task<Job> GetJobById(int id);
         Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList);
         Task<int> AddJob(Job job);
-        Task<Job> UpdateJobById(Job job);
-        Task<Job> DeleteJob(int id);
         Task<int> RemoveExpiredJobsAsync(List<int> jobIds);
+        Task<JobsInterviewDTO> GetJobInterviewById(int id);
+        Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview);
+        Task<int> DeleteJobAsync(int id);
     }
 }

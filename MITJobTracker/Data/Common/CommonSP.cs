@@ -96,6 +96,7 @@ namespace MITJobTracker.Data.Common
                     }
                 }
             }
+
             return dt;
         }
 
@@ -141,7 +142,9 @@ namespace MITJobTracker.Data.Common
                             while (reader.Read())
                             {
                                 // Retrieve the return value from the reader
-                                returnValue = reader["DeletedCount"] != DBNull.Value ? Convert.ToInt32(reader["DeletedCount"]) : 0;
+                                returnValue = reader["DeletedCount"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["DeletedCount"])
+                                    : 0;
                             }
                         }
                     }
@@ -151,5 +154,88 @@ namespace MITJobTracker.Data.Common
             // Return the number of jobs that were successfully removed
             return returnValue;
         }
+
+        /// <summary>
+        /// Get detail data from Jobs and Interview tables
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Exception"></exception>
+        public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
+        {
+            if (id == 0) throw new ArgumentNullException(nameof(id));
+
+            JobsInterviewDTO dt = new JobsInterviewDTO();
+
+            await using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+
+                if (con.State != ConnectionState.Open)
+                {
+                    throw new Exception("Connection to database failed.");
+                }
+
+                await using (SqlCommand command = new SqlCommand("dbo.sp_GetDetailInfo", con))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    await using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        // check if reader has rows
+                        if (!reader.HasRows)
+                        {
+                            return dt;
+                        }
+
+                        while (reader.Read())
+                        {
+                            JobsInterviewDTO result = new JobsInterviewDTO
+                            {
+                                JobId = reader["JobId"] != DBNull.Value ? Convert.ToInt32(reader["JobId"]) : 0,
+                                JobTitle = reader["JobTitle"] != DBNull.Value ? reader["JobTitle"].ToString() : null,
+                                JobNo = reader["JobNo"] != DBNull.Value ? reader["JobNo"].ToString() : null,
+                                CompanyName = reader["CompanyName"] != DBNull.Value ? reader["CompanyName"].ToString() : null,
+                                RecruitingAgency = reader["RecruitingAgency"] != DBNull.Value ? reader["RecruitingAgency"].ToString() : null,
+                                RecruitertName = reader["RecruitertName"] != DBNull.Value ? reader["RecruitertName"].ToString() : null,
+                                RecruiterPhone = reader["RecruiterPhone"] != DBNull.Value ? reader["RecruiterPhone"].ToString() : null,
+                                RecruiterEmail = reader["RecruiterEmail"] != DBNull.Value ? reader["RecruiterEmail"].ToString() : null,
+                                JobLocation = reader["JobLocation"] != DBNull.Value ? reader["JobLocation"].ToString() : null,
+                                Remote = reader["Remote"] != DBNull.Value ? Convert.ToBoolean(reader["Remote"]) : false,
+                                Hybrid = reader["Hybrid"] != DBNull.Value ? Convert.ToBoolean(reader["Hybrid"]) : false,
+                                HybridNoOfDays = reader["HybridNoOfDays"] != DBNull.Value ? reader["HybridNoOfDays"].ToString() : null,
+                                Requirements = reader["Requirements"] != DBNull.Value ? reader["Requirements"].ToString() : null,
+                                JobDescription = reader["JobDescription"] != DBNull.Value ? reader["JobDescription"].ToString() : null,
+                                Salary = reader["Salary"] != DBNull.Value ? reader["Salary"].ToString() : null,
+                                EmploymentType = reader["EmploymentType"] != DBNull.Value ? reader["EmploymentType"].ToString() : null,
+                                SubContract = reader["SubContract"] != DBNull.Value ? Convert.ToBoolean(reader["SubContract"]) : false,
+                                ResumeSend = reader["ResumeSend"] != DBNull.Value ? Convert.ToBoolean(reader["ResumeSend"]) : false,
+                                ResumeSendDate = reader["ResumeSendDate"] != DBNull.Value ? Convert.ToDateTime(reader["ResumeSendDate"]) : DateTime.MinValue,
+                                DateApplied = reader["DateApplied"] != DBNull.Value ? Convert.ToDateTime(reader["DateApplied"]) : DateTime.MinValue,
+                                Duration = reader["Duration"] != DBNull.Value ? reader["Duration"].ToString() : null,
+                                OnSite = reader["OnSite"] != DBNull.Value ? Convert.ToBoolean(reader["OnSite"]) : false,
+                                InterviewId = reader["InterviewId"] != DBNull.Value ? Convert.ToInt32(reader["InterviewId"]) : 0,
+                                InterviewDate = reader["InterviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["InterviewDate"]) : DateTime.MinValue,
+                                InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null,
+                                InterviewerName = reader["InterviewerName"] != DBNull.Value ? reader["InterviewerName"].ToString() : null,
+                                InterviewerPhone = reader["InterviewerPhone"] != DBNull.Value ? reader["InterviewerPhone"].ToString() : null,
+                                InterviewerEmail = reader["InterviewerEmail"] != DBNull.Value ? reader["InterviewerEmail"].ToString() : null,
+                                InterviewerNotes = reader["InterviewerNotes"] != DBNull.Value ? reader["InterviewerNotes"].ToString() : null,
+                                InterviewerResulte = reader["InterviewerResulte"] != DBNull.Value ? reader["InterviewerResulte"].ToString() : null,
+                            };
+
+                            dt = result;
+                        } 
+                    }
+                        
+                }
+            }
+
+            return dt;
+        }
+
+
     }
 }

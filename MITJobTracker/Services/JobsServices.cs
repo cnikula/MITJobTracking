@@ -12,8 +12,6 @@
 // <summary>Jobs Services Class CRUD operations</summary>
 // ***********************************************************************
 
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
@@ -25,11 +23,14 @@ namespace MITJobTracker.Services
     {
         protected readonly AppDBContext _context;
         private CommonSP _commonSP;
+        public EFTableManagement efTableManagement;
+
 
         public JobsServices(AppDBContext context, IConfiguration configuration)
         {
             _context = context;
             _commonSP = new CommonSP(configuration);
+            efTableManagement = new EFTableManagement(_context);
         }
 
        
@@ -84,11 +85,7 @@ namespace MITJobTracker.Services
             throw new NotImplementedException();
         }
 
-        public Task<Job> DeleteJob(int id)
-        {
-            throw new NotImplementedException();
-        }
-
+       
 
         /// <summary>
         /// Removes expired jobs asynchronously.
@@ -120,6 +117,84 @@ namespace MITJobTracker.Services
                 Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
                 return 0;
             }
+        }
+
+
+        public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
+        {
+            try
+            {
+                return await _commonSP.GetJobInterviewById(id);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult.ToString()}");
+                return null;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Updates the job and interview Table or update jpb and interview.
+        /// </summary>
+        /// <param name="JobsInterview">The jobs interview.</param>
+        /// <param name="job">if set to <c>true</c> [job].</param>
+        /// <param name="interview">if set to <c>true</c> [interview].</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        public async Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
+        {
+            bool returnValue = false;
+           
+            if (job && interview)
+            {
+                if (JobsInterview.InterviewId == 0)
+                {
+                    // Update Jobs table
+                    // insert new record into Interview table
+                    returnValue = await efTableManagement.UpdateJob_AddInterviwById(JobsInterview);
+                }
+                else
+                {
+                    // Update Jobs table
+                    // Update Interview table
+                    returnValue = await efTableManagement.UpdateJob_InterviwById(JobsInterview); 
+                }
+            }
+            else if (job && !interview)
+            {
+                // update jobs table
+                returnValue = await efTableManagement.UpdateJob_ById(JobsInterview);
+            }
+            else if (interview && !job)
+            {
+                if (JobsInterview.InterviewId == 0)
+                {
+                    // insert new Interview record
+                    returnValue = await efTableManagement.InsertInterview(JobsInterview);
+                }
+                else
+                {
+                    // update Interview record
+                    returnValue = await efTableManagement.UpdateInterviewById(JobsInterview);
+                }
+            }
+            else
+            {
+                returnValue = false;
+            }
+
+            return returnValue;
+        }
+
+        public async Task<int> DeleteJobAsysnc(int id)
+        {
+            int returnValue = 0;
+
+            returnValue = await efTableManagement.DeleteJobById(id);
+
+            return returnValue;
         }
     }
 

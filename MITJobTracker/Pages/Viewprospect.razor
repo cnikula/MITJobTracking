@@ -1,6 +1,6 @@
 ﻿@page "/viewJobProspect"
-@using System.Dynamic
 @inject IJobsFactory JobsFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>View Job Prospect</PageTitle>
 
@@ -29,9 +29,9 @@
     </div>
 
     <div class="row">
-        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" QueryCellStyle="OnQueryCellStyle" EnableStickyHeader="true">
+        <SfGrid DataSource="@prospectListDTO" AllowPaging="true" AllowSorting="true" AllowFiltering="true" EnableStickyHeader="true">
             <GridPageSettings PageSize="10"></GridPageSettings>
-            <GridEvents QueryCellInfo="QueryCellInfoHandler" TValue="ProspectListDTO"></GridEvents>
+            <GridEvents OnRecordClick="RecordClickHandler" TValue="ProspectListDTO"></GridEvents>
             <GridColumns>
                 <GridColumn Field="@nameof(ProspectListDTO.JobNo)"
                             HeaderText="Job No"
@@ -50,11 +50,30 @@
                             Type="ColumnType.Date"
                             Width="100">
                 </GridColumn>
+                
                 <GridColumn Field="@nameof(ProspectListDTO.Status)"
                             HeaderText="Status"
                             TextAlign="TextAlign.Center"
                             Width="120">
+                            <Template>
+                                @{
+                                    var changeBackColor = (context as ProspectListDTO);
+                                    if (changeBackColor.Status == "Expired")
+                                    {
+                                        <div class="mit-gridcell-red">
+                                            @changeBackColor.Status
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mit-gridcell-green">
+                                            @changeBackColor.Status
+                                        </div>
+                                    }
+                                }
+                            </Template>
                 </GridColumn>
+                
                 <GridColumn Field="@nameof(ProspectListDTO.JobLocation)"
                             HeaderText="Job Location"
                             TextAlign="TextAlign.Center"
@@ -92,7 +111,7 @@
                             Type="ColumnType.Date"
                             Width="100">
                 </GridColumn>
-                
+
             </GridColumns>
         </SfGrid>
     </div>
@@ -103,11 +122,11 @@
         </div>
         <div class="row">
             <SfButtonGroup>
-                <ButtonGroupButton CssClass="e-primary">Edit</ButtonGroupButton>
+                <ButtonGroupButton @onclick="GetDetailView" CssClass="e-primary">Edit</ButtonGroupButton>
                 &nbsp;&nbsp;
                 <ButtonGroupButton @onclick="RemoveExpired" CssClass="e-success">Remove Expired</ButtonGroupButton>
                 &nbsp;&nbsp;
-                <ButtonGroupButton CssClass="e-info">Delete</ButtonGroupButton>
+                <ButtonGroupButton @onclick="DeleteJob" CssClass="e-info">Delete</ButtonGroupButton>
             </SfButtonGroup>
         </div>
 
@@ -135,6 +154,8 @@
     protected bool Visibility { get; set; } = false;
     protected string dialogText = "No Match Found";
     protected string dialogHeader = "Database Search";
+    protected int key = 0;
+    protected int recordKey = 0;
 
     protected List<ProspectListDTO> prospectListDTO { get; set; }
 
@@ -166,26 +187,20 @@
         }
     }
 
-
-
-    /// <param name="args"></param>
     /// <summary>
-    /// Handles the QueryCellInfo event and adds a CSS class to the cell if the status of the prospect is "Expired".
+    /// In summary, the RecordClickHandler method captures the JobId of the clicked record in
+    /// the grid and assigns it to the recordKey variable for later use.
     /// </summary>
-    /// <param name="args">The QueryCellInfoEventArgs containing information about the cell and the data.</param>
-    protected void QueryCellInfoHandler(QueryCellInfoEventArgs<ProspectListDTO> args)
+    /// <param name="args"></param>
+    private void RecordClickHandler(RecordClickEventArgs<ProspectListDTO> args)
     {
-        if (args.Column.Field == nameof(ProspectListDTO.Status) && args.Data.Status == "Expired")
-        {
-            args.Cell.AddClass(new string[] { "mit-e-attr" });
-        }
+        recordKey = args.RowData.JobId;
     }
-
 
     /// <summary>
     /// Re-PpopulateGrid the grid with the search value
     /// </summary>
-    protected void DoSearch()
+    private void DoSearch()
     {
         if (!string.IsNullOrWhiteSpace(searchValue))
         {
@@ -199,7 +214,7 @@
 
     }
 
-    protected void ClearSearch()
+    private void ClearSearch()
     {
         searchValue = string.Empty;
         PpopulateGrid("N/A", true);
@@ -218,7 +233,7 @@
     /// Method for removing expired jobs from the database
     /// </summary>
     /// <returns></returns>
-    protected async Task RemoveExpired()
+    private async Task RemoveExpired()
     {
         int expired = 0;        // Count the number of expired jobs
 
@@ -247,8 +262,37 @@
                 Visibility = true;
             }
         }
-  
+
     }
 
+    private async Task DeleteJob()
+    {
+        if (recordKey > 0)
+        {
+            int result = await JobsFactory.DeleteJobAsync(recordKey);
+            if (result > 0)
+            {
+                dialogText = "Job Deleted";
+                Visibility = true;
+                await PpopulateGrid("N/A", true);
+            }
+            else
+            {
+                dialogText = "Job Not Deleted";
+                Visibility = true;
+            }
+        }
+        else
+        {
+            dialogText = "Please select a job to delete";
+            Visibility = true;
+        }
+    }
 
+    private void GetDetailView()
+    {
+        NavigationManager.NavigateTo($"/DetailView/{recordKey}");
+    }
+
+   
 }
