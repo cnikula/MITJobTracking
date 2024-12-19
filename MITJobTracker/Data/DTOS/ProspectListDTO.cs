@@ -33,6 +33,7 @@ namespace MITJobTracker.Data.DTOS
             public DateTime InterviewDate { get; set; }
             public string InterviewType { get; set; }
             public string CompanyName { get; set; }
+            public string Note { get; set; }
 
     }
 }

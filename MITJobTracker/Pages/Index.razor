@@ -102,9 +102,21 @@
                    
                     <div class="form-group mb-3">
                         <br/>
-                        <label for="requirements">Job Requirements</label>
-                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="on" @bind="@JobModel.Requirements"></textarea>
-                        <validationmessage for="@(() => JobModel.Requirements)" />
+                            <div class="form-group mb-3">
+                                <br/>
+                                <div class="d-flex">
+                                    <div class="flex-grow-1 me-2">
+                                        <label for="requirements">Job Requirements</label>
+                                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="requirements" wrap="on" @bind="@JobModel.Requirements"></textarea>
+                                        <validationmessage for="@(() => JobModel.Requirements)" />
+                                    </div>
+                                    <div class="flex-grow-1 ms-2">
+                                        <label for="specialNote">Special Notes </label>
+                                        <textarea asp-for="specialNote" name="special_Note" class="form-control mit-text-ara" id="special_Note" wrap="on" @bind="@JobModel.Note"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                       
                     </div>
                     
                     <div class="form-group mb-3">
