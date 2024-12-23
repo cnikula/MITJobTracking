@@ -141,6 +141,10 @@ namespace MITJobTracker.Data
         [DataMember]
         public DateTime DateApplied { get; set; }
 
+        [Comment("Note, Freeform notes in reference to the job applying for.")]
+        [DataMember]
+        public string? Note { get; set; }
+
         //Table Relationship 
         public virtual ICollection<Interview> Interviews { get; set; }
     }

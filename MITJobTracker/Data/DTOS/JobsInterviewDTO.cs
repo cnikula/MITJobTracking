@@ -47,6 +47,7 @@ namespace MITJobTracker.Data.DTOS
             public string InterviewerEmail { get; set; }
             public string InterviewerNotes { get; set; }
             public string InterviewerResulte { get; set; }
+            public string Note { get; set; }
 
         /// <summary>
         /// Clones the JobsInterviewDTO object by value.

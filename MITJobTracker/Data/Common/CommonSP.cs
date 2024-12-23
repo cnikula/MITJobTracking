@@ -216,6 +216,7 @@ namespace MITJobTracker.Data.Common
                                 DateApplied = reader["DateApplied"] != DBNull.Value ? Convert.ToDateTime(reader["DateApplied"]) : DateTime.MinValue,
                                 Duration = reader["Duration"] != DBNull.Value ? reader["Duration"].ToString() : null,
                                 OnSite = reader["OnSite"] != DBNull.Value ? Convert.ToBoolean(reader["OnSite"]) : false,
+                                Note = reader["Note"] != DBNull.Value ? reader["Note"].ToString() : null,
                                 InterviewId = reader["InterviewId"] != DBNull.Value ? Convert.ToInt32(reader["InterviewId"]) : 0,
                                 InterviewDate = reader["InterviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["InterviewDate"]) : DateTime.MinValue,
                                 InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null,
