@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # files belong to the project that should not be uploaded
 PrivateConnectionInfo.txt
+Syncfusion.Licensing.txt
