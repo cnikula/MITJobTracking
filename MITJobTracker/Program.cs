@@ -43,7 +43,7 @@ builder.Services.AddTransient<IJobsServices, JobsServices>();
 var app = builder.Build();
 
 
-// 26.X.X
+// 26.X.X - Syncfusion.Licensing
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("<Syncfusion.Licensing go here>");
 
 if (!app.Environment.IsDevelopment())
