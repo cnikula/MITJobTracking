@@ -167,21 +167,26 @@
                 </div>
             </div>
 
-            
             <div class="form-group mb-3" style="margin-top: 0px">
-                <br/>
-                <label for="InterviewerNotes">Interviewer Notes</label>
-                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="on" @bind="@JobsInterview.InterviewerNotes"></textarea>
-                <validationmessage for="@(() => JobsInterview.InterviewerNotes)"/>
+                <div class="form-group mb-3" style="margin-top: 0px">
+                    <div class="form-group mb-3" style="margin-top: 0px">
+                        <br/>
+                        <label for="InterviewerNotes">Interviewer Notes</label>
+                        <label for="InterviewerResulte" class="mitcustom-margin-left-496">Interviewer Result</label>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1 me-2">
+                                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="on" @bind="@JobsInterview.InterviewerNotes"></textarea>
+                            </div>
+                            <div class="flex-grow-1 ms-2" style="margin-right: 800px;">
+                                <textarea asp-for="InterviewerResulte" name="InterviewerResulte" class="form-control mit-text-ara" id="InterviewerResulte" wrap="on" @bind="@JobsInterview.InterviewerResulte"></textarea>
+                            </div>
+                        </div>
+                        <validationmessage for="@(() => JobsInterview.InterviewerNotes)"/>
+                        <validationmessage for="@(() => JobsInterview.InterviewerResulte)" />
+                    </div>
+                </div>
             </div>
             
-            <div class="form-group mb-3" style="margin-top: 0px">
-                <br />
-                <label for="InterviewerNotes">Interviewer Result</label>
-                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerResulte" wrap="on" @bind="@JobsInterview.InterviewerResulte"></textarea>
-                <validationmessage for="@(() => JobsInterview.InterviewerResulte)" />
-            </div>
-           
             <div class="form-group mb-3">
                  <SfButton CssClass="e-primary" @onclick="SaveToDBC">Save To Database</SfButton>
                  <SfButton CssClass="e-success" @onclick="Cancel">Cancel</SfButton>

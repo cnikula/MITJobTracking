@@ -53,6 +53,7 @@ namespace MITJobTracker.Data.Common
                     jobEntity.RecruitertName = JobsInterview.RecruitertName;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
+                    jobEntity.Note = JobsInterview.Note;
 
                     // Mark the job entity as modified
                     _context.Entry(jobEntity).State = EntityState.Modified;
@@ -131,6 +132,7 @@ namespace MITJobTracker.Data.Common
                     jobEntity.RecruitertName = JobsInterview.RecruitertName;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
+                    jobEntity.Note = JobsInterview.Note;
 
                     // Mark the job entity as modified
                     _context.Entry(jobEntity).State = EntityState.Modified;
@@ -203,6 +205,7 @@ namespace MITJobTracker.Data.Common
                     jobEntity.RecruitertName = JobsInterview.RecruitertName;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
+                    jobEntity.Note = JobsInterview.Note;
 
                     // Mark the job entity as modified
                     _context.Entry(jobEntity).State = EntityState.Modified;
