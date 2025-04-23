@@ -44,7 +44,7 @@ var app = builder.Build();
 
 
 // 26.X.X - Syncfusion.Licensing
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("<Syncfusion Licensing Token Gos Here>");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXhfcnVXRmRZUk13WEU=");
 
 if (!app.Environment.IsDevelopment())
 {
