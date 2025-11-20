@@ -12,10 +12,10 @@ namespace MITJobTracker.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-                            sql = @"USE MITJobTracker19
+                            sql = @"USE MITJobTracker
                 GO
 
-                IF DB_NAME() <> N'MITJobTracker19' SET NOEXEC ON
+                IF DB_NAME() <> N'MITJobTracker' SET NOEXEC ON
                 GO
 
                 SET QUOTED_IDENTIFIER, ANSI_NULLS ON
@@ -29,7 +29,7 @@ namespace MITJobTracker.Migrations
                 -- ============================================================================
                  -- Author:      Claude Nikula
                  -- Create date: 7/30/2024 1:52 PM
-                 -- Database:    MITJobTracker19
+                 -- Database:    MITJobTracker
                  -- Description: 
                  --
                  -- Parameter:  @Id - primary key for the Jobs table-
@@ -82,10 +82,10 @@ namespace MITJobTracker.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            sql = @"USE MITJobTracker19
+            sql = @"USE MITJobTracker
                     GO
 
-                    IF DB_NAME() <> N'MITJobTracker19' SET NOEXEC ON
+                    IF DB_NAME() <> N'MITJobTracker' SET NOEXEC ON
                     GO
 
                     --

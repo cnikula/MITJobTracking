@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MITJobTracker.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240702122045_sp_ViewProspect_Ver2")]
-    partial class sp_ViewProspect_Ver2
+    [Migration("20251120224506_usp_ViweProspectV1")]
+    partial class usp_ViweProspectV1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.17")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -203,6 +203,10 @@ namespace MITJobTracker.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2")
                         .HasComment("Date and Time record was create.");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)")
+                        .HasComment("Note, Freeform notes in reference to the job applying for.");
 
                     b.Property<bool>("OnSite")
                         .HasColumnType("bit")

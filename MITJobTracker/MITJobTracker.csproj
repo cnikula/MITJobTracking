@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Version>9.2.0</Version>
+    <Description>The UI allows you to enter potential jobs in a view information and outcome</Description>
   </PropertyGroup>
 
   <ItemGroup>

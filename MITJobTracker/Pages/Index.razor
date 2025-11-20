@@ -1,7 +1,9 @@
 ﻿@page "/"
+@inject MITJobTracker.Services.Interfaces.IAppInfoService AppInfo
 @inject IJobsFactory JobsFactory
 
 <PageTitle>Add Job</PageTitle>
+<div class="mb-2 text-muted">Version: @AppInfo.Version</div>
 
 <div class="row">
     <div class="col">

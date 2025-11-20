@@ -20,7 +20,7 @@ namespace MITJobTracker.Migrations
                   -- ============================================================================
                   -- Author:      Claude Nikula
                   -- Create date: 7/17/2024 @ 9:11 AM
-                  -- Database:    MITJobTracker19
+                  -- Database:    MITJobTracker
                   -- Description: Get Job and Interview data buy JobID key
                   --
                   -- Parameter:  @JobID - Job Key

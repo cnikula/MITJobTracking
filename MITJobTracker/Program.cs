@@ -32,7 +32,7 @@ builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configurat
 builder.Services.AddTransient<IJobsFactory, JobsFactory>();
 //builder.Services.AddSingleton<IJobsServices, JobsServices>();
 builder.Services.AddTransient<IJobsServices, JobsServices>();
-
+builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService, MITJobTracker.Services.AppInfoService>();
 
 // ...
 #endregion
@@ -44,7 +44,7 @@ var app = builder.Build();
 
 
 // 26.X.X - Syncfusion.Licensing
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("<License token gos here>");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXhfcnVXRmRZUk13WEU=");
 
 if (!app.Environment.IsDevelopment())
 {
