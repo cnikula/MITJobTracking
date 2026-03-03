@@ -30,9 +30,21 @@ namespace MITJobTracker.Data
             ResumeSend = false;
             OnSite = false;
             DateApplied = DateTime.Now;
-            JobNo = "0";
+            JobNo = GenerateUniqueJobNumber();
             Salary = "0";
             Duration = "N/A";
+        }
+
+        /// <summary>
+        /// Generates a random unique job number in the format: JOB-YYYYMMDD-XXXX
+        /// </summary>
+        /// <returns>A unique job number string</returns>
+        public static string GenerateUniqueJobNumber()
+        {
+            var timestamp = DateTime.Now.ToString("yyyyMMdd");
+            var random = Random.Shared.Next(1000, 9999);
+            var guid = Guid.NewGuid().ToString("N")[..4].ToUpper();
+            return $"JOB-{timestamp}-{guid}{random}";
         }
 
         [Comment("Table primary key")]
