@@ -107,7 +107,7 @@ namespace MITJobTracker.Services
                 string jobIdsString = string.Join(",", jobIds);
 
                 // Call the appropriate method to remove expired jobs using the jobIdsString
-                returnValue = await _commonSP.RemoveExpiredJobsByIdAsync(jobIdsString);
+                returnValue = await _commonSP.RemoveExpiredJobsByIdAsync(jobIdsString, "CNikula");
 
                 return returnValue;
             }
