@@ -24,11 +24,13 @@ namespace MITJobTracker.Data.Common
 {
     public class CommonSP
     {
-        private readonly string connectionString = string.Empty;
+        private readonly string _connectionString;
+        private const int CommandTimeout = 30; // seconds
 
         public CommonSP(IConfiguration configuration)
         {
-            connectionString = configuration.GetConnectionString("mitLocalConnection");
+            _connectionString = configuration.GetConnectionString("mitLocalConnection") 
+                ?? throw new InvalidOperationException("Connection string 'mitLocalConnection' not found");
         }
 
 
@@ -40,64 +42,49 @@ namespace MITJobTracker.Data.Common
         /// <param name="searchValue">The search value to filter the job prospects.</param>
         /// <param name="fullList">A flag indicating whether to retrieve the full list of job prospects.</param>
         /// <returns>A list of ProspectListDTO objects representing the job prospects.</returns>
-        public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
+        public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(searchValue)) throw new ArgumentNullException(nameof(searchValue));
+            if (string.IsNullOrWhiteSpace(searchValue)) 
+                throw new ArgumentNullException(nameof(searchValue));
 
-            List<ProspectListDTO> dt = new List<ProspectListDTO>();
+            var results = new List<ProspectListDTO>();
 
-            await using (SqlConnection con = new SqlConnection(connectionString))
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync(cancellationToken);
+
+            await using var command = new SqlCommand("dbo.usp_ViewProspect", con)
             {
-                con.Open();
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = CommandTimeout
+            };
 
-                if (con.State != ConnectionState.Open)
+            command.Parameters.Add("@SearchValue", SqlDbType.NVarChar, 255).Value = searchValue;
+            command.Parameters.Add("@FullList", SqlDbType.Bit).Value = fullList;
+
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                results.Add(new ProspectListDTO
                 {
-                    throw new Exception("Connection to database failed.");
-                }
-
-                await using (SqlCommand command = new SqlCommand("dbo.usp_ViewProspect", con))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@SearchValue", searchValue);
-                    command.Parameters.AddWithValue("@FullList", fullList);
-
-                    await using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        // check if reader has rows
-                        if (!reader.HasRows)
-                        {
-                            return dt;
-                        }
-
-                        while (reader.Read())
-                        {
-                            ProspectListDTO result = new ProspectListDTO
-                            {
-                                JobId = reader["JobId"] != DBNull.Value ? Convert.ToInt32(reader["JobId"]) : 0,
-                                JobTitle = reader["JobTitle"] != DBNull.Value ? reader["JobTitle"].ToString() : null,
-                                JobNo = reader["JobNo"] != DBNull.Value ? reader["JobNo"].ToString() : null,
-                                DateApplied = reader["DateApplied"] != DBNull.Value ? Convert.ToDateTime(reader["DateApplied"]) : DateTime.MinValue,
-                                Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : null,
-                                JobLocation = reader["JobLocation"] != DBNull.Value ? reader["JobLocation"].ToString() : null,
-                                RecruitingAgency = reader["RecruitingAgency"] != DBNull.Value ? reader["RecruitingAgency"].ToString() : null,
-                                RecruitertName = reader["RecruitertName"] != DBNull.Value ? reader["RecruitertName"].ToString() : null,
-                                RecruiterPhone = reader["RecruiterPhone"] != DBNull.Value ? reader["RecruiterPhone"].ToString() : null,
-                                RecruiterEmail = reader["RecruiterEmail"] != DBNull.Value ? reader["RecruiterEmail"].ToString() : null,
-                                InterviewId = reader["InterviewId"] != DBNull.Value ? Convert.ToInt32(reader["InterviewId"]) : 0,
-                                InterviewDate = reader["InterviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["InterviewDate"]) : DateTime.MinValue,
-                                InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null,
-                                CompanyName = reader["CompanyName"] != DBNull.Value ? reader["CompanyName"].ToString() : null
-
-                            };
-
-                            dt.Add(result);
-                        }
-
-                    }
-                }
+                    JobId = reader.GetInt32Safe("JobId"),
+                    JobTitle = reader.GetStringSafe("JobTitle"),
+                    JobNo = reader.GetStringSafe("JobNo"),
+                    DateApplied = reader.GetDateTimeSafe("DateApplied"),
+                    Status = reader.GetStringSafe("Status"),
+                    JobLocation = reader.GetStringSafe("JobLocation"),
+                    RecruitingAgency = reader.GetStringSafe("RecruitingAgency"),
+                    RecruitertName = reader.GetStringSafe("RecruitertName"),
+                    RecruiterPhone = reader.GetStringSafe("RecruiterPhone"),
+                    RecruiterEmail = reader.GetStringSafe("RecruiterEmail"),
+                    InterviewId = reader.GetInt32Safe("InterviewId"),
+                    InterviewDate = reader.GetDateTimeSafe("InterviewDate"),
+                    InterviewType = reader.GetStringSafe("InterviewType"),
+                    CompanyName = reader.GetStringSafe("CompanyName")
+                });
             }
 
-            return dt;
+            return results;
         }
 
 
@@ -108,51 +95,33 @@ namespace MITJobTracker.Data.Common
         /// <param name="jobIds">The IDs of the jobs to be removed.</param>
         /// <returns>The number of jobs that were successfully removed.</returns>
         /// <remarks>jobIds is a list of comma seprated of ID's</remarks>
-        public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds)
+        public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds, string userId, CancellationToken cancellationToken = default)
         {
-            // Check if jobIds is null or empty
-            if (string.IsNullOrWhiteSpace(jobIds)) throw new ArgumentNullException(nameof(jobIds));
+            if (string.IsNullOrWhiteSpace(jobIds)) 
+                throw new ArgumentNullException(nameof(jobIds));
+            if (string.IsNullOrWhiteSpace(userId)) 
+                throw new ArgumentNullException(nameof(userId));
 
-            int returnValue = 0;
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync(cancellationToken);
 
-            // Open a connection to the database
-            await using (SqlConnection con = new SqlConnection(connectionString))
+            await using var command = new SqlCommand("dbo.sp_SoftDeleteJobs", con)
             {
-                con.Open();
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = CommandTimeout
+            };
 
-                // Check if the connection is open
-                if (con.State != ConnectionState.Open)
-                {
-                    throw new Exception("Connection to database failed.");
-                }
+            command.Parameters.Add("@JobIds", SqlDbType.NVarChar, -1).Value = jobIds;
+            command.Parameters.Add("@UserId", SqlDbType.NVarChar, 150).Value = userId;
 
-                // Create a new SqlCommand to call the stored procedure
-                await using (SqlCommand command = new SqlCommand("dbo.sp_SoftDeleteJobs", con))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@JobIds", jobIds);
-                    command.Parameters.AddWithValue("@UserId", "CNikula");
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-                    // Execute the command and retrieve the results
-                    await using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        // Check if the reader has rows
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                // Retrieve the return value from the reader
-                                returnValue = reader["DeletedCount"] != DBNull.Value
-                                    ? Convert.ToInt32(reader["DeletedCount"])
-                                    : 0;
-                            }
-                        }
-                    }
-                }
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                return reader.GetInt32Safe("DeletedCount");
             }
 
-            // Return the number of jobs that were successfully removed
-            return returnValue;
+            return 0;
         }
 
         /// <summary>
@@ -162,81 +131,93 @@ namespace MITJobTracker.Data.Common
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="Exception"></exception>
-        public async Task<JobsInterviewDTO> GetJobInterviewById(int id)
+        public async Task<JobsInterviewDTO?> GetJobInterviewById(int id, CancellationToken cancellationToken = default)
         {
-            if (id == 0) throw new ArgumentNullException(nameof(id));
+            if (id <= 0) 
+                throw new ArgumentException("ID must be greater than zero", nameof(id));
 
-            JobsInterviewDTO dt = new JobsInterviewDTO();
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync(cancellationToken);
 
-            await using (SqlConnection con = new SqlConnection(connectionString))
+            await using var command = new SqlCommand("dbo.sp_GetDetailInfo", con)
             {
-                con.Open();
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = CommandTimeout
+            };
 
-                if (con.State != ConnectionState.Open)
+            command.Parameters.Add("@Id", SqlDbType.Int).Value = id;
+
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                return new JobsInterviewDTO
                 {
-                    throw new Exception("Connection to database failed.");
-                }
-
-                await using (SqlCommand command = new SqlCommand("dbo.sp_GetDetailInfo", con))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    await using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        // check if reader has rows
-                        if (!reader.HasRows)
-                        {
-                            return dt;
-                        }
-
-                        while (reader.Read())
-                        {
-                            JobsInterviewDTO result = new JobsInterviewDTO
-                            {
-                                JobId = reader["JobId"] != DBNull.Value ? Convert.ToInt32(reader["JobId"]) : 0,
-                                JobTitle = reader["JobTitle"] != DBNull.Value ? reader["JobTitle"].ToString() : null,
-                                JobNo = reader["JobNo"] != DBNull.Value ? reader["JobNo"].ToString() : null,
-                                CompanyName = reader["CompanyName"] != DBNull.Value ? reader["CompanyName"].ToString() : null,
-                                RecruitingAgency = reader["RecruitingAgency"] != DBNull.Value ? reader["RecruitingAgency"].ToString() : null,
-                                RecruitertName = reader["RecruitertName"] != DBNull.Value ? reader["RecruitertName"].ToString() : null,
-                                RecruiterPhone = reader["RecruiterPhone"] != DBNull.Value ? reader["RecruiterPhone"].ToString() : null,
-                                RecruiterEmail = reader["RecruiterEmail"] != DBNull.Value ? reader["RecruiterEmail"].ToString() : null,
-                                JobLocation = reader["JobLocation"] != DBNull.Value ? reader["JobLocation"].ToString() : null,
-                                Remote = reader["Remote"] != DBNull.Value ? Convert.ToBoolean(reader["Remote"]) : false,
-                                Hybrid = reader["Hybrid"] != DBNull.Value ? Convert.ToBoolean(reader["Hybrid"]) : false,
-                                HybridNoOfDays = reader["HybridNoOfDays"] != DBNull.Value ? reader["HybridNoOfDays"].ToString() : null,
-                                Requirements = reader["Requirements"] != DBNull.Value ? reader["Requirements"].ToString() : null,
-                                JobDescription = reader["JobDescription"] != DBNull.Value ? reader["JobDescription"].ToString() : null,
-                                Salary = reader["Salary"] != DBNull.Value ? reader["Salary"].ToString() : null,
-                                EmploymentType = reader["EmploymentType"] != DBNull.Value ? reader["EmploymentType"].ToString() : null,
-                                SubContract = reader["SubContract"] != DBNull.Value ? Convert.ToBoolean(reader["SubContract"]) : false,
-                                ResumeSend = reader["ResumeSend"] != DBNull.Value ? Convert.ToBoolean(reader["ResumeSend"]) : false,
-                                ResumeSendDate = reader["ResumeSendDate"] != DBNull.Value ? Convert.ToDateTime(reader["ResumeSendDate"]) : DateTime.MinValue,
-                                DateApplied = reader["DateApplied"] != DBNull.Value ? Convert.ToDateTime(reader["DateApplied"]) : DateTime.MinValue,
-                                Duration = reader["Duration"] != DBNull.Value ? reader["Duration"].ToString() : null,
-                                OnSite = reader["OnSite"] != DBNull.Value ? Convert.ToBoolean(reader["OnSite"]) : false,
-                                Note = reader["Note"] != DBNull.Value ? reader["Note"].ToString() : null,
-                                InterviewId = reader["InterviewId"] != DBNull.Value ? Convert.ToInt32(reader["InterviewId"]) : 0,
-                                InterviewDate = reader["InterviewDate"] != DBNull.Value ? Convert.ToDateTime(reader["InterviewDate"]) : DateTime.MinValue,
-                                InterviewType = reader["InterviewType"] != DBNull.Value ? reader["InterviewType"].ToString() : null,
-                                InterviewerName = reader["InterviewerName"] != DBNull.Value ? reader["InterviewerName"].ToString() : null,
-                                InterviewerPhone = reader["InterviewerPhone"] != DBNull.Value ? reader["InterviewerPhone"].ToString() : null,
-                                InterviewerEmail = reader["InterviewerEmail"] != DBNull.Value ? reader["InterviewerEmail"].ToString() : null,
-                                InterviewerNotes = reader["InterviewerNotes"] != DBNull.Value ? reader["InterviewerNotes"].ToString() : null,
-                                InterviewerResulte = reader["InterviewerResulte"] != DBNull.Value ? reader["InterviewerResulte"].ToString() : null,
-                            };
-
-                            dt = result;
-                        } 
-                    }
-                        
-                }
+                    JobId = reader.GetInt32Safe("JobId"),
+                    JobTitle = reader.GetStringSafe("JobTitle"),
+                    JobNo = reader.GetStringSafe("JobNo"),
+                    CompanyName = reader.GetStringSafe("CompanyName"),
+                    RecruitingAgency = reader.GetStringSafe("RecruitingAgency"),
+                    RecruitertName = reader.GetStringSafe("RecruitertName"),
+                    RecruiterPhone = reader.GetStringSafe("RecruiterPhone"),
+                    RecruiterEmail = reader.GetStringSafe("RecruiterEmail"),
+                    JobLocation = reader.GetStringSafe("JobLocation"),
+                    Remote = reader.GetBooleanSafe("Remote"),
+                    Hybrid = reader.GetBooleanSafe("Hybrid"),
+                    HybridNoOfDays = reader.GetStringSafe("HybridNoOfDays"),
+                    Requirements = reader.GetStringSafe("Requirements"),
+                    JobDescription = reader.GetStringSafe("JobDescription"),
+                    Salary = reader.GetStringSafe("Salary"),
+                    EmploymentType = reader.GetStringSafe("EmploymentType"),
+                    SubContract = reader.GetBooleanSafe("SubContract"),
+                    ResumeSend = reader.GetBooleanSafe("ResumeSend"),
+                    ResumeSendDate = reader.GetDateTimeSafe("ResumeSendDate"),
+                    DateApplied = reader.GetDateTimeSafe("DateApplied"),
+                    Duration = reader.GetStringSafe("Duration"),
+                    OnSite = reader.GetBooleanSafe("OnSite"),
+                    Note = reader.GetStringSafe("Note"),
+                    InterviewId = reader.GetInt32Safe("InterviewId"),
+                    InterviewDate = reader.GetDateTimeSafe("InterviewDate"),
+                    InterviewType = reader.GetStringSafe("InterviewType"),
+                    InterviewerName = reader.GetStringSafe("InterviewerName"),
+                    InterviewerPhone = reader.GetStringSafe("InterviewerPhone"),
+                    InterviewerEmail = reader.GetStringSafe("InterviewerEmail"),
+                    InterviewerNotes = reader.GetStringSafe("InterviewerNotes"),
+                    InterviewerResulte = reader.GetStringSafe("InterviewerResulte")
+                };
             }
 
-            return dt;
+            return null;
         }
 
 
+    }
+
+    // Extension methods for safer data reader access
+    public static class SqlDataReaderExtensions
+    {
+        public static string? GetStringSafe(this SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
+        }
+
+        public static int GetInt32Safe(this SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? 0 : reader.GetInt32(ordinal);
+        }
+
+        public static bool GetBooleanSafe(this SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+            return !reader.IsDBNull(ordinal) && reader.GetBoolean(ordinal);
+        }
+
+        public static DateTime GetDateTimeSafe(this SqlDataReader reader, string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? DateTime.MinValue : reader.GetDateTime(ordinal);
+        }
     }
 }
