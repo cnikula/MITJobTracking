@@ -90,12 +90,12 @@ namespace MITJobTracker.Data.Common
 
 
         /// <summary>
-        /// 
+        /// Removes expired jobs by their IDs. (Soft delete only, not physical delete from database)
         /// </summary>
-        /// <param name="jobIds"></param>
-        /// <param name="userId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="jobIds">A comma-separated list of job IDs to be removed.</param>
+        /// <param name="userId">The ID of the user performing the deletion.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>The number of jobs that were marked as deleted.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds, string userId, CancellationToken cancellationToken = default)
         {
