@@ -90,11 +90,13 @@ namespace MITJobTracker.Data.Common
 
 
         /// <summary>
-        /// Removes expired jobs from the database based on the provided job IDs.
+        /// 
         /// </summary>
-        /// <param name="jobIds">The IDs of the jobs to be removed.</param>
-        /// <returns>The number of jobs that were successfully removed.</returns>
-        /// <remarks>jobIds is a list of comma seprated of ID's</remarks>
+        /// <param name="jobIds"></param>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds, string userId, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(jobIds)) 
