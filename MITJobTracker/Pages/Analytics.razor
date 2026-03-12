@@ -1,0 +1,57 @@
+﻿@* MITJobTracker/Pages/Analytics.razor *@
+@page "/analytics"
+@inject IJobsFactory JobsFactory
+
+<PageTitle>Job Application Analytics</PageTitle>
+
+<h3>Your Job Search Analytics</h3>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@totalApplications</h5>
+                <p class="card-text">Total Applications</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@interviewRate%</h5>
+                <p class="card-text">Interview Rate</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@avgResponseTime days</h5>
+                <p class="card-text">Avg Response Time</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@activeApplications</h5>
+                <p class="card-text">Active Applications</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts: Applications per week, Success by company type, etc. -->
+<!-- Use Chart.js or Blazor charting libraries -->
+
+@code {
+    private int totalApplications;
+    private decimal interviewRate;
+    private int avgResponseTime;
+    private int activeApplications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Calculate analytics from your Jobs and Interviews tables
+    }
+}
