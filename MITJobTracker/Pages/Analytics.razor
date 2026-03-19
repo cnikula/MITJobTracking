@@ -53,5 +53,13 @@
     protected override async Task OnInitializedAsync()
     {
         // Calculate analytics from your Jobs and Interviews tables
+        var jobCount = await JobsFactory.GetJobCountAsync();
+        totalApplications = jobCount;
+
+        var jobActiveCount = await JobsFactory.GetActiveJobCount();
+        activeApplications = jobActiveCount;
+
+        var interviewRateValue = await JobsFactory.GetInterviewRateAsync();
+        interviewRate = interviewRateValue;
     }
 }

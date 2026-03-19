@@ -73,6 +73,24 @@ namespace MITJobTracker.Factory
             if (id == 0 || string.IsNullOrEmpty(id.ToString())) throw new ArgumentNullException(nameof(id));
             return await _jobsServices.DeleteJobAsysnc(id);
         }
+
+        public async Task<int> GetJobCountAsync()
+        {
+            
+            return await _jobsServices.GetJobCountAsync();          
+           
+
+        }
+
+        public async Task<int> GetActiveJobCount()
+        {
+            return await _jobsServices.GetActiveJobCount();
+        }
+
+        public async Task<decimal> GetInterviewRateAsync()
+        {
+            return await _jobsServices.GetInterviewRateAsync();
+        }
     }
 
     

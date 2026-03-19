@@ -3,5 +3,7 @@
     public interface IAppInfoService
     {
         public string Version { get; }
+
+        
     }
 }

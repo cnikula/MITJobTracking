@@ -1,10 +1,14 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data.DTOS;
 
 
 namespace MITJobTracker.Data.Common
 {
+    
+    /// <summary>
+    /// Provides Entity Framework operations for managing Job and Interview table records,
+    /// including creating, updating, and soft-deleting entities via <see cref="AppDBContext"/>.
+    /// </summary>
     public class EFTableManagement
     {
         private readonly AppDBContext _context;

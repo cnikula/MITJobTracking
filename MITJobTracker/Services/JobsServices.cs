@@ -16,6 +16,7 @@ using MITJobTracker.Data;
 using MITJobTracker.Data.DTOS;
 using MITJobTracker.Services.Interfaces;
 using MITJobTracker.Data.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace MITJobTracker.Services
 {
@@ -195,6 +196,45 @@ namespace MITJobTracker.Services
             returnValue = await efTableManagement.DeleteJobById(id);
 
             return returnValue;
+        }
+
+        public async Task<int> GetJobCountAsync()
+        {
+            int returnValue = 0;
+            returnValue =  await _context.Jobs
+                .Select(j => j.JobId)
+                .CountAsync();
+            
+            return returnValue;
+        }
+
+        public async Task<int> GetActiveJobCount()
+        {
+            int returnValue = 0;
+
+            returnValue = await _context.Jobs
+               .Where(j => j.IsDeleted == false)
+               .CountAsync();
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// Gets the interview rate by calling the stored procedure.
+        /// </summary>
+        /// <returns>The interview rate as a decimal percentage.</returns>
+        public async Task<decimal> GetInterviewRateAsync()
+        {
+            try
+            {
+                return await _commonSP.GetInterviewRateAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult}");
+                return 0;
+            }
         }
     }
 

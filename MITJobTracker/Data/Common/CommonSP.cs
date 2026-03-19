@@ -192,6 +192,33 @@ namespace MITJobTracker.Data.Common
             return null;
         }
 
+        // <summary>
+        /// Gets the interview rate by calling the usp_GetInterviewRate stored procedure.
+        /// </summary>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>The interview rate as a decimal percentage.</returns>
+        public async Task<decimal> GetInterviewRateAsync(CancellationToken cancellationToken = default)
+        {
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync(cancellationToken);
+
+            await using var command = new SqlCommand("dbo.usp_GetInterviewRate", con)
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = CommandTimeout
+            };
+
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                var ordinal = reader.GetOrdinal("InterviewRate");
+                return reader.IsDBNull(ordinal) ? 0 : reader.GetDecimal(ordinal);
+            }
+
+            return 0;
+        }
+
 
     }
 
@@ -221,5 +248,6 @@ namespace MITJobTracker.Data.Common
             var ordinal = reader.GetOrdinal(columnName);
             return reader.IsDBNull(ordinal) ? DateTime.MinValue : reader.GetDateTime(ordinal);
         }
+       
     }
 }
