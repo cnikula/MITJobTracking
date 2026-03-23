@@ -27,6 +27,10 @@ namespace MITJobTracker.Services.Interfaces
         Task<int> RemoveExpiredJobsAsync(List<int> jobIds);
         Task<JobsInterviewDTO> GetJobInterviewById(int id);
         Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview);
+        Task<int> GetJobCountAsync();
+        Task<int> GetActiveJobCount();
+        Task<decimal> GetInterviewRateAsync();
+        Task<int> GetAvgResponseTimeAsync();
 
     }
 }

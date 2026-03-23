@@ -1,0 +1,99 @@
+﻿@* MITJobTracker/Pages/Analytics.razor *@
+@page "/analytics"
+@inject IJobsFactory JobsFactory
+
+
+<PageTitle>Job Application Analytics</PageTitle>
+
+<h3>Your Job Search Analytics</h3>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@totalApplications</h5>
+                <p class="card-text">Total Applications</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@interviewRate%</h5>
+                <p class="card-text">Interview Rate</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@avgResponseTime days</h5>
+                <p class="card-text">Avg Response Time</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@activeApplications</h5>
+                <p class="card-text">Active Applications</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <!-- Charts: Applications -->
+    <SfChart Title="Job Search Results">
+
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+    <ChartPrimaryYAxis Title="Count"></ChartPrimaryYAxis>
+    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+
+     <ChartSeriesCollection>
+        <ChartSeries DataSource="@jobReports" XName="X" YName="YValue" Type="ChartSeriesType.Column"></ChartSeries>
+    </ChartSeriesCollection>
+
+    </SfChart>
+
+</div>
+
+
+@code {
+    private int totalApplications;
+    private decimal interviewRate;
+    private int avgResponseTime;
+    private int activeApplications;
+    private List<ChartData> jobReports;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Calculate analytics from your Jobs and Interviews tables
+        totalApplications = await JobsFactory.GetJobCountAsync();
+        activeApplications = await JobsFactory.GetActiveJobCount();
+        interviewRate = await JobsFactory.GetInterviewRateAsync();
+        avgResponseTime = await JobsFactory.GetAvgResponseTimeAsync();
+
+        // Initialize jobReports after totalApplications is set
+        jobReports = new List<ChartData>
+        {
+            new ChartData { X= "Total Applications", YValue= totalApplications},
+            new ChartData { X= "Interview Rate", YValue= (double)interviewRate},
+            new ChartData { X= "Avg ResponseTime By Days", YValue= avgResponseTime},
+            new ChartData { X= "Active Applications", YValue= activeApplications}
+        };
+
+
+    }
+
+    /// <summary>
+    /// Represents a data point for a chart.
+    /// </summary>
+    public class ChartData
+        {
+            public string X { get; set; }
+            public double YValue { get; set; }
+        }
+
+    
+}

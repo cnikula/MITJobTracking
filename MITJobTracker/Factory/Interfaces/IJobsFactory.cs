@@ -27,5 +27,10 @@ namespace MITJobTracker.Factory.Interfaces
         Task<JobsInterviewDTO> GetJobInterviewById(int id);
         Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview);
         Task<int> DeleteJobAsync(int id);
+        Task<int> GetJobCountAsync();
+        Task<int> GetActiveJobCount();
+        Task<decimal> GetInterviewRateAsync();
+        Task<int> GetAvgResponseTimeAsync();       
+
     }
 }
