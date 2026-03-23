@@ -91,6 +91,11 @@ namespace MITJobTracker.Factory
         {
             return await _jobsServices.GetInterviewRateAsync();
         }
+
+        public async Task<int> GetAvgResponseTimeAsync()
+        {
+            return await _jobsServices.GetAvgResponseTimeAsync();
+        }
     }
 
     

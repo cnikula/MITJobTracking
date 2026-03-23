@@ -34,20 +34,20 @@ namespace MITJobTracker.Services
             efTableManagement = new EFTableManagement(_context);
         }
 
-       
-        
+
+
         public Task<Job> GetJobById(int id)
         {
             throw new NotImplementedException();
         }
 
-        
+
         public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
-           return await _commonSP.GetJobList(searchValue, fullList);
+            return await _commonSP.GetJobList(searchValue, fullList);
         }
 
-       
+
         /// <summary>Adds the job.</summary>
         /// <param name="job">The job.</param>
         /// <returns>System.Int32.</returns>
@@ -61,7 +61,7 @@ namespace MITJobTracker.Services
                 //_context.Entry(job).State = EntityState.Added;
 
                 _context.Jobs.Add(job);
-                
+
                 returnValue = await _context.SaveChangesAsync();
 
                 if (returnValue > 0)
@@ -86,7 +86,7 @@ namespace MITJobTracker.Services
             throw new NotImplementedException();
         }
 
-       
+
 
         /// <summary>
         /// Removes expired jobs asynchronously.
@@ -147,7 +147,7 @@ namespace MITJobTracker.Services
         public async Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
         {
             bool returnValue = false;
-           
+
             if (job && interview)
             {
                 if (JobsInterview.InterviewId == 0)
@@ -160,7 +160,7 @@ namespace MITJobTracker.Services
                 {
                     // Update Jobs table
                     // Update Interview table
-                    returnValue = await efTableManagement.UpdateJob_InterviwById(JobsInterview); 
+                    returnValue = await efTableManagement.UpdateJob_InterviwById(JobsInterview);
                 }
             }
             else if (job && !interview)
@@ -201,10 +201,10 @@ namespace MITJobTracker.Services
         public async Task<int> GetJobCountAsync()
         {
             int returnValue = 0;
-            returnValue =  await _context.Jobs
+            returnValue = await _context.Jobs
                 .Select(j => j.JobId)
                 .CountAsync();
-            
+
             return returnValue;
         }
 
@@ -236,8 +236,22 @@ namespace MITJobTracker.Services
                 return 0;
             }
         }
+
+        public Task<int> GetAvgResponseTimeAsync()
+        {
+            try
+            {
+                return _commonSP.GetAvgResponseTimeAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine($"Error Message: {e.Message}, Error No. {e.HResult}");
+                return Task.FromResult(0);
+            }
+        }
+
+
     }
 
-
 }
-

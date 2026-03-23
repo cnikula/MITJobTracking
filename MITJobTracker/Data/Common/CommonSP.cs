@@ -219,6 +219,34 @@ namespace MITJobTracker.Data.Common
             return 0;
         }
 
+        /// <summary>
+        /// Asynchronously retrieves the average response time from the database.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the average response time in
+        /// milliseconds, or 0 if no data is available.</returns>
+        public async Task<int> GetAvgResponseTimeAsync(CancellationToken cancellationToken = default)
+        {
+            await using var con = new SqlConnection(_connectionString);
+            await con.OpenAsync(cancellationToken);
+
+            await using var command = new SqlCommand("dbo.usp_GetAvgResponseTime", con)
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = CommandTimeout
+            };
+
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                var ordinal = reader.GetOrdinal("AvgResponseDays");
+                return reader.IsDBNull(ordinal) ? 0 : reader.GetInt32(ordinal);
+            }
+
+            return 0;
+        }
+
 
     }
 
@@ -248,6 +276,8 @@ namespace MITJobTracker.Data.Common
             var ordinal = reader.GetOrdinal(columnName);
             return reader.IsDBNull(ordinal) ? DateTime.MinValue : reader.GetDateTime(ordinal);
         }
+
        
+
     }
 }

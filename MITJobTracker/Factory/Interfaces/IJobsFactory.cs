@@ -30,6 +30,7 @@ namespace MITJobTracker.Factory.Interfaces
         Task<int> GetJobCountAsync();
         Task<int> GetActiveJobCount();
         Task<decimal> GetInterviewRateAsync();
+        Task<int> GetAvgResponseTimeAsync();       
 
     }
 }

@@ -2,6 +2,7 @@
 @page "/analytics"
 @inject IJobsFactory JobsFactory
 
+
 <PageTitle>Job Application Analytics</PageTitle>
 
 <h3>Your Job Search Analytics</h3>
@@ -41,25 +42,58 @@
     </div>
 </div>
 
-<!-- Charts: Applications per week, Success by company type, etc. -->
-<!-- Use Chart.js or Blazor charting libraries -->
+<div>
+    <!-- Charts: Applications -->
+    <SfChart Title="Job Search Results">
+
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
+    <ChartPrimaryYAxis Title="Count"></ChartPrimaryYAxis>
+    <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+
+     <ChartSeriesCollection>
+        <ChartSeries DataSource="@jobReports" XName="X" YName="YValue" Type="ChartSeriesType.Column"></ChartSeries>
+    </ChartSeriesCollection>
+
+    </SfChart>
+
+</div>
+
 
 @code {
     private int totalApplications;
     private decimal interviewRate;
     private int avgResponseTime;
     private int activeApplications;
+    private List<ChartData> jobReports;
 
     protected override async Task OnInitializedAsync()
     {
         // Calculate analytics from your Jobs and Interviews tables
-        var jobCount = await JobsFactory.GetJobCountAsync();
-        totalApplications = jobCount;
+        totalApplications = await JobsFactory.GetJobCountAsync();
+        activeApplications = await JobsFactory.GetActiveJobCount();
+        interviewRate = await JobsFactory.GetInterviewRateAsync();
+        avgResponseTime = await JobsFactory.GetAvgResponseTimeAsync();
 
-        var jobActiveCount = await JobsFactory.GetActiveJobCount();
-        activeApplications = jobActiveCount;
+        // Initialize jobReports after totalApplications is set
+        jobReports = new List<ChartData>
+        {
+            new ChartData { X= "Total Applications", YValue= totalApplications},
+            new ChartData { X= "Interview Rate", YValue= (double)interviewRate},
+            new ChartData { X= "Avg ResponseTime By Days", YValue= avgResponseTime},
+            new ChartData { X= "Active Applications", YValue= activeApplications}
+        };
 
-        var interviewRateValue = await JobsFactory.GetInterviewRateAsync();
-        interviewRate = interviewRateValue;
+
     }
+
+    /// <summary>
+    /// Represents a data point for a chart.
+    /// </summary>
+    public class ChartData
+        {
+            public string X { get; set; }
+            public double YValue { get; set; }
+        }
+
+    
 }
