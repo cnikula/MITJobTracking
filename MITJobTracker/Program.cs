@@ -43,9 +43,8 @@ builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService,
 
 var app = builder.Build();
 
-
 // 26.X.X - Syncfusion.Licensing
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXhfcnVXRmRZUk13WEU=");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NDI4OTI2OEAzMjM2MmUzMDJlMzBQR21RZ01sTHR1emoxa0ZVb3Q1b085MUhNTHozbEZLUnFDVWd3NUQvbmEwPQ==");
 
 if (!app.Environment.IsDevelopment())
 {
@@ -59,6 +58,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Set the path base for IIS sub-application deployment
+app.UsePathBase("/mitJobTracker");
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
