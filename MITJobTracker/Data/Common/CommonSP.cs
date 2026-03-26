@@ -90,12 +90,13 @@ namespace MITJobTracker.Data.Common
 
 
         /// <summary>
-        /// Removes expired jobs by their IDs. (Soft delete only, not physical delete from database)
+        /// Remove expired jobs by calling the sp_SoftDeleteJobs stored procedure. This will mark the jobs as deleted in the database, 
+        /// but not actually delete them. The stored procedure will return the number of jobs that were marked as deleted.
         /// </summary>
-        /// <param name="jobIds">A comma-separated list of job IDs to be removed.</param>
-        /// <param name="userId">The ID of the user performing the deletion.</param>
-        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-        /// <returns>The number of jobs that were marked as deleted.</returns>
+        /// <param name="jobIds"></param>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<int> RemoveExpiredJobsByIdAsync(string jobIds, string userId, CancellationToken cancellationToken = default)
         {

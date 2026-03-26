@@ -29,6 +29,10 @@ namespace MITJobTracker.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            sql = @"DROP INDEX IX_Interviews_JobId_IsDeleted ON Interviews;
+                    DROP INDEX IX_Jobs_JobId_IsDeleted ON Jobs;";
+            
+            migrationBuilder.Sql(sql);
 
         }
     }
