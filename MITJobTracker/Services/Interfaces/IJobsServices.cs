@@ -19,11 +19,11 @@ namespace MITJobTracker.Services.Interfaces
 {
     public interface IJobsServices
     {
-        Task<Job> GetJobById(int id);
+        //Task<Job> GetJobById(int id);
         Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList);
         Task<int> AddJob(Job job);
         Task<Job> UpdateJobById(Job job);
-        Task<int> DeleteJobAsysnc(int id);
+        Task<int> DeleteJobAsync(int id);
         Task<int> RemoveExpiredJobsAsync(List<int> jobIds);
         Task<JobsInterviewDTO> GetJobInterviewById(int id);
         Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview);

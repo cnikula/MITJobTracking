@@ -34,14 +34,7 @@ namespace MITJobTracker.Services
             efTableManagement = new EFTableManagement(_context);
         }
 
-
-
-        public Task<Job> GetJobById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-
+        
         public async Task<List<ProspectListDTO>> GetJobList(string searchValue, bool fullList)
         {
             return await _commonSP.GetJobList(searchValue, fullList);
@@ -251,7 +244,19 @@ namespace MITJobTracker.Services
             }
         }
 
+        //public Task<Job> GetJobById(int id)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
+        public async Task<int> DeleteJobAsync(int id)
+        {
+            int returnValue = 0;
+
+            returnValue = await efTableManagement.DeleteJobById(id);
+
+            return returnValue;
+        }
     }
 
 }

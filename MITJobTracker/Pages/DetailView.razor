@@ -31,9 +31,9 @@
                     <span>&nbsp;&nbsp;</span>
                     <input type="text" asp-for="jobno" class="form-control mit-input-width-200" id="jobno" @bind-value="JobsInterview.JobNo" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="date" asp-for="dateApplied" class="form-control mit-input-width-200" id="date" name="dateApplied" @bind-value="JobsInterview.DateApplied" />
+                    <input type="date" asp-for="dateApplied" class="form-control mit-input-width-200" id="dateApp" name="dateApplied" @bind-value="JobsInterview.DateApplied" />
                     <span>&nbsp;&nbsp;</span>
-                    <input type="date" asp-for="resumeSendDate" class="form-control mit-input-width-200" id="date" name="resumeSendDate" @bind-value="JobsInterview.ResumeSendDate" />
+                    <input type="date" asp-for="resumeSendDate" class="form-control mit-input-width-200" id="dateSendDT" name="resumeSendDate" @bind-value="JobsInterview.ResumeSendDate" />
                 </div>
             </div>
 
@@ -200,7 +200,7 @@
                         <Header> @dialogHeader</Header>
                         <Content>
                             <div class="mit-dialog-content"></div>
-                            <spam class="mit-dialogText">@dialogText</spam>
+                            <span class="mit-dialogText">@dialogText</span>
                         </Content>
                     </DialogTemplates>
                 </SfDialog>
@@ -292,81 +292,83 @@
         bool interview = false;
         bool job = false;
         bool returnValue = false;
+
+        differences.Clear();
         
 
         if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
         {
             // Save the data to the database, eighter to the Jobs or Interview table or both.
-            interview = differences.Any(s => s.Contains("Interview", StringComparison.OrdinalIgnoreCase));
+            interview = differences.Any(s => s.StartsWith("Interview", StringComparison.OrdinalIgnoreCase));
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("job", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("job", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("recruiter", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("RecruitertName", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("CompanyName", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("CompanyName", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Remote", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Remote:", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Hybrid", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Hybrid", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Requirements", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Requirements", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Salary", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Salary", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Employment", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Employment", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("SubContract", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("SubContract", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Resume", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Resume", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("DateApplied", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("DateApplied", StringComparison.OrdinalIgnoreCase));
             }
             
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Duration", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Duration", StringComparison.OrdinalIgnoreCase));
             }
             
             if (!job)
             {
-                job = differences.Any(s => s.Contains("OnSite", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("OnSite", StringComparison.OrdinalIgnoreCase));
             }
 
             if (!job)
             {
-                job = differences.Any(s => s.Contains("Note", StringComparison.OrdinalIgnoreCase));
+                job = differences.Any(s => s.StartsWith("Note", StringComparison.OrdinalIgnoreCase));
             }
 
 
