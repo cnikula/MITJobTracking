@@ -15,7 +15,6 @@ var configuration = builder.Configuration;
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddCircuitOptions(options => { options.DetailedErrors = true; });
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSyncfusionBlazor();
 
 #region Connection String
@@ -28,11 +27,10 @@ void ConfigureServices(IServiceCollection services)
 }
 
 builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
-
-//builder.Services.Add<IJobsFactory, JobsFactory>();
-builder.Services.AddTransient<IJobsFactory, JobsFactory>();
-//builder.Services.AddSingleton<IJobsServices, JobsServices>();
-builder.Services.AddTransient<IJobsServices, JobsServices>();
+//builder.Services.AddTransient<IJobsFactory, JobsFactory>();
+builder.Services.AddScoped<IJobsFactory, JobsFactory>();
+//builder.Services.AddTransient<IJobsServices, JobsServices>();
+builder.Services.AddScoped<IJobsServices, JobsServices>();
 builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService, MITJobTracker.Services.AppInfoService>();
 
 // ...
@@ -44,7 +42,11 @@ builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService,
 var app = builder.Build();
 
 // 26.X.X - Syncfusion.Licensing
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NDI4OTI2OEAzMjM2MmUzMDJlMzBQR21RZ01sTHR1emoxa0ZVb3Q1b085MUhNTHozbEZLUnFDVWd3NUQvbmEwPQ==");
+var syncfusionLicenseKey = configuration["SyncfusionLicenseKey"];
+if (!string.IsNullOrEmpty(syncfusionLicenseKey))
+{
+    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicenseKey);
+}
 
 if (!app.Environment.IsDevelopment())
 {
@@ -57,10 +59,10 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.UseRouting();
-
 // Set the path base for IIS sub-application deployment
 app.UsePathBase("/mitJobTracker");
+
+app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

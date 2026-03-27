@@ -62,8 +62,8 @@ namespace MITJobTracker.Factory
         public Task<bool> UpdateJobAndInterview(JobsInterviewDTO JobsInterview, bool job, bool interview)
           {
             if (JobsInterview is null) throw new ArgumentNullException(nameof(JobsInterview));
-            if (job.ToString() is null) throw new ArgumentNullException(nameof(job));
-            if (interview.ToString() is null) throw new ArgumentNullException(nameof(interview));
+            //if (job.ToString() is null) throw new ArgumentNullException(nameof(job));
+            //if (interview.ToString() is null) throw new ArgumentNullException(nameof(interview));
 
               return _jobsServices.UpdateJobAndInterview(JobsInterview, job, interview);
         }
@@ -71,7 +71,7 @@ namespace MITJobTracker.Factory
         public async Task<int> DeleteJobAsync(int id)
         {
             if (id == 0 || string.IsNullOrEmpty(id.ToString())) throw new ArgumentNullException(nameof(id));
-            return await _jobsServices.DeleteJobAsysnc(id);
+            return await _jobsServices.DeleteJobAsync(id);
         }
 
         public async Task<int> GetJobCountAsync()

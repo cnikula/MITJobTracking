@@ -200,11 +200,11 @@
     /// <summary>
     /// Re-PpopulateGrid the grid with the search value
     /// </summary>
-    private void DoSearch()
+    private async Task DoSearch()
     {
         if (!string.IsNullOrWhiteSpace(searchValue))
         {
-            PpopulateGrid(searchValue, false);
+            await PpopulateGrid(searchValue, false);
         }
         else
         {

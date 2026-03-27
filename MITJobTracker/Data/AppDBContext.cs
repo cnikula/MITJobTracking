@@ -37,9 +37,17 @@ namespace MITJobTracker.Data
         public virtual DbSet<Job> Jobs { get; set; }
         public virtual DbSet<Interview> Interviews { get; set; }
 
-        public void OnModelCreating(ModelBuilder modelBuilder)
+        
+        // This method is used to configure the model that was discovered by convention from the entity types
+        //public void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //   modelBuilder.Entity<ProspectListDTO>().HasNoKey();
+        //}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           modelBuilder.Entity<ProspectListDTO>().HasNoKey();
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ProspectListDTO>().HasNoKey();
         }
 
 
