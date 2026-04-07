@@ -1,7 +1,7 @@
 Overall Summary of MITJobTracker Application
 
 MITJobTracker is a Blazor-based web application designed to help users manage job applications and interviews. 
-The application leverages .NET 8 and Entity Framework Core for data access and management. 
+The application leverages .NET 9 and Entity Framework Core for data access and management. 
 The primary functionalities of the application include:
 
 1.	Job Management: Users can add, update, and delete job records. Each job record contains detailed information such as job title, job number, company name, job location, salary, employment type, and more.
