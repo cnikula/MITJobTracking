@@ -9,6 +9,7 @@
     <AssemblyVersion>9.4.1</AssemblyVersion>
     <FileVersion>9.4.1</FileVersion>
     <Copyright>Mesquite Information Technologies</Copyright>
+    <UserSecretsId>c46f3641-4481-4c3c-97e8-b3a1e5b68894</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
