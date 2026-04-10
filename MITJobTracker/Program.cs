@@ -36,8 +36,16 @@ builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService,
 // ...
 #endregion
 
+#region External API Clients
 
+// JSearch API via RapidAPI
+builder.Services.AddHttpClient("JSearch", client =>
+{
+    client.BaseAddress = new Uri(configuration["RapidApi:JSearchBaseUrl"] ?? "https://jsearch.p.rapidapi.com/");
+});
+builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 
+#endregion
 
 var app = builder.Build();
 
