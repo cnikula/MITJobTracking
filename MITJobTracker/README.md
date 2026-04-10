@@ -1,7 +1,7 @@
 Overall Summary of MITJobTracker Application — V10.0.0
 
 MITJobTracker is a Blazor Server web application designed to help users manage job applications and interviews.
-The application targets .NET 10, uses Entity Framework Core 10 for data access, Syncfusion Blazor 33.x for UI
+The application targets .NET 10, uses Entity Framework Core 10.0.5 for data access, Syncfusion Blazor 26.x for UI
 components, and SQL Server stored procedures for reporting queries.
 
 Primary Functionalities
@@ -51,3 +51,25 @@ calculation (usp_GetInterviewRate), average response time (usp_GetAvgResponseTim
 for performance.
 
 NOTE: Be sure to update the connection string in the appsettings.json file to point to your own SQL Server database.
+
+---
+
+Version History
+
+V10.0.0 — .NET 10 Upgrade (Current)
+
+Changes from V9.4.1:
+
+-	Target Framework: Upgraded from net9.0 to net10.0.
+-	Application Version: Bumped from 9.4.1 to 10.0.0 in the .csproj (Version, AssemblyVersion, FileVersion).
+-	Entity Framework Core: Upgraded all EF Core packages (Microsoft.EntityFrameworkCore,
+	Microsoft.EntityFrameworkCore.SqlServer, Microsoft.EntityFrameworkCore.Design,
+	Microsoft.EntityFrameworkCore.Tools) from 9.x to 10.0.5.
+-	Microsoft.VisualStudio.Web.CodeGeneration.Design: Updated to 10.0.2.
+-	Newtonsoft.Json: Updated from 13.0.3 to 13.0.4.
+-	Program.cs: Removed the IgnoreScriptIsolation = true option from AddSyncfusionBlazor() — this
+	option was removed from the Syncfusion GlobalOptions API and is no longer required.
+-	_Host.cshtml: Moved the Syncfusion script reference (syncfusion-blazor.min.js) from the
+	end of <body> to the <head> section to ensure scripts are available before component
+	hydration begins.
+-	Syncfusion Blazor: Remains at 26.x (no Syncfusion major version upgrade in this release).

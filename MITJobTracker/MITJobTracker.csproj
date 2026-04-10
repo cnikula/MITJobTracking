@@ -24,17 +24,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.Charts" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.DataForm" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.Popups" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Blazor.Themes" Version="33.1.47" />
-    <PackageReference Include="Syncfusion.Licensing" Version="33.1.47" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Charts" Version="26.1.40" />
+    <PackageReference Include="Syncfusion.Blazor.DataForm" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.SplitButtons" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.41" />
+    <PackageReference Include="Syncfusion.Licensing" Version="26.1.41" />
   </ItemGroup>
 
 </Project>
