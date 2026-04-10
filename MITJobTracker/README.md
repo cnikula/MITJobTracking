@@ -1,7 +1,7 @@
-Overall Summary of MITJobTracker Application — V9.4.1
+Overall Summary of MITJobTracker Application — V10.0.0
 
 MITJobTracker is a Blazor Server web application designed to help users manage job applications and interviews.
-The application targets .NET 9, uses Entity Framework Core 9 for data access, Syncfusion Blazor 26.x for UI
+The application targets .NET 10, uses Entity Framework Core 10 for data access, Syncfusion Blazor 33.x for UI
 components, and SQL Server stored procedures for reporting queries.
 
 Primary Functionalities
@@ -24,7 +24,7 @@ Primary Functionalities
 	The AppDBContext class defines the database context, and the EFTableManagement class provides methods
 	for CRUD operations on job and interview records via EF. The CommonSP class executes stored procedures
 	for list retrieval and analytics queries.
-7.	Version Display: The application version (set in the .csproj as 9.4.1) is read at runtime by the
+7.	Version Display: The application version (set in the .csproj as 10.0.0) is read at runtime by the
 	AppInfoService and displayed on the home page.
 8.	User Interface: The application uses Blazor Server-Side rendering with Syncfusion Blazor components
 	(SfGrid, SfDropDownList, SfCheckBox, SfButton, SfDialog, SfChart, SfTextBox, SfIcon) and Bootstrap 5
