@@ -116,10 +116,10 @@ public class JobListing
     public string JobCountry { get; set; } = string.Empty;
 
     [JsonPropertyName("job_latitude")]
-    public double JobLatitude { get; set; }
+    public double? JobLatitude { get; set; }
 
     [JsonPropertyName("job_longitude")]
-    public double JobLongitude { get; set; }
+    public double? JobLongitude { get; set; }
 
     [JsonPropertyName("job_benefits")]
     public List<string>? JobBenefits { get; set; }

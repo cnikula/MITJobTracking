@@ -19,116 +19,130 @@
         @* ── Search Parameters Form ── *@
         <EditForm Model="@SearchRequest" class="form">
 
-            @* Row 1 — Query + Location *@
-            <div class="form-group mb-3">
-                <label for="query">Search Query <span class="text-danger">*</span></label>
-                <label for="location" class="mitcustom-margin-left-530">Location</label>
-                <div class="d-flex align-items-center">
-                    <SfTextBox ID="query" Placeholder="e.g. .NET developer jobs in San Diego"
-                               CssClass="mit-input-width-600"
+            @* Row 1 — Query | Location *@
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label" for="query">
+                        Search Query <span class="text-danger">*</span>
+                    </label>
+                    <SfTextBox ID="query"
+                               Placeholder="e.g. .NET developer jobs in San Diego"
+                               CssClass="w-100"
                                @bind-Value="@SearchRequest.Query" />
-                    <span>&nbsp;&nbsp;</span>
-                    <SfTextBox ID="location" Placeholder="e.g. San Diego, United States"
-                               CssClass="mit-input-width-400"
+                </div>
+                <div class="col-4">
+                    <label class="form-label" for="location">Location</label>
+                    <SfTextBox ID="location"
+                               Placeholder="e.g. San Diego, United States"
+                               CssClass="w-100"
                                @bind-Value="@SearchRequest.Location" />
                 </div>
             </div>
 
-            @* Row 2 — Date Posted + Country + Language *@
-            <div class="form-group mb-3">
-                <label>Date Posted</label>
-                <label class="mitcustom-margin-left-155">Country</label>
-                <label class="mitcustom-margin-left-145">Language (ISO 639)</label>
-                <div class="d-flex align-items-center">
-                    <div class="col-lg-2 sb-property-border">
-                        <SfDropDownList ID="datePosted" TItem="SelectOption" TValue="string"
-                                        PopupHeight="200px" Placeholder="Select Date Range"
-                                        DataSource="@_datePostedOptions"
-                                        @bind-Value="@SearchRequest.DatePosted">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                        </SfDropDownList>
-                    </div>
-                    <span>&nbsp;&nbsp;</span>
-                    <div class="col-lg-2 sb-property-border">
-                        <SfDropDownList ID="country" TItem="SelectOption" TValue="string"
-                                        PopupHeight="230px" Placeholder="Select Country"
-                                        DataSource="@_countryOptions"
-                                        @bind-Value="@SearchRequest.Country">
-                            <DropDownListFieldSettings Text="Text" Value="Value" />
-                        </SfDropDownList>
-                    </div>
-                    <span>&nbsp;&nbsp;</span>
-                    <SfTextBox ID="language" Placeholder="e.g. en, fr, de"
-                               CssClass="mit-input-width-200"
+            @* Row 2 — Date Posted | Country | Language *@
+            <div class="row g-3 mb-3">
+                <div class="col-2">
+                    <label class="form-label">Date Posted</label>
+                    <SfDropDownList ID="datePosted" TItem="SelectOption" TValue="string"
+                                    PopupHeight="200px" Placeholder="Select Date Range"
+                                    DataSource="@_datePostedOptions"
+                                    @bind-Value="@SearchRequest.DatePosted"
+                                    Width="100%">
+                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                    </SfDropDownList>
+                </div>
+                <div class="col-2">
+                    <label class="form-label">Country</label>
+                    <SfDropDownList ID="country" TItem="SelectOption" TValue="string"
+                                    PopupHeight="230px" Placeholder="Select Country"
+                                    DataSource="@_countryOptions"
+                                    @bind-Value="@SearchRequest.Country"
+                                    Width="100%">
+                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                    </SfDropDownList>
+                </div>
+                <div class="col-2">
+                    <label class="form-label">Language (ISO 639)</label>
+                    <SfTextBox ID="language"
+                               Placeholder="e.g. en, fr, de"
+                               CssClass="w-100"
                                @bind-Value="@SearchRequest.Language" />
                 </div>
             </div>
 
-            @* Row 3 — Employment Types + Job Requirements *@
-            <div class="form-group mb-3">
-                <label>Employment Types</label>
-                <label class="mitcustom-margin-left-368">Job Requirements</label>
-                <div class="d-flex align-items-center">
-                    <div style="width: 450px;">
-                        <SfMultiSelect ID="employmentTypes" TValue="string[]" TItem="SelectOption"
-                                       Placeholder="Select employment types"
-                                       DataSource="@_employmentTypeOptions"
-                                       @bind-Value="@_selectedEmploymentTypes">
-                            <MultiSelectFieldSettings Text="Text" Value="Value" />
-                        </SfMultiSelect>
-                    </div>
-                    <span>&nbsp;&nbsp;</span>
-                    <div style="width: 500px;">
-                        <SfMultiSelect ID="jobRequirements" TValue="string[]" TItem="SelectOption"
-                                       Placeholder="Select experience / degree requirements"
-                                       DataSource="@_jobRequirementOptions"
-                                       @bind-Value="@_selectedJobRequirements">
-                            <MultiSelectFieldSettings Text="Text" Value="Value" />
-                        </SfMultiSelect>
-                    </div>
+            @* Row 3 — Employment Types | Job Requirements *@
+            <div class="row g-3 mb-3">
+                <div class="col-4">
+                    <label class="form-label">Employment Types</label>
+                    <SfMultiSelect ID="employmentTypes" TValue="string[]" TItem="SelectOption"
+                                   Placeholder="Select employment types"
+                                   DataSource="@_employmentTypeOptions"
+                                   @bind-Value="@_selectedEmploymentTypes"
+                                   Width="100%">
+                        <MultiSelectFieldSettings Text="Text" Value="Value" />
+                    </SfMultiSelect>
+                </div>
+                <div class="col-5">
+                    <label class="form-label">Job Requirements</label>
+                    <SfMultiSelect ID="jobRequirements" TValue="string[]" TItem="SelectOption"
+                                   Placeholder="Select experience / degree requirements"
+                                   DataSource="@_jobRequirementOptions"
+                                   @bind-Value="@_selectedJobRequirements"
+                                   Width="100%">
+                        <MultiSelectFieldSettings Text="Text" Value="Value" />
+                    </SfMultiSelect>
                 </div>
             </div>
 
-            @* Row 4 — Work From Home + Page + Num Pages + Radius *@
-            <div class="form-group mb-3">
-                <label class="mitcustom-margin-left-2">Work From Home</label>
-                <label class="mitcustom-margin-left-80">Page</label>
-                <label class="mitcustom-margin-left-130">Number of Pages</label>
-                <label class="mitcustom-margin-left-70">Radius (km)</label>
-                <div class="d-flex align-items-center">
+            @* Row 4 — Work From Home | Page | Number of Pages | Radius *@
+            <div class="row g-3 mb-3 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label d-block">Work From Home</label>
                     <SfCheckBox @bind-Checked="@SearchRequest.WorkFromHome" Label="Remote Only" />
-                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="page">Page</label>
                     <SfNumericTextBox ID="page" TValue="int" Min="1" Max="50"
-                                      CssClass="mit-input-width-200"
-                                      @bind-Value="@SearchRequest.Page" />
-                    <span>&nbsp;&nbsp;</span>
+                                      @bind-Value="@SearchRequest.Page"
+                                      Width="100%" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="numPages">Number of Pages</label>
                     <SfNumericTextBox ID="numPages" TValue="int" Min="1" Max="50"
-                                      CssClass="mit-input-width-200"
-                                      @bind-Value="@SearchRequest.NumPages" />
-                    <span>&nbsp;&nbsp;</span>
+                                      @bind-Value="@SearchRequest.NumPages"
+                                      Width="100%" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="radius">Radius (km)</label>
                     <SfNumericTextBox ID="radius" TValue="int?" Min="0"
                                       Placeholder="Optional"
-                                      CssClass="mit-input-width-200"
-                                      @bind-Value="@SearchRequest.Radius" />
+                                      @bind-Value="@SearchRequest.Radius"
+                                      Width="100%" />
                 </div>
             </div>
 
             @* Row 5 — Exclude Publishers *@
-            <div class="form-group mb-3">
-                <label for="excludePublishers">Exclude Publishers (comma-separated)</label>
-                <div>
-                    <SfTextBox ID="excludePublishers" Placeholder="e.g. Dice,BeeBe"
-                               CssClass="mit-input-width-600"
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label" for="excludePublishers">
+                        Exclude Publishers (comma-separated)
+                    </label>
+                    <SfTextBox ID="excludePublishers"
+                               Placeholder="e.g. Dice,BeeBe"
+                               CssClass="w-100"
                                @bind-Value="@SearchRequest.ExcludeJobPublishers" />
                 </div>
             </div>
 
             @* Buttons *@
-            <div class="form-group mb-3">
-                <SfButton CssClass="e-primary" @onclick="RunSearch" Disabled="@_isLoading">
-                    @(_isLoading ? "Searching..." : "Search Jobs")
-                </SfButton>
-                <SfButton CssClass="e-secondary" @onclick="ClearForm" Disabled="@_isLoading">Clear</SfButton>
+            <div class="row mb-3">
+                <div class="col">
+                    <SfButton CssClass="e-primary" @onclick="RunSearch" Disabled="@_isLoading">
+                        @(_isLoading ? "Searching..." : "Search Jobs")
+                    </SfButton>
+                    &nbsp;
+                    <SfButton CssClass="e-secondary" @onclick="ClearForm" Disabled="@_isLoading">Clear</SfButton>
+                </div>
             </div>
 
         </EditForm>
