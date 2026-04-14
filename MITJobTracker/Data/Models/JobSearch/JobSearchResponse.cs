@@ -4,7 +4,7 @@
 // Created          : 04-10-2026
 //
 // Last Modified By : Claude Nikula
-// Last Modified On : 04-10-2026
+// Last Modified On : 04-14-2026
 // ***********************************************************************
 // <copyright file="JobSearchResponse.cs" company="Mesquite IT">
 //     Copyright (c) . All rights reserved.
@@ -82,8 +82,9 @@ public class JobListing
     [JsonPropertyName("job_apply_link")]
     public string JobApplyLink { get; set; } = string.Empty;
 
+    // Nullable: API returns null for this field on some listings
     [JsonPropertyName("job_apply_is_direct")]
-    public bool JobApplyIsDirect { get; set; }
+    public bool? JobApplyIsDirect { get; set; }
 
     [JsonPropertyName("apply_options")]
     public List<ApplyOption> ApplyOptions { get; set; } = [];
@@ -91,8 +92,9 @@ public class JobListing
     [JsonPropertyName("job_description")]
     public string JobDescription { get; set; } = string.Empty;
 
+    // Nullable: API returns null for this field on some listings
     [JsonPropertyName("job_is_remote")]
-    public bool JobIsRemote { get; set; }
+    public bool? JobIsRemote { get; set; }
 
     [JsonPropertyName("job_posted_at")]
     public string? JobPostedAt { get; set; }
@@ -115,9 +117,11 @@ public class JobListing
     [JsonPropertyName("job_country")]
     public string JobCountry { get; set; } = string.Empty;
 
+    // Nullable: API returns null for some listings
     [JsonPropertyName("job_latitude")]
     public double? JobLatitude { get; set; }
 
+    // Nullable: API returns null for some listings
     [JsonPropertyName("job_longitude")]
     public double? JobLongitude { get; set; }
 
@@ -163,8 +167,9 @@ public class ApplyOption
     [JsonPropertyName("apply_link")]
     public string ApplyLink { get; set; } = string.Empty;
 
+    // Nullable: API returns null for this field on some listings
     [JsonPropertyName("is_direct")]
-    public bool IsDirect { get; set; }
+    public bool? IsDirect { get; set; }
 
     [JsonPropertyName("publisher")]
     public string Publisher { get; set; } = string.Empty;
