@@ -1,0 +1,358 @@
+@page "/jobSearch"
+@using MITJobTracker.Data.Models.JobSearch
+@using MITJobTracker.Services.Interfaces
+@inject IJobSearchService JobSearchService
+@inject IJobSearchStateService SearchState
+
+<PageTitle>Job Search</PageTitle>
+
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">External Job Search</h3>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col">
+
+        @* ── Search Parameters Form ── *@
+        <EditForm Model="@SearchRequest" class="form">
+
+            @* Row 1 — Query | Location *@
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label" for="query">
+                        Search Query <span class="text-danger">*</span>
+                    </label>
+                    <SfTextBox ID="query"
+                               Placeholder="e.g. .NET developer jobs in San Diego"
+                               CssClass="w-100"
+                               @bind-Value="@SearchRequest.Query" />
+                </div>
+                <div class="col-4">
+                    <label class="form-label" for="location">Location</label>
+                    <SfTextBox ID="location"
+                               Placeholder="e.g. San Diego, United States"
+                               CssClass="w-100"
+                               @bind-Value="@SearchRequest.Location" />
+                </div>
+            </div>
+
+            @* Row 2 — Date Posted | Country | Language *@
+            <div class="row g-3 mb-3">
+                <div class="col-2">
+                    <label class="form-label">Date Posted</label>
+                    <SfDropDownList ID="datePosted" TItem="SelectOption" TValue="string"
+                                    PopupHeight="200px" Placeholder="Select Date Range"
+                                    DataSource="@_datePostedOptions"
+                                    @bind-Value="@SearchRequest.DatePosted"
+                                    Width="100%">
+                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                    </SfDropDownList>
+                </div>
+                <div class="col-2">
+                    <label class="form-label">Country</label>
+                    <SfDropDownList ID="country" TItem="SelectOption" TValue="string"
+                                    PopupHeight="230px" Placeholder="Select Country"
+                                    DataSource="@_countryOptions"
+                                    @bind-Value="@SearchRequest.Country"
+                                    Width="100%">
+                        <DropDownListFieldSettings Text="Text" Value="Value" />
+                    </SfDropDownList>
+                </div>
+                <div class="col-2">
+                    <label class="form-label">Language (ISO 639)</label>
+                    <SfTextBox ID="language"
+                               Placeholder="e.g. en, fr, de"
+                               CssClass="w-100"
+                               @bind-Value="@SearchRequest.Language" />
+                </div>
+            </div>
+
+            @* Row 3 — Employment Types | Job Requirements *@
+            <div class="row g-3 mb-3">
+                <div class="col-4">
+                    <label class="form-label">Employment Types</label>
+                    <SfMultiSelect ID="employmentTypes" TValue="string[]" TItem="SelectOption"
+                                   Placeholder="Select employment types"
+                                   DataSource="@_employmentTypeOptions"
+                                   @bind-Value="@_selectedEmploymentTypes"
+                                   Width="100%">
+                        <MultiSelectFieldSettings Text="Text" Value="Value" />
+                    </SfMultiSelect>
+                </div>
+                <div class="col-5">
+                    <label class="form-label">Job Requirements</label>
+                    <SfMultiSelect ID="jobRequirements" TValue="string[]" TItem="SelectOption"
+                                   Placeholder="Select experience / degree requirements"
+                                   DataSource="@_jobRequirementOptions"
+                                   @bind-Value="@_selectedJobRequirements"
+                                   Width="100%">
+                        <MultiSelectFieldSettings Text="Text" Value="Value" />
+                    </SfMultiSelect>
+                </div>
+            </div>
+
+            @* Row 4 — Work From Home | Page | Number of Pages | Radius *@
+            <div class="row g-3 mb-3 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label d-block">Work From Home</label>
+                    <SfCheckBox @bind-Checked="@SearchRequest.WorkFromHome" Label="Remote Only" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="page">Page</label>
+                    <SfNumericTextBox ID="page" TValue="int" Min="1" Max="50"
+                                      @bind-Value="@SearchRequest.Page"
+                                      Width="100%" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="numPages">Number of Pages</label>
+                    <SfNumericTextBox ID="numPages" TValue="int" Min="1" Max="50"
+                                      @bind-Value="@SearchRequest.NumPages"
+                                      Width="100%" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="radius">Radius (km)</label>
+                    <SfNumericTextBox ID="radius" TValue="int?" Min="0"
+                                      Placeholder="Optional"
+                                      @bind-Value="@SearchRequest.Radius"
+                                      Width="100%" />
+                </div>
+            </div>
+
+            @* Row 5 — Exclude Publishers *@
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="form-label" for="excludePublishers">
+                        Exclude Publishers (comma-separated)
+                    </label>
+                    <SfTextBox ID="excludePublishers"
+                               Placeholder="e.g. Dice,BeeBe"
+                               CssClass="w-100"
+                               @bind-Value="@SearchRequest.ExcludeJobPublishers" />
+                </div>
+            </div>
+
+            @* Buttons *@
+            <div class="row mb-3">
+                <div class="col">
+                    <SfButton CssClass="e-primary" @onclick="RunSearch" Disabled="@_isLoading">
+                        @(_isLoading ? "Searching..." : "Search Jobs")
+                    </SfButton>
+                    &nbsp;
+                    <SfButton CssClass="e-secondary" @onclick="ClearForm" Disabled="@_isLoading">Clear</SfButton>
+                </div>
+            </div>
+
+        </EditForm>
+
+        @* ── Results Section ── *@
+        @if (_isLoading)
+        {
+            <div class="mt-3">
+                <p><em>Searching for jobs, please wait...</em></p>
+            </div>
+        }
+        else if (_searchResults is not null)
+        {
+            <hr />
+            <div class="row mb-2 align-items-center">
+                <div class="col">
+                    <h5>
+                        Results — @_searchResults.Data.Count job(s) found
+                        <small class="text-muted ms-2">(Request ID: @_searchResults.RequestId)</small>
+                    </h5>
+                </div>
+                @if (SearchState.LastSearchedAt.HasValue)
+                {
+                    <div class="col-auto">
+                        <span class="badge bg-secondary">
+                            Last searched: @SearchState.LastSearchedAt.Value.ToLocalTime().ToString("MM/dd/yyyy h:mm tt")
+                        </span>
+                    </div>
+                }
+            </div>
+
+            <SfGrid DataSource="@_searchResults.Data" AllowPaging="true" AllowSorting="true"
+                    AllowTextWrap="true">
+                <GridPageSettings PageSize="10" />
+                <GridColumns>
+                    <GridColumn Field="@nameof(JobListing.JobTitle)" HeaderText="Job Title" Width="220" />
+                    <GridColumn Field="@nameof(JobListing.EmployerName)" HeaderText="Employer" Width="180" />
+                    <GridColumn Field="@nameof(JobListing.JobLocation)" HeaderText="Location" Width="160" />
+                    <GridColumn Field="@nameof(JobListing.JobEmploymentType)" HeaderText="Type" Width="110" />
+                    <GridColumn Field="@nameof(JobListing.JobSalaryString)" HeaderText="Salary" Width="130" />
+                    <GridColumn Field="@nameof(JobListing.JobPostedAt)" HeaderText="Posted" Width="110" />
+                    <GridColumn Field="@nameof(JobListing.JobIsRemote)" HeaderText="Remote" Width="90"
+                                DisplayAsCheckBox="true" />
+                    <GridColumn Field="@nameof(JobListing.JobPublisher)" HeaderText="Publisher" Width="130" />
+                    <GridColumn HeaderText="Apply" Width="80">
+                        <Template>
+                            @{
+                                var job = context as JobListing;
+                            }
+                            @if (job is not null)
+                            {
+                                <a href="@job.JobApplyLink" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    Apply
+                                </a>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+
+        @* ── Error Dialog ── *@
+        <div id="jobSearchErrorDialog">
+            <SfDialog Width="350px" ShowCloseIcon="true" @bind-Visible="_errorVisible"
+                      AllowPrerender="true" IsModal="true">
+                <DialogTemplates>
+                    <Header>Search Error</Header>
+                    <Content>
+                        <span class="mit-dialogText">@_errorMessage</span>
+                    </Content>
+                </DialogTemplates>
+            </SfDialog>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    // ── Search model ──────────────────────────────────────────────────
+    private JobSearchRequest SearchRequest { get; set; } = new();
+
+    // ── Multi-select bound values ─────────────────────────────────────
+    private string[] _selectedEmploymentTypes = [];
+    private string[] _selectedJobRequirements = [];
+
+    // ── UI state ──────────────────────────────────────────────────────
+    private JobSearchResponse? _searchResults;
+    private bool   _isLoading    = false;
+    private bool   _errorVisible = false;
+    private string _errorMessage = string.Empty;
+
+    // ── Dropdown data sources (static — never need persisting) ────────
+
+    private readonly List<SelectOption> _datePostedOptions =
+    [
+        new SelectOption { Value = "all",   Text = "All" },
+        new SelectOption { Value = "today", Text = "Today" },
+        new SelectOption { Value = "3days", Text = "Last 3 Days" },
+        new SelectOption { Value = "week",  Text = "This Week" },
+        new SelectOption { Value = "month", Text = "This Month" }
+    ];
+
+    private readonly List<SelectOption> _countryOptions =
+    [
+        new SelectOption { Value = "us", Text = "United States" },
+        new SelectOption { Value = "gb", Text = "United Kingdom" },
+        new SelectOption { Value = "ca", Text = "Canada" },
+        new SelectOption { Value = "au", Text = "Australia" },
+        new SelectOption { Value = "de", Text = "Germany" },
+        new SelectOption { Value = "fr", Text = "France" },
+        new SelectOption { Value = "in", Text = "India" },
+        new SelectOption { Value = "jp", Text = "Japan" },
+        new SelectOption { Value = "br", Text = "Brazil" },
+        new SelectOption { Value = "mx", Text = "Mexico" }
+    ];
+
+    private readonly List<SelectOption> _employmentTypeOptions =
+    [
+        new SelectOption { Value = "FULLTIME",   Text = "Full Time" },
+        new SelectOption { Value = "CONTRACTOR", Text = "Contractor" },
+        new SelectOption { Value = "PARTTIME",   Text = "Part Time" },
+        new SelectOption { Value = "INTERN",     Text = "Internship" }
+    ];
+
+    private readonly List<SelectOption> _jobRequirementOptions =
+    [
+        new SelectOption { Value = "under_3_years_experience",      Text = "Under 3 Years Experience" },
+        new SelectOption { Value = "more_than_3_years_experience",  Text = "More Than 3 Years Experience" },
+        new SelectOption { Value = "no_experience",                 Text = "No Experience Required" },
+        new SelectOption { Value = "no_degree",                     Text = "No Degree Required" }
+    ];
+
+    // ── Lifecycle — restore state on navigation return ────────────────
+
+    protected override void OnInitialized()
+    {
+        if (SearchState.HasResults)
+        {
+            // Restore form and results from the scoped state service —
+            // no API call needed.
+            SearchRequest              = SearchState.SearchRequest ?? new();
+            _selectedEmploymentTypes   = SearchState.SelectedEmploymentTypes;
+            _selectedJobRequirements   = SearchState.SelectedJobRequirements;
+            _searchResults             = SearchState.LastResults;
+        }
+    }
+
+    // ── Event handlers ────────────────────────────────────────────────
+
+    private async Task RunSearch()
+    {
+        if (string.IsNullOrWhiteSpace(SearchRequest.Query))
+        {
+            _errorMessage = "A search query is required. Please enter a job title and/or location.";
+            _errorVisible = true;
+            return;
+        }
+
+        // Sync multi-select values back into the request model
+        SearchRequest.EmploymentTypes = [.. _selectedEmploymentTypes];
+        SearchRequest.JobRequirements = [.. _selectedJobRequirements];
+
+        _isLoading     = true;
+        _searchResults = null;
+        _errorMessage  = string.Empty;
+
+        try
+        {
+            _searchResults = await JobSearchService.SearchJobsAsync(SearchRequest);
+
+            // ── Persist to state service so navigation away and back
+            //    restores the form and grid without a second API call.
+            SearchState.SearchRequest           = SearchRequest;
+            SearchState.SelectedEmploymentTypes = _selectedEmploymentTypes;
+            SearchState.SelectedJobRequirements = _selectedJobRequirements;
+            SearchState.LastResults             = _searchResults;
+            SearchState.LastSearchedAt          = DateTime.UtcNow;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Job search failed: {ex.Message}";
+            _errorVisible = true;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearForm()
+    {
+        // Reset both local state and the persisted state service
+        SearchState.Clear();
+
+        SearchRequest            = new JobSearchRequest();
+        _selectedEmploymentTypes = [];
+        _selectedJobRequirements = [];
+        _searchResults           = null;
+        _errorMessage            = string.Empty;
+        StateHasChanged();
+    }
+
+    // ── Helper types (local to this page) ────────────────────────────
+
+    private class SelectOption
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text  { get; set; } = string.Empty;
+    }
+}

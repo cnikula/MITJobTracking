@@ -20,12 +20,6 @@ builder.Services.AddSyncfusionBlazor();
 #region Connection String
 
 // Retrieve the connection string using the Configuration object
-void ConfigureServices(IServiceCollection services)
-{
-    services.AddDbContext<AppDBContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
-}
-
 builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
 //builder.Services.AddTransient<IJobsFactory, JobsFactory>();
 builder.Services.AddScoped<IJobsFactory, JobsFactory>();
@@ -36,8 +30,19 @@ builder.Services.AddSingleton<MITJobTracker.Services.Interfaces.IAppInfoService,
 // ...
 #endregion
 
+#region External API Clients
 
+// JSearch API via RapidAPI
+builder.Services.AddHttpClient("JSearch", client =>
+{
+    client.BaseAddress = new Uri(configuration["RapidApi:JSearchBaseUrl"] ?? "https://jsearch.p.rapidapi.com/");
+});
+builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 
+// Scoped state — persists across navigation within the same browser tab
+builder.Services.AddScoped<IJobSearchStateService, JobSearchStateService>();
+
+#endregion
 
 var app = builder.Build();
 
@@ -55,12 +60,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
-// Set the path base for IIS sub-application deployment
 app.UsePathBase("/mitJobTracker");
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
 
