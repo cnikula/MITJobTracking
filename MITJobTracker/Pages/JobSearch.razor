@@ -2,6 +2,7 @@
 @using MITJobTracker.Data.Models.JobSearch
 @using MITJobTracker.Services.Interfaces
 @inject IJobSearchService JobSearchService
+@inject IJobSearchStateService SearchState
 
 <PageTitle>Job Search</PageTitle>
 
@@ -157,12 +158,21 @@
         else if (_searchResults is not null)
         {
             <hr />
-            <div class="row mb-2">
+            <div class="row mb-2 align-items-center">
                 <div class="col">
-                    <h5>Results — @_searchResults.Data.Count job(s) found
-                        <small class="text-muted">(Request ID: @_searchResults.RequestId)</small>
+                    <h5>
+                        Results — @_searchResults.Data.Count job(s) found
+                        <small class="text-muted ms-2">(Request ID: @_searchResults.RequestId)</small>
                     </h5>
                 </div>
+                @if (SearchState.LastSearchedAt.HasValue)
+                {
+                    <div class="col-auto">
+                        <span class="badge bg-secondary">
+                            Last searched: @SearchState.LastSearchedAt.Value.ToLocalTime().ToString("MM/dd/yyyy h:mm tt")
+                        </span>
+                    </div>
+                }
             </div>
 
             <SfGrid DataSource="@_searchResults.Data" AllowPaging="true" AllowSorting="true"
@@ -222,11 +232,11 @@
 
     // ── UI state ──────────────────────────────────────────────────────
     private JobSearchResponse? _searchResults;
-    private bool _isLoading = false;
-    private bool _errorVisible = false;
+    private bool   _isLoading    = false;
+    private bool   _errorVisible = false;
     private string _errorMessage = string.Empty;
 
-    // ── Dropdown data sources ─────────────────────────────────────────
+    // ── Dropdown data sources (static — never need persisting) ────────
 
     private readonly List<SelectOption> _datePostedOptions =
     [
@@ -267,6 +277,21 @@
         new SelectOption { Value = "no_degree",                     Text = "No Degree Required" }
     ];
 
+    // ── Lifecycle — restore state on navigation return ────────────────
+
+    protected override void OnInitialized()
+    {
+        if (SearchState.HasResults)
+        {
+            // Restore form and results from the scoped state service —
+            // no API call needed.
+            SearchRequest              = SearchState.SearchRequest ?? new();
+            _selectedEmploymentTypes   = SearchState.SelectedEmploymentTypes;
+            _selectedJobRequirements   = SearchState.SelectedJobRequirements;
+            _searchResults             = SearchState.LastResults;
+        }
+    }
+
     // ── Event handlers ────────────────────────────────────────────────
 
     private async Task RunSearch()
@@ -282,13 +307,21 @@
         SearchRequest.EmploymentTypes = [.. _selectedEmploymentTypes];
         SearchRequest.JobRequirements = [.. _selectedJobRequirements];
 
-        _isLoading = true;
+        _isLoading     = true;
         _searchResults = null;
-        _errorMessage = string.Empty;
+        _errorMessage  = string.Empty;
 
         try
         {
             _searchResults = await JobSearchService.SearchJobsAsync(SearchRequest);
+
+            // ── Persist to state service so navigation away and back
+            //    restores the form and grid without a second API call.
+            SearchState.SearchRequest           = SearchRequest;
+            SearchState.SelectedEmploymentTypes = _selectedEmploymentTypes;
+            SearchState.SelectedJobRequirements = _selectedJobRequirements;
+            SearchState.LastResults             = _searchResults;
+            SearchState.LastSearchedAt          = DateTime.UtcNow;
         }
         catch (Exception ex)
         {
@@ -304,11 +337,14 @@
 
     private void ClearForm()
     {
-        SearchRequest = new JobSearchRequest();
+        // Reset both local state and the persisted state service
+        SearchState.Clear();
+
+        SearchRequest            = new JobSearchRequest();
         _selectedEmploymentTypes = [];
         _selectedJobRequirements = [];
-        _searchResults = null;
-        _errorMessage = string.Empty;
+        _searchResults           = null;
+        _errorMessage            = string.Empty;
         StateHasChanged();
     }
 

@@ -58,6 +58,9 @@ and interview results. The application is deployed as an IIS sub-application und
   employment type (multi-select), job requirements (multi-select), work-from-home toggle,
   page/pagination controls, radius, and publisher exclusions.
 - Results are displayed in a sortable, paginated `SfGrid` with a direct Apply link per listing.
+- **Search state is preserved** across page navigation using a Scoped state service
+  (`IJobSearchStateService`). When you navigate away and return, your search criteria and
+  results are restored instantly without consuming an additional API call.
 - API credentials are stored in `appsettings.json` under the `RapidApi` section.
 
 ### Version Display
@@ -118,6 +121,7 @@ Pages (Job Search)
 | `AppDBContext` | EF Core `DbContext`; defines `Job` and `Interview` DbSets |
 | `AppInfoService` | Reads assembly version at startup; singleton |
 | `JobSearchService` | Calls JSearch RapidAPI, builds query string, deserializes response; scoped |
+| `JobSearchStateService` | Scoped state container — preserves Job Search page criteria and results across Blazor navigation within the same circuit |
 
 ### Dependency Injection (Program.cs)
 
@@ -128,6 +132,7 @@ Pages (Job Search)
 | `IJobsServices` / `JobsServices` | Scoped |
 | `IAppInfoService` / `AppInfoService` | Singleton |
 | `IJobSearchService` / `JobSearchService` | Scoped |
+| `IJobSearchStateService` / `JobSearchStateService` | Scoped |
 | `HttpClient` (named: "JSearch") | Managed by `IHttpClientFactory` |
 
 ---
@@ -220,9 +225,11 @@ MITJobTracker/
 │   ├── Interfaces/
 │   │   ├── IJobsServices.cs
 │   │   ├── IJobSearchService.cs
+│   │   ├── IJobSearchStateService.cs
 │   │   └── IAppInfoService.cs
 │   ├── JobsServices.cs
 │   ├── JobSearchService.cs
+│   ├── JobSearchStateService.cs
 │   └── AppInfoService.cs
 ├── Pages/
 │   ├── Index.razor                    Home / Add Job page
@@ -242,23 +249,74 @@ MITJobTracker/
 
 ## Configuration (appsettings.json)
 
+> **⚠️ IMPORTANT — You must configure the following before running the application.**
+> The committed `appsettings.json` intentionally does **not** contain secrets.
+> All three items below are commented out in the file and must be provided by you.
+
+### 1. SQL Server Connection String (Required)
+
+You **must** set your own connection string. Uncomment and update the `ConnectionStrings`
+section in `appsettings.json` to point to your SQL Server instance:
+
 ```json
-{
-  "ConnectionStrings": {
-	"mitLocalConnection": "Server=YOUR_SERVER;Database=YOUR_DB;..."
-  },
-  "SyncfusionLicenseKey": "YOUR_SYNCFUSION_LICENSE_KEY",
-  "RapidApi": {
-	"JSearchKey": "YOUR_RAPID_API_KEY",
-	"JSearchHost": "jsearch.p.rapidapi.com",
-	"JSearchBaseUrl": "https://jsearch.p.rapidapi.com/"
-  }
+"ConnectionStrings": {
+  "mitLocalConnection": "Data Source=YOUR_SERVER;Initial Catalog=MITJobTracker;Integrated Security=True;MultipleActiveResultSets=true;TrustServerCertificate=true"
 }
 ```
 
-> **Security Note:** Never commit real API keys or connection strings to source control.
-> Use **User Secrets** (`dotnet user-secrets`) during development and environment variables
-> or **Azure Key Vault** in production.
+Or use **User Secrets** (recommended for development):
+
+```powershell
+cd MITJobTracker
+dotnet user-secrets set "ConnectionStrings:mitLocalConnection" "Data Source=YOUR_SERVER;Initial Catalog=MITJobTracker;Integrated Security=True;MultipleActiveResultSets=true;TrustServerCertificate=true"
+```
+
+### 2. Syncfusion License Key (Required)
+
+> **The Syncfusion license key is not included in the repository.**
+> It will be **provided by the developer (Claude Nikula) on request**.
+> Please contact the developer directly to obtain the key.
+
+Once you have the key, uncomment and set the `SyncfusionLicenseKey` value in
+`appsettings.json`:
+
+```json
+"SyncfusionLicenseKey": "YOUR_KEY_HERE"
+```
+
+Or use **User Secrets**:
+
+```powershell
+dotnet user-secrets set "SyncfusionLicenseKey" "YOUR_KEY_HERE"
+```
+
+Without this key the application will run but Syncfusion components will display a
+trial/license watermark banner.
+
+### 3. RapidAPI Key — JSearch (Optional — for Job Search feature)
+
+The external Job Search page requires a RapidAPI key for the JSearch API.
+Sign up at https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch and then set:
+
+```json
+"RapidApi": {
+  "JSearchKey": "YOUR_RAPID_API_KEY",
+  "JSearchHost": "jsearch.p.rapidapi.com",
+  "JSearchBaseUrl": "https://jsearch.p.rapidapi.com/"
+}
+```
+
+Or use **User Secrets**:
+
+```powershell
+dotnet user-secrets set "RapidApi:JSearchKey" "YOUR_RAPID_API_KEY"
+```
+
+The rest of the application (job management, interviews, analytics) works without this key.
+
+> **Security Note:** Never commit real API keys, license keys, or connection strings to
+> source control. Use **User Secrets** (`dotnet user-secrets`) during development and
+> environment variables or **Azure Key Vault** in production.
 
 ---
 
@@ -273,55 +331,143 @@ The application is configured for deployment as an IIS sub-application:
 
 ---
 
+## SQL Server Express — Editions & Licensing
+
+MITJobTracker requires Microsoft SQL Server. **SQL Server Express** is a free edition that
+can be redistributed with your application at no cost.
+
+### SQL Server Express Editions
+
+| Edition | Description |
+|---|---|
+| **SQL Server Express (Core Engine)** | The basic database engine. Free to distribute with your applications. |
+| **SQL Server Express with Tools** | Includes the SQL Server Management Studio (SSMS) installer alongside the engine. |
+| **SQL Server Express LocalDB** | A lightweight, file-based SQL Server instance that runs in user mode. Perfect for desktop apps and development. |
+| **SQL Server Express with Advanced Services** | Includes Full-Text Search and Reporting Services (limited) in addition to the core engine. |
+
+> **Recommendation:** For local development, **SQL Server Express LocalDB** is the simplest
+> option — it installs with Visual Studio and requires no configuration. For deployment or
+> shared environments, use **SQL Server Express** or **Express with Advanced Services**.
+
+### Licensing Summary
+
+✅ SQL Server Express is **free to distribute** with your application.
+
+- No runtime royalties.
+- No per-user or per-server fees.
+- Your end users do **not** need to purchase SQL Server licenses.
+- The free tier is limited to 1 GB RAM, 10 GB max database size, and 1 physical CPU — more
+  than sufficient for the single-user / small-team use case of MITJobTracker.
+- If capacity requirements grow beyond Express limits, upgrade to SQL Server Standard or
+  Enterprise (separate license required).
+
+### Download
+
+- **SQL Server Express:** https://www.microsoft.com/en-us/sql-server/sql-server-downloads
+- **SQL Server Management Studio (SSMS):** https://learn.microsoft.com/en-us/ssms/download-sql-server-management-studio-ssms
+
+---
+
+## Prerequisites
+
+- **.NET 10 SDK** — https://dotnet.microsoft.com/download/dotnet/10.0
+- **SQL Server** (LocalDB, Express, Developer, or full edition) — see **SQL Server Express** section above
+- **Visual Studio 2026** (recommended) or the `dotnet` CLI
+- **Syncfusion license key** — contact the developer (Claude Nikula) to obtain
+- **RapidAPI account** (optional) — only needed for the external Job Search feature
+
+---
+
 ## Getting Started
 
 1. **Clone the repository**
    ```
    git clone https://github.com/cnikula/MITJobTracking
+   cd MITJobTracking
    ```
 
-2. **Configure the database connection**
-   Update the `mitLocalConnection` value in `appsettings.json` to point to your SQL Server instance.
+2. **Configure your SQL Server connection string** ⚠️
+   This is required — the application will not start without it.
+   Uncomment and update the `ConnectionStrings` section in `appsettings.json`,
+   or set it via User Secrets (see **Configuration** section above for details).
 
-3. **Apply EF Core migrations**
+3. **Obtain and configure the Syncfusion license key** ⚠️
+   Contact the developer (**Claude Nikula**) to request the Syncfusion license key.
+   Set it in `appsettings.json` or User Secrets (see **Configuration** section above).
+
+4. **Apply EF Core migrations**
    ```
-   dotnet ef database update
+   dotnet ef database update --project MITJobTracker
    ```
+   This creates the database, tables, stored procedures, and indexes.
 
-4. **Add your Syncfusion license key**
-   Set `SyncfusionLicenseKey` in `appsettings.json` or User Secrets.
-
-5. **Add your RapidAPI key** (for Job Search feature)
-   Set `RapidApi:JSearchKey` in `appsettings.json` or User Secrets.
+5. **Configure the RapidAPI key** (optional)
+   Only needed if you want to use the Job Search page.
    Sign up at https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
+   and set `RapidApi:JSearchKey` in `appsettings.json` or User Secrets.
 
 6. **Run the application**
    ```
-   dotnet run
+   dotnet run --project MITJobTracker
    ```
-   Or press **F5** in Visual Studio.
+   Or open `MITJobTracker.sln` in Visual Studio and press **F5**.
 
 ---
 
 ## Version History
 
-### V10.0.0 — .NET 10 Upgrade + Job Search Feature (Current)
+### V10.0.0 — .NET 10 Upgrade + Job Search + State Management (Current)
 
 **Changes from V9.4.1:**
 
+**Framework & Packages:**
 - Target Framework upgraded from `net9.0` to `net10.0`.
 - Application version bumped to `10.0.0` in `.csproj` (Version, AssemblyVersion, FileVersion).
 - All Entity Framework Core packages upgraded from `9.x` to `10.0.5`.
 - `Microsoft.VisualStudio.Web.CodeGeneration.Design` updated to `10.0.2`.
 - `Newtonsoft.Json` updated from `13.0.3` to `13.0.4`.
-- `Program.cs`: Removed `IgnoreScriptIsolation = true` from `AddSyncfusionBlazor()` — the
-  property was removed from Syncfusion's `GlobalOptions` API.
-- `_Host.cshtml`: Syncfusion script reference moved from `<body>` to `<head>` to prevent
-  hydration timing issues.
-- **New Feature — External Job Search:** Added `JobSearch.razor` page with full parameter form
-  (Syncfusion components), `JobSearchService`, `IJobSearchService`, `JobSearchRequest`,
-  `JobSearchResponse` models, and RapidAPI JSearch integration via `IHttpClientFactory`.
 - Syncfusion Blazor component packages remain at `26.x` (no component library major upgrade).
+
+**Program.cs & Middleware:**
+- Removed `IgnoreScriptIsolation = true` from `AddSyncfusionBlazor()` — the property was
+  removed from Syncfusion's `GlobalOptions` API.
+- Removed dead `ConfigureServices` local function that was declared but never called.
+- Moved `UsePathBase("/mitJobTracker")` before `UseStaticFiles()` so IIS sub-app
+  deployment resolves static files and routes correctly.
+- Removed commented-out `AddTransient` registrations.
+
+**_Host.cshtml:**
+- Syncfusion script reference moved from `<body>` to `<head>` to prevent hydration
+  timing issues.
+
+**New Feature — External Job Search:**
+- Added `JobSearch.razor` page with full parameter form (Syncfusion components) and
+  results grid (`SfGrid`) with Apply links.
+- Added `JobSearchService`, `IJobSearchService`, `JobSearchRequest`, `JobSearchResponse`
+  models, and RapidAPI JSearch integration via `IHttpClientFactory`.
+- Job Search form layout uses Bootstrap grid (`row`/`col`) instead of fragile
+  margin-based label positioning for proper horizontal and vertical alignment.
+
+**New Feature — Search State Preservation:**
+- Added `IJobSearchStateService` / `JobSearchStateService` (Scoped) to preserve
+  the Job Search page's criteria and results across Blazor navigation.
+- Navigating away and returning restores the form and grid instantly without
+  consuming an additional API call, reducing API cost.
+- A "Last searched" timestamp badge shows when results were fetched.
+- The Clear button resets both the form and the persisted state.
+
+**Security — Secrets Removed from Source Control:**
+- `appsettings.json` no longer contains real API keys, license keys, or connection
+  strings. All sensitive values are commented out with placeholder instructions.
+- Developers must configure their own connection string, Syncfusion key (provided by
+  the developer on request), and RapidAPI key via `appsettings.json` or User Secrets.
+
+**Bug Fixes — JSearch API Deserialization:**
+- `JobSearchResponse.cs`: Changed `job_is_remote`, `job_apply_is_direct`, and
+  `ApplyOption.is_direct` from `bool` to `bool?` — the API returns `null` for
+  these fields on some listings.
+- Changed `job_latitude` and `job_longitude` from `double` to `double?` for the
+  same reason.
 
 ### V9.4.1 — Previous Release
 
