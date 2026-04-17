@@ -42,6 +42,9 @@ builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 // Scoped state — persists across navigation within the same browser tab
 builder.Services.AddScoped<IJobSearchStateService, JobSearchStateService>();
 
+// Daily job-search log — duplicate suppression & reviewed tracking (DB-backed)
+builder.Services.AddScoped<IJobSearchLogService, JobSearchLogService>();
+
 #endregion
 
 var app = builder.Build();

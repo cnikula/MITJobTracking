@@ -36,6 +36,7 @@ namespace MITJobTracker.Data
 
         public virtual DbSet<Job> Jobs { get; set; }
         public virtual DbSet<Interview> Interviews { get; set; }
+        public virtual DbSet<DailyJobSearchLog> DailyJobSearchLogs { get; set; }
 
         
         // This method is used to configure the model that was discovered by convention from the entity types

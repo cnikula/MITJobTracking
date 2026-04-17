@@ -3,6 +3,7 @@
 @using MITJobTracker.Services.Interfaces
 @inject IJobSearchService JobSearchService
 @inject IJobSearchStateService SearchState
+@inject IJobSearchLogService JobSearchLogService
 
 <PageTitle>Job Search</PageTitle>
 
@@ -95,7 +96,7 @@
                 </div>
             </div>
 
-            @* Row 4 — Work From Home | Page | Number of Pages | Radius *@
+            @* Row 4 — Work From Home | Page | Number of Pages | Radius | Posted Within Hours *@
             <div class="row g-3 mb-3 align-items-end">
                 <div class="col-auto">
                     <label class="form-label d-block">Work From Home</label>
@@ -118,6 +119,14 @@
                     <SfNumericTextBox ID="radius" TValue="int?" Min="0"
                                       Placeholder="Optional"
                                       @bind-Value="@SearchRequest.Radius"
+                                      Width="100%" />
+                </div>
+                <div class="col-2">
+                    <label class="form-label" for="postedWithinHours">Posted Within (hours)</label>
+                    <SfNumericTextBox ID="postedWithinHours" TValue="int" Min="0" Max="168"
+                                      Step="1"
+                                      Placeholder="0 = no limit"
+                                      @bind-Value="@_postedWithinHours"
                                       Width="100%" />
                 </div>
             </div>
@@ -143,6 +152,8 @@
                     </SfButton>
                     &nbsp;
                     <SfButton CssClass="e-secondary" @onclick="ClearForm" Disabled="@_isLoading">Clear</SfButton>
+                    &nbsp;
+                    <SfButton CssClass="e-warning" @onclick="ResetDay" Disabled="@_isLoading">Reset Day</SfButton>
                 </div>
             </div>
 
@@ -155,14 +166,26 @@
                 <p><em>Searching for jobs, please wait...</em></p>
             </div>
         }
-        else if (_searchResults is not null)
+        else if (_displayedResults is not null && _displayedResults.Count > 0)
         {
             <hr />
             <div class="row mb-2 align-items-center">
                 <div class="col">
                     <h5>
-                        Results — @_searchResults.Data.Count job(s) found
-                        <small class="text-muted ms-2">(Request ID: @_searchResults.RequestId)</small>
+                        Results — @_displayedResults.Count job(s) displayed
+                        @if (_searchResults is not null)
+                        {
+                            <small class="text-muted ms-2">
+                                (@_searchResults.Data.Count total from API,
+                                @_duplicatesRemoved duplicate(s) suppressed,
+                                @_reviewedHidden reviewed hidden
+                                @if (_postedWithinHours > 0)
+                                {
+                                    <text>, @_filteredByHours filtered by posted time</text>
+                                }
+                                — Request ID: @_searchResults.RequestId)
+                            </small>
+                        }
                     </h5>
                 </div>
                 @if (SearchState.LastSearchedAt.HasValue)
@@ -175,7 +198,7 @@
                 }
             </div>
 
-            <SfGrid DataSource="@_searchResults.Data" AllowPaging="true" AllowSorting="true"
+            <SfGrid @ref="_gridRef" DataSource="@_displayedResults" AllowPaging="true" AllowSorting="true"
                     AllowTextWrap="true">
                 <GridPageSettings PageSize="10" />
                 <GridColumns>
@@ -201,8 +224,33 @@
                             }
                         </Template>
                     </GridColumn>
+                    <GridColumn HeaderText="Reviewed" Width="100">
+                        <Template>
+                            @{
+                                var reviewJob = context as JobListing;
+                            }
+                            @if (reviewJob is not null)
+                            {
+                                <SfCheckBox TChecked="bool"
+                                            Checked="@(_reviewedJobIds.Contains(reviewJob.JobId))"
+                                            Label=""
+                                            ValueChange="@((Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> e) => OnReviewedChanged(reviewJob.JobId, e.Checked))" />
+                            }
+                        </Template>
+                    </GridColumn>
                 </GridColumns>
             </SfGrid>
+        }
+        else if (_searchResults is not null)
+        {
+            <hr />
+            <div class="row mb-2">
+                <div class="col">
+                    <h5 class="text-muted">
+                        No new jobs to display — all results were duplicates, already reviewed, or filtered out.
+                    </h5>
+                </div>
+            </div>
         }
 
         @* ── Error Dialog ── *@
@@ -232,9 +280,20 @@
 
     // ── UI state ──────────────────────────────────────────────────────
     private JobSearchResponse? _searchResults;
+    private List<JobListing>?  _displayedResults;
     private bool   _isLoading    = false;
     private bool   _errorVisible = false;
     private string _errorMessage = string.Empty;
+
+    // ── Filter / tracking state ───────────────────────────────────────
+    private int _postedWithinHours;
+    private int _duplicatesRemoved;
+    private int _reviewedHidden;
+    private int _filteredByHours;
+    private HashSet<string> _reviewedJobIds = new(StringComparer.OrdinalIgnoreCase);
+
+    // ── Grid reference ────────────────────────────────────────────────
+    private SfGrid<JobListing>? _gridRef;
 
     // ── Dropdown data sources (static — never need persisting) ────────
 
@@ -289,6 +348,12 @@
             _selectedEmploymentTypes   = SearchState.SelectedEmploymentTypes;
             _selectedJobRequirements   = SearchState.SelectedJobRequirements;
             _searchResults             = SearchState.LastResults;
+
+            // Re-apply display filtering without an API call
+            if (_searchResults is not null)
+            {
+                _displayedResults = _searchResults.Data;
+            }
         }
     }
 
@@ -307,13 +372,66 @@
         SearchRequest.EmploymentTypes = [.. _selectedEmploymentTypes];
         SearchRequest.JobRequirements = [.. _selectedJobRequirements];
 
-        _isLoading     = true;
-        _searchResults = null;
-        _errorMessage  = string.Empty;
+        _isLoading        = true;
+        _searchResults    = null;
+        _displayedResults = null;
+        _errorMessage     = string.Empty;
+        _duplicatesRemoved = 0;
+        _reviewedHidden    = 0;
+        _filteredByHours   = 0;
 
         try
         {
+            // ── Auto-reset on first search of the day ──
+            var hasTodays = await JobSearchLogService.HasTodaysRecordsAsync();
+            if (!hasTodays)
+            {
+                // First search of the day — previous day's data is stale,
+                // no explicit reset needed because there are no records yet.
+            }
+
+            // ── Call the external API ──
             _searchResults = await JobSearchService.SearchJobsAsync(SearchRequest);
+
+            if (_searchResults is not null)
+            {
+                var results = _searchResults.Data;
+
+                // ── 1. "Posted Within X Hours" filter ──
+                if (_postedWithinHours > 0)
+                {
+                    var cutoff = DateTime.UtcNow.AddHours(-_postedWithinHours);
+                    var before = results.Count;
+                    results = results
+                        .Where(j => j.JobPostedAtDateTimeUtc.HasValue && j.JobPostedAtDateTimeUtc.Value >= cutoff)
+                        .ToList();
+                    _filteredByHours = before - results.Count;
+                }
+
+                // ── 2. Suppress duplicates (already retrieved today) ──
+                var alreadyRetrieved = await JobSearchLogService.GetTodaysRetrievedJobIdsAsync();
+                var beforeDupes = results.Count;
+                results = results
+                    .Where(j => !alreadyRetrieved.Contains(j.JobId))
+                    .ToList();
+                _duplicatesRemoved = beforeDupes - results.Count;
+
+                // ── 3. Log newly retrieved job IDs ──
+                if (results.Count > 0)
+                {
+                    await JobSearchLogService.LogRetrievedJobsAsync(results.Select(j => j.JobId));
+                }
+
+                // ── 4. Hide reviewed jobs ──
+                _reviewedJobIds = await JobSearchLogService.GetTodaysReviewedJobIdsAsync();
+                var beforeReviewed = results.Count;
+                results = results
+                    .Where(j => !_reviewedJobIds.Contains(j.JobId))
+                    .ToList();
+                _reviewedHidden = beforeReviewed - results.Count;
+
+                _displayedResults = results;
+            }
 
             // ── Persist to state service so navigation away and back
             //    restores the form and grid without a second API call.
@@ -335,6 +453,49 @@
         }
     }
 
+    private async Task OnReviewedChanged(string externalJobId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            await JobSearchLogService.MarkJobReviewedAsync(externalJobId);
+            _reviewedJobIds.Add(externalJobId);
+
+            // Hide the reviewed job from the displayed results
+            _displayedResults = _displayedResults?
+                .Where(j => !_reviewedJobIds.Contains(j.JobId))
+                .ToList();
+            _reviewedHidden++;
+        }
+        else
+        {
+            await JobSearchLogService.UnmarkJobReviewedAsync(externalJobId);
+            _reviewedJobIds.Remove(externalJobId);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ResetDay()
+    {
+        await JobSearchLogService.ResetDayAsync();
+
+        // Clear all local state
+        _reviewedJobIds    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        _searchResults     = null;
+        _displayedResults  = null;
+        _duplicatesRemoved = 0;
+        _reviewedHidden    = 0;
+        _filteredByHours   = 0;
+
+        SearchState.Clear();
+
+        SearchRequest            = new JobSearchRequest();
+        _selectedEmploymentTypes = [];
+        _selectedJobRequirements = [];
+        _errorMessage            = string.Empty;
+        StateHasChanged();
+    }
+
     private void ClearForm()
     {
         // Reset both local state and the persisted state service
@@ -344,7 +505,11 @@
         _selectedEmploymentTypes = [];
         _selectedJobRequirements = [];
         _searchResults           = null;
+        _displayedResults        = null;
         _errorMessage            = string.Empty;
+        _duplicatesRemoved       = 0;
+        _reviewedHidden          = 0;
+        _filteredByHours         = 0;
         StateHasChanged();
     }
 
