@@ -41,7 +41,8 @@
                 </div>
             </div>
 
-            @* Row 2 — Date Posted | Country | Language *@
+            @* Row 2 — Date Posted | Country | Language
+                       Note: "Posted Within Hours" is only enabled when Date Posted = Today *@
             <div class="row g-3 mb-3">
                 <div class="col-2">
                     <label class="form-label">Date Posted</label>
@@ -51,6 +52,8 @@
                                     @bind-Value="@SearchRequest.DatePosted"
                                     Width="100%">
                         <DropDownListFieldSettings Text="Text" Value="Value" />
+                        <DropDownListEvents TItem="SelectOption" TValue="string"
+                                            OnValueSelect="@OnDatePostedChanged" />
                     </SfDropDownList>
                 </div>
                 <div class="col-2">
@@ -96,7 +99,8 @@
                 </div>
             </div>
 
-            @* Row 4 — Work From Home | Page | Number of Pages | Radius | Posted Within Hours *@
+            @* Row 4 — Work From Home | Page | Number of Pages | Radius | Posted Within Hours
+                       Rule: Posted Within Hours is only enabled when DatePosted = "today" *@
             <div class="row g-3 mb-3 align-items-end">
                 <div class="col-auto">
                     <label class="form-label d-block">Work From Home</label>
@@ -122,10 +126,20 @@
                                       Width="100%" />
                 </div>
                 <div class="col-2">
-                    <label class="form-label" for="postedWithinHours">Posted Within (hours)</label>
-                    <SfNumericTextBox ID="postedWithinHours" TValue="int" Min="0" Max="168"
+                    <label class="form-label" for="postedWithinHours">
+                        Posted Within (hours)
+                        @if (!_isPostedWithinHoursEnabled)
+                        {
+                            <br /><small class="text-muted fst-italic">Requires Date Posted = Today</small>
+                        }
+                    </label>
+                    <SfNumericTextBox ID="postedWithinHours"
+                                      TValue="int"
+                                      Min="0"
+                                      Max="23"
                                       Step="1"
-                                      Placeholder="0 = no limit"
+                                      Placeholder="0 = no filter"
+                                      Enabled="@_isPostedWithinHoursEnabled"
                                       @bind-Value="@_postedWithinHours"
                                       Width="100%" />
                 </div>
@@ -286,10 +300,15 @@
     private string _errorMessage = string.Empty;
 
     // ── Filter / tracking state ───────────────────────────────────────
-    private int _postedWithinHours;
-    private int _duplicatesRemoved;
-    private int _reviewedHidden;
-    private int _filteredByHours;
+    private int  _postedWithinHours;
+    private int  _duplicatesRemoved;
+    private int  _reviewedHidden;
+    private int  _filteredByHours;
+
+    // Rule: Posted Within Hours is only enabled when DatePosted = "today"
+    // Default is disabled because the default DatePosted is "all"
+    private bool _isPostedWithinHoursEnabled = false;
+
     private HashSet<string> _reviewedJobIds = new(StringComparer.OrdinalIgnoreCase);
 
     // ── Grid reference ────────────────────────────────────────────────
@@ -354,7 +373,26 @@
             {
                 _displayedResults = _searchResults.Data;
             }
+
+            // Restore the enabled state of the Posted Within Hours control
+            _isPostedWithinHoursEnabled = SearchRequest.DatePosted == "today";
         }
+    }
+
+    // ── Date Posted changed — enforce the Posted Within Hours dependency ──
+
+    private void OnDatePostedChanged(SelectEventArgs<SelectOption> args)
+    {
+        bool isToday = args.ItemData?.Value == "today";
+
+        _isPostedWithinHoursEnabled = isToday;
+
+        // Rule: if Date Posted is no longer "today", reset the hours filter
+        // to 0 (no filter) so stale values don't silently affect future searches
+        if (!isToday)
+            _postedWithinHours = 0;
+
+        StateHasChanged();
     }
 
     // ── Event handlers ────────────────────────────────────────────────
@@ -372,24 +410,16 @@
         SearchRequest.EmploymentTypes = [.. _selectedEmploymentTypes];
         SearchRequest.JobRequirements = [.. _selectedJobRequirements];
 
-        _isLoading        = true;
-        _searchResults    = null;
-        _displayedResults = null;
-        _errorMessage     = string.Empty;
+        _isLoading         = true;
+        _searchResults     = null;
+        _displayedResults  = null;
+        _errorMessage      = string.Empty;
         _duplicatesRemoved = 0;
         _reviewedHidden    = 0;
         _filteredByHours   = 0;
 
         try
         {
-            // ── Auto-reset on first search of the day ──
-            var hasTodays = await JobSearchLogService.HasTodaysRecordsAsync();
-            if (!hasTodays)
-            {
-                // First search of the day — previous day's data is stale,
-                // no explicit reset needed because there are no records yet.
-            }
-
             // ── Call the external API ──
             _searchResults = await JobSearchService.SearchJobsAsync(SearchRequest);
 
@@ -397,18 +427,20 @@
             {
                 var results = _searchResults.Data;
 
-                // ── 1. "Posted Within X Hours" filter ──
-                if (_postedWithinHours > 0)
+                // ── 1. "Posted Within X Hours" filter
+                //       Only active when DatePosted = "today" and hours > 0
+                if (_isPostedWithinHoursEnabled && _postedWithinHours > 0)
                 {
                     var cutoff = DateTime.UtcNow.AddHours(-_postedWithinHours);
                     var before = results.Count;
                     results = results
-                        .Where(j => j.JobPostedAtDateTimeUtc.HasValue && j.JobPostedAtDateTimeUtc.Value >= cutoff)
+                        .Where(j => j.JobPostedAtDateTimeUtc.HasValue
+                                 && j.JobPostedAtDateTimeUtc.Value >= cutoff)
                         .ToList();
                     _filteredByHours = before - results.Count;
                 }
 
-                // ── 2. Suppress duplicates (already retrieved today) ──
+                // ── 2. Suppress duplicates (already retrieved today)
                 var alreadyRetrieved = await JobSearchLogService.GetTodaysRetrievedJobIdsAsync();
                 var beforeDupes = results.Count;
                 results = results
@@ -416,13 +448,11 @@
                     .ToList();
                 _duplicatesRemoved = beforeDupes - results.Count;
 
-                // ── 3. Log newly retrieved job IDs ──
+                // ── 3. Log newly retrieved job IDs
                 if (results.Count > 0)
-                {
                     await JobSearchLogService.LogRetrievedJobsAsync(results.Select(j => j.JobId));
-                }
 
-                // ── 4. Hide reviewed jobs ──
+                // ── 4. Hide reviewed jobs
                 _reviewedJobIds = await JobSearchLogService.GetTodaysReviewedJobIdsAsync();
                 var beforeReviewed = results.Count;
                 results = results
@@ -486,6 +516,7 @@
         _duplicatesRemoved = 0;
         _reviewedHidden    = 0;
         _filteredByHours   = 0;
+        _postedWithinHours = 0;
 
         SearchState.Clear();
 
@@ -493,6 +524,10 @@
         _selectedEmploymentTypes = [];
         _selectedJobRequirements = [];
         _errorMessage            = string.Empty;
+
+        // Reset enabled state — new SearchRequest defaults DatePosted to "all"
+        _isPostedWithinHoursEnabled = false;
+
         StateHasChanged();
     }
 
@@ -510,6 +545,11 @@
         _duplicatesRemoved       = 0;
         _reviewedHidden          = 0;
         _filteredByHours         = 0;
+        _postedWithinHours       = 0;
+
+        // Reset enabled state — new SearchRequest defaults DatePosted to "all"
+        _isPostedWithinHoursEnabled = false;
+
         StateHasChanged();
     }
 

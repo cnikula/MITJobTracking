@@ -1,4 +1,4 @@
-# MITJobTracker — V10.0.0
+# MITJobTracker — V10.27.0
 
 **Copyright © Mesquite Information Technologies**
 A Blazor Server web application for managing job applications, tracking interviews, and discovering
@@ -64,7 +64,7 @@ and interview results. The application is deployed as an IIS sub-application und
 - API credentials are stored in `appsettings.json` under the `RapidApi` section.
 
 ### Version Display
-- The application version (`10.0.0`) is read at startup from the assembly via `AppInfoService`
+- The application version (`10.27.0`) is read at startup from the assembly via `AppInfoService`
   and displayed on the home page.
 
 ### Error Handling
@@ -165,6 +165,25 @@ Pages (Job Search)
 | `JobDescription` | string | Full job description text |
 | `Note` | string | Personal notes |
 | `IsDeleted` | bool | Soft-delete flag (from `CommonModel`) |
+
+### DailyJobSearchLogs Table (`DailyJobSearchLog` entity)
+
+Tracks external job IDs retrieved from the JSearch API per calendar day. Used to suppress
+duplicate results across multiple searches within the same day and to record which jobs
+the user has already reviewed.
+
+| Field | Type | Notes |
+|---|---|---|
+| `Id` | int (PK) | Auto-increment primary key |
+| `ExternalJobId` | string (256) | Job ID returned by the JSearch API. Required |
+| `SearchDate` | DateTime | Calendar date (UTC) on which the job was retrieved |
+| `RetrievedAtUtc` | DateTime | UTC timestamp when the record was first created |
+| `IsReviewed` | bool | True when the user has marked this job as reviewed. Default: false |
+| `ReviewedAtUtc` | DateTime? | UTC timestamp when the job was marked reviewed. Null if not reviewed |
+
+> A composite index on `(ExternalJobId, SearchDate)` enforces fast duplicate-suppression lookups.
+
+---
 
 ### Interviews Table (`Interview` entity)
 
@@ -416,9 +435,34 @@ can be redistributed with your application at no cost.
 
 ## Version History
 
-### V10.0.0 — .NET 10 Upgrade + Job Search + State Management (Current)
+### V10.27.0 — Bug Fixes & Database Cleanup (Current)
 
-**Changes from V9.4.1:**
+**Changes from V10.26.0:**
+
+**Bug Fix — Analytics Chart Rendering:**
+- `Analytics.razor`: Added `OnAfterRenderAsync(firstRender)` alongside `OnInitializedAsync`
+  to fix a Syncfusion `SfChart` rendering issue where the chart would not render when
+  navigating directly to the Analytics page before visiting the ViewProspect page.
+- `OnInitializedAsync` still loads all metric data (cards and chart data source).
+- `OnAfterRenderAsync` calls `StateHasChanged()` on first render to signal the chart to
+  mount with the already-loaded data once the DOM is fully ready.
+
+**Database Cleanup — Drop ProspectListDTO Table:**
+- `AppDBContext.cs`: Updated `OnModelCreating` to add `.ToView(null)` to the
+  `ProspectListDTO` keyless entity configuration. This correctly marks it as a
+  raw-SQL-result mapping type only, preventing EF Core from creating or managing
+  it as a physical table.
+- Added migration `DropProspectListDTOTable` to drop the `ProspectListDTO` table
+  that was incorrectly created in the database during a prior migration. The `Down`
+  method is intentionally empty — this table should never have existed.
+- `ProspectListDTO` remains a valid DTO used by `CommonSP.cs` to map results from
+  the `usp_ViweProspect` stored procedure via ADO.NET.
+
+---
+
+### V10.26.0 — .NET 10 Upgrade + Job Search + State Management
+
+**Changes from V9.4.1 (previous release):**
 
 **Framework & Packages:**
 - Target Framework upgraded from `net9.0` to `net10.0`.

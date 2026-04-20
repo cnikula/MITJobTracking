@@ -1,23 +1,24 @@
 // ***********************************************************************
 // Assembly         : MITJobTracker
 // Author           : Claude Nikula
-// Created          : 04-17-2026
+// Created          : 04-20-2026
 //
 // Last Modified By : Claude Nikula
-// Last Modified On : 04-17-2026
+// Last Modified On : 04-20-2026
 // ***********************************************************************
 // <copyright file="JobSearchLogService.cs" company="Mesquite IT">
 //     Copyright (c) . All rights reserved.
 // </copyright>
 // <summary>
-//   Database-backed implementation of IJobSearchLogService.
-//   All date comparisons use the UTC calendar day.
+//   EF Core-backed implementation of IJobSearchLogService.
+//   All operations are scoped to the current UTC calendar date.
 // </summary>
 // ***********************************************************************
 
 using Microsoft.EntityFrameworkCore;
 using MITJobTracker.Data;
 using MITJobTracker.Services.Interfaces;
+using DailyJobSearchLog = MITJobTracker.Data.DailyJobSearchLog;
 
 namespace MITJobTracker.Services;
 
@@ -30,109 +31,120 @@ public class JobSearchLogService : IJobSearchLogService
         _context = context;
     }
 
-    /// <inheritdoc />
+    private static DateTime Today => DateTime.UtcNow.Date;
+
+    // ── Retrieval tracking ────────────────────────────────────────────
+
     public async Task<HashSet<string>> GetTodaysRetrievedJobIdsAsync()
     {
-        var today = DateTime.UtcNow.Date;
+        var today = Today;
         var ids = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today)
             .Select(l => l.ExternalJobId)
             .ToListAsync();
+
         return new HashSet<string>(ids, StringComparer.OrdinalIgnoreCase);
     }
 
-    /// <inheritdoc />
+    public async Task LogRetrievedJobsAsync(IEnumerable<string> externalJobIds)
+    {
+        var today = Today;
+
+        // Only insert IDs not already logged today (handles concurrent searches)
+        var existingIds = await _context.DailyJobSearchLogs
+            .Where(l => l.SearchDate == today)
+            .Select(l => l.ExternalJobId)
+            .ToHashSetAsync(StringComparer.OrdinalIgnoreCase);
+
+        var newEntries = externalJobIds
+            .Where(id => !string.IsNullOrWhiteSpace(id) && !existingIds.Contains(id))
+            .Select(id => new DailyJobSearchLog
+            {
+                SearchDate      = today,
+                ExternalJobId   = id,
+                RetrievedAtUtc  = DateTime.UtcNow
+            })
+            .ToList();
+
+        if (newEntries.Count > 0)
+        {
+            _context.DailyJobSearchLogs.AddRange(newEntries);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    // ── Reviewed tracking ─────────────────────────────────────────────
+
     public async Task<HashSet<string>> GetTodaysReviewedJobIdsAsync()
     {
-        var today = DateTime.UtcNow.Date;
+        var today = Today;
         var ids = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today && l.IsReviewed)
             .Select(l => l.ExternalJobId)
             .ToListAsync();
+
         return new HashSet<string>(ids, StringComparer.OrdinalIgnoreCase);
     }
 
-    /// <inheritdoc />
-    public async Task LogRetrievedJobsAsync(IEnumerable<string> externalJobIds)
-    {
-        var today = DateTime.UtcNow.Date;
-        var utcNow = DateTime.UtcNow;
-
-        var existing = await _context.DailyJobSearchLogs
-            .Where(l => l.SearchDate == today)
-            .Select(l => l.ExternalJobId)
-            .ToListAsync();
-
-        var existingSet = new HashSet<string>(existing, StringComparer.OrdinalIgnoreCase);
-
-        var newLogs = externalJobIds
-            .Where(id => !existingSet.Contains(id))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Select(id => new DailyJobSearchLog
-            {
-                ExternalJobId = id,
-                SearchDate = today,
-                RetrievedAtUtc = utcNow,
-                IsReviewed = false
-            })
-            .ToList();
-
-        if (newLogs.Count > 0)
-        {
-            _context.DailyJobSearchLogs.AddRange(newLogs);
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    /// <inheritdoc />
     public async Task MarkJobReviewedAsync(string externalJobId)
     {
-        var today = DateTime.UtcNow.Date;
-        var log = await _context.DailyJobSearchLogs
-            .FirstOrDefaultAsync(l => l.SearchDate == today && l.ExternalJobId == externalJobId);
+        var today = Today;
+        var entry = await _context.DailyJobSearchLogs
+            .FirstOrDefaultAsync(l => l.SearchDate == today
+                                   && l.ExternalJobId == externalJobId);
 
-        if (log is not null && !log.IsReviewed)
+        if (entry is null)
         {
-            log.IsReviewed = true;
-            log.ReviewedAtUtc = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            entry = new DailyJobSearchLog
+            {
+                SearchDate      = today,
+                ExternalJobId   = externalJobId,
+                RetrievedAtUtc  = DateTime.UtcNow
+            };
+            _context.DailyJobSearchLogs.Add(entry);
         }
+
+        entry.IsReviewed    = true;
+        entry.ReviewedAtUtc = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
     }
 
-    /// <inheritdoc />
     public async Task UnmarkJobReviewedAsync(string externalJobId)
     {
-        var today = DateTime.UtcNow.Date;
-        var log = await _context.DailyJobSearchLogs
-            .FirstOrDefaultAsync(l => l.SearchDate == today && l.ExternalJobId == externalJobId);
+        var today = Today;
+        var entry = await _context.DailyJobSearchLogs
+            .FirstOrDefaultAsync(l => l.SearchDate == today
+                                   && l.ExternalJobId == externalJobId);
 
-        if (log is not null && log.IsReviewed)
+        if (entry is not null)
         {
-            log.IsReviewed = false;
-            log.ReviewedAtUtc = null;
+            entry.IsReviewed    = false;
+            entry.ReviewedAtUtc = null;
             await _context.SaveChangesAsync();
         }
     }
 
-    /// <inheritdoc />
+    // ── Day management ────────────────────────────────────────────────
+
+    public async Task<bool> HasTodaysRecordsAsync()
+    {
+        var today = Today;
+        return await _context.DailyJobSearchLogs
+            .AnyAsync(l => l.SearchDate == today);
+    }
+
     public async Task ResetDayAsync()
     {
-        var today = DateTime.UtcNow.Date;
-        var todaysLogs = await _context.DailyJobSearchLogs
+        var today = Today;
+        var todaysRecords = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today)
             .ToListAsync();
 
-        if (todaysLogs.Count > 0)
+        if (todaysRecords.Count > 0)
         {
-            _context.DailyJobSearchLogs.RemoveRange(todaysLogs);
+            _context.DailyJobSearchLogs.RemoveRange(todaysRecords);
             await _context.SaveChangesAsync();
         }
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> HasTodaysRecordsAsync()
-    {
-        var today = DateTime.UtcNow.Date;
-        return await _context.DailyJobSearchLogs.AnyAsync(l => l.SearchDate == today);
     }
 }

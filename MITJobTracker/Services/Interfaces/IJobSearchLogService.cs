@@ -1,18 +1,18 @@
 // ***********************************************************************
 // Assembly         : MITJobTracker
 // Author           : Claude Nikula
-// Created          : 04-17-2026
+// Created          : 04-20-2026
 //
 // Last Modified By : Claude Nikula
-// Last Modified On : 04-17-2026
+// Last Modified On : 04-20-2026
 // ***********************************************************************
 // <copyright file="IJobSearchLogService.cs" company="Mesquite IT">
 //     Copyright (c) . All rights reserved.
 // </copyright>
 // <summary>
-//   Interface for managing daily job-search retrieval logs.
-//   Supports duplicate suppression, "Reviewed" marking, and
-//   daily reset operations.
+//   Contract for the daily job search log service.
+//   Manages duplicate suppression and reviewed-job tracking
+//   backed by the DailyJobSearchLogs SQL Server table.
 // </summary>
 // ***********************************************************************
 
@@ -20,41 +20,24 @@ namespace MITJobTracker.Services.Interfaces;
 
 public interface IJobSearchLogService
 {
-    /// <summary>
-    /// Returns the set of external job IDs already retrieved today (UTC).
-    /// </summary>
+    /// <summary>Returns all external job IDs already retrieved today.</summary>
     Task<HashSet<string>> GetTodaysRetrievedJobIdsAsync();
 
-    /// <summary>
-    /// Returns the set of external job IDs marked as reviewed today (UTC).
-    /// </summary>
-    Task<HashSet<string>> GetTodaysReviewedJobIdsAsync();
-
-    /// <summary>
-    /// Logs a batch of newly retrieved external job IDs for today.
-    /// Existing IDs for today are ignored (idempotent).
-    /// </summary>
+    /// <summary>Logs a batch of newly retrieved job IDs for today.</summary>
     Task LogRetrievedJobsAsync(IEnumerable<string> externalJobIds);
 
-    /// <summary>
-    /// Marks a single job as reviewed for today.
-    /// </summary>
+    /// <summary>Returns all external job IDs marked as reviewed today.</summary>
+    Task<HashSet<string>> GetTodaysReviewedJobIdsAsync();
+
+    /// <summary>Marks a single job as reviewed.</summary>
     Task MarkJobReviewedAsync(string externalJobId);
 
-    /// <summary>
-    /// Un-marks a single job as reviewed for today (undo).
-    /// </summary>
+    /// <summary>Removes the reviewed flag from a single job.</summary>
     Task UnmarkJobReviewedAsync(string externalJobId);
 
-    /// <summary>
-    /// Deletes all log records for today (manual "Reset Day" button).
-    /// </summary>
-    Task ResetDayAsync();
-
-    /// <summary>
-    /// Returns true if any records exist for today (UTC).
-    /// Used to determine whether the automatic first-search-of-day
-    /// reset has already occurred.
-    /// </summary>
+    /// <summary>Returns true if any log records exist for today (used to detect first search of the day).</summary>
     Task<bool> HasTodaysRecordsAsync();
+
+    /// <summary>Deletes all log records for today, resetting duplicate suppression and reviewed state.</summary>
+    Task ResetDayAsync();
 }

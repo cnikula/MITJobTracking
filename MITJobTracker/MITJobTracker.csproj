@@ -6,10 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NuGetAuditMode>direct</NuGetAuditMode>
     <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
-    <Version>10.0.0</Version>
+    <Version>10.27.0</Version>
     <Description>The UI allows you to enter potential jobs in a view information and outcome</Description>
-    <AssemblyVersion>10.0.0</AssemblyVersion>
-    <FileVersion>10.0.0</FileVersion>
+    <AssemblyVersion>10.27.0</AssemblyVersion>
+    <FileVersion>10.27.0</FileVersion>
     <Copyright>Mesquite Information Technologies</Copyright>
     <UserSecretsId>c46f3641-4481-4c3c-97e8-b3a1e5b68894</UserSecretsId>
   </PropertyGroup>
