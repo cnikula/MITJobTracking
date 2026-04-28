@@ -127,18 +127,41 @@ public class JobSearchLogService : IJobSearchLogService
 
     // ── Day management ────────────────────────────────────────────────
 
+
+    // <summary>
+    /// Determines whether any <see cref="DailyJobSearchLog"/> records exist
+    /// for today's UTC date.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> that resolves to <c>true</c> if at least
+    /// one record with a <c>SearchDate</c> matching today's UTC date exists in
+    /// the database; otherwise <c>false</c>.
+    /// </returns>
     public async Task<bool> HasTodaysRecordsAsync()
     {
         var today = Today;
         return await _context.DailyJobSearchLogs
-            .AnyAsync(l => l.SearchDate == today);
+            .AnyAsync(l => l.SearchDate <= today);
     }
+
+
+    /// <summary>
+    /// Removes all <see cref="DailyJobSearchLog"/> records with a
+    /// <c>SearchDate <= on or before today's UTC date, effectively
+    /// resetting the current day's (and any stale prior-day) search log.
+    /// </summary>
+    /// <remarks>
+    /// This method performs a bulk delete; all retrieved and reviewed
+    /// job tracking data up to and including today will be permanently
+    /// removed. If no matching records exist, no database write is made.
+    /// </remarks>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation
 
     public async Task ResetDayAsync()
     {
         var today = Today;
         var todaysRecords = await _context.DailyJobSearchLogs
-            .Where(l => l.SearchDate == today)
+            .Where(l => l.SearchDate <= today)
             .ToListAsync();
 
         if (todaysRecords.Count > 0)
