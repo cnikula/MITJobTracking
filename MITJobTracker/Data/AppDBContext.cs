@@ -20,37 +20,26 @@
 // ***********************************************************************
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using MITJobTracker.Data.DTOS;
+using MITJobTracker.Data.Models.JobSearch;
 
 
 namespace MITJobTracker.Data
 {
     public class AppDBContext : DbContext
     {
-       // internal readonly object ProspectListDTOs;
-
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options)
         {
         }
 
         public virtual DbSet<Job> Jobs { get; set; }
         public virtual DbSet<Interview> Interviews { get; set; }
-
-        
-        // This method is used to configure the model that was discovered by convention from the entity types
-        //public void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //   modelBuilder.Entity<ProspectListDTO>().HasNoKey();
-        //}
+        public virtual DbSet<DailyJobSearchLog> DailyJobSearchLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ProspectListDTO>().HasNoKey();
+            modelBuilder.Entity<ProspectListDTO>().HasNoKey().ToView(null);
         }
-
-
     }
-
 }

@@ -74,7 +74,6 @@
         interviewRate = await JobsFactory.GetInterviewRateAsync();
         avgResponseTime = await JobsFactory.GetAvgResponseTimeAsync();
 
-        // Initialize jobReports after totalApplications is set
         jobReports = new List<ChartData>
         {
             new ChartData { X= "Total Applications", YValue= totalApplications},
@@ -82,8 +81,16 @@
             new ChartData { X= "Avg ResponseTime By Days", YValue= avgResponseTime},
             new ChartData { X= "Active Applications", YValue= activeApplications}
         };
+    }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // Re-trigger render so the Syncfusion chart mounts with the data
+        // loaded in OnInitializedAsync
         StateHasChanged();
+        await Task.CompletedTask;
     }
 
     /// <summary>

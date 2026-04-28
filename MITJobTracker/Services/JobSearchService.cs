@@ -80,6 +80,11 @@ public class JobSearchService : IJobSearchService
         httpRequest.Headers.Add("x-rapidapi-host", _configuration["RapidApi:JSearchHost"]);
 
         using var response = await client.SendAsync(httpRequest);
+
+        if ((int)response.StatusCode == 429)
+            throw new InvalidOperationException(
+                "The job search API rate limit has been reached. Please wait a moment before searching again.");
+
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
