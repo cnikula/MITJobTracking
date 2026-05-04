@@ -1,0 +1,391 @@
+@page "/usajobs"
+@using MITJobTracker.Data.Models.JobSearch
+@using MITJobTracker.Services.Interfaces
+@inject IUSAJobsService USAJobsService
+
+<PageTitle>USA Jobs Search</PageTitle>
+
+<div class="row">
+    <div class="col">
+        <h3 class="display-8">USA Jobs Search</h3>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col">
+
+        @* ── Endpoint Selection ── *@
+        <div class="row mb-3">
+            <div class="col">
+                <label class="form-label fw-semibold">Select API Endpoint</label>
+                <div class="d-flex flex-wrap gap-4 mt-1">
+                    @foreach (var opt in _endpointOptions)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="endpointSelection"
+                                   id="@opt.Value"
+                                   value="@opt.Value"
+                                   checked="@(_selectedEndpoint == opt.Value)"
+                                   @onchange="@(() => OnEndpointChanged(opt.Value))" />
+                            <label class="form-check-label" for="@opt.Value">
+                                @opt.Text
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* ── Endpoint-Specific Parameter Inputs ── *@
+        @if (_selectedEndpoint == "keyword")
+        {
+            <div class="row g-3 mb-3">
+                <div class="col-5">
+                    <label class="form-label" for="keyword">
+                        Keyword <span class="text-danger">*</span>
+                    </label>
+                    <SfTextBox ID="keyword"
+                               Placeholder="e.g. Software"
+                               CssClass="w-100"
+                               @bind-Value="@_keyword" />
+                </div>
+            </div>
+        }
+        else if (_selectedEndpoint == "positiontitle")
+        {
+            <div class="row g-3 mb-3">
+                <div class="col-5">
+                    <label class="form-label" for="positionTitle">
+                        Position Title <span class="text-danger">*</span>
+                    </label>
+                    <SfTextBox ID="positionTitle"
+                               Placeholder="e.g. Software Engineer"
+                               CssClass="w-100"
+                               @bind-Value="@_positionTitle" />
+                </div>
+            </div>
+        }
+        else if (_selectedEndpoint == "location")
+        {
+            <div class="row g-3 mb-3">
+                <div class="col-5">
+                    <label class="form-label" for="locationName">
+                        Location <span class="text-danger">*</span>
+                        <small class="text-muted ms-1">e.g. San Diego, California</small>
+                    </label>
+                    <SfTextBox ID="locationName"
+                               Placeholder="e.g. San Diego, California"
+                               CssClass="w-100"
+                               @bind-Value="@_locationName" />
+                </div>
+            </div>
+        }
+        else if (_selectedEndpoint == "agencysubelements")
+        {
+            <div class="row mb-3">
+                <div class="col">
+                    <p class="text-muted fst-italic">
+                        No parameters required — retrieves the full agency sub-elements code list.
+                    </p>
+                </div>
+            </div>
+        }
+
+        @* ── Action Buttons ── *@
+        <div class="row mb-3">
+            <div class="col">
+                <SfButton CssClass="e-primary" @onclick="RunSearch" Disabled="@_isLoading">
+                    @(_isLoading ? "Searching..." : "Search")
+                </SfButton>
+                &nbsp;
+                <SfButton CssClass="e-secondary" @onclick="ClearForm" Disabled="@_isLoading">Clear</SfButton>
+            </div>
+        </div>
+
+        @* ── Loading indicator ── *@
+        @if (_isLoading)
+        {
+            <div class="mt-3">
+                <p><em>Retrieving results, please wait...</em></p>
+            </div>
+        }
+
+        @* ── Job Search Results Grid (endpoints 1, 2, 4) ── *@
+        @if (_searchResultItems is not null && _searchResultItems.Count > 0)
+        {
+            <hr />
+            <div class="row mb-2">
+                <div class="col">
+                    <h5>Results — @_searchResultItems.Count job(s) found</h5>
+                </div>
+            </div>
+
+            <SfGrid DataSource="@_searchResultItems" AllowPaging="true" AllowSorting="true"
+                    AllowTextWrap="true">
+                <GridPageSettings PageSize="15" />
+                <GridColumns>
+                    <GridColumn Field="@nameof(USAJobsGridRow.PositionTitle)" HeaderText="Position Title" Width="220" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.OrganizationName)" HeaderText="Organization" Width="200" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.DepartmentName)" HeaderText="Department" Width="200" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.LocationDisplay)" HeaderText="Location" Width="180" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.SalaryRange)" HeaderText="Salary Range" Width="160" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.PositionSchedule)" HeaderText="Schedule" Width="110" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.OpenDate)" HeaderText="Opens" Width="110" Format="d" />
+                    <GridColumn Field="@nameof(USAJobsGridRow.CloseDate)" HeaderText="Closes" Width="110" Format="d" />
+                    <GridColumn HeaderText="Apply" Width="80">
+                        <Template>
+                            @{
+                                var row = context as USAJobsGridRow;
+                            }
+                            @if (row is not null && !string.IsNullOrEmpty(row.ApplyUri))
+                            {
+                                <a href="@row.ApplyUri" target="_blank" class="btn btn-sm btn-outline-primary">Apply</a>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+
+        @* ── Agency Sub-Elements Code List Grid (endpoint 3) ── *@
+        @if (_agencyItems is not null && _agencyItems.Count > 0)
+        {
+            <hr />
+            <div class="row mb-2">
+                <div class="col">
+                    <h5>Agency Sub-Elements — @_agencyItems.Count entries</h5>
+                </div>
+            </div>
+
+            <SfGrid DataSource="@_agencyItems" AllowPaging="true" AllowSorting="true"
+                    AllowFiltering="true" AllowTextWrap="true">
+                <GridPageSettings PageSize="20" />
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+                <GridColumns>
+                    <GridColumn Field="@nameof(USAJOBSValidValueResponse.Code)" HeaderText="Code" Width="110" />
+                    <GridColumn Field="@nameof(USAJOBSValidValueResponse.Value)" HeaderText="Agency Name" Width="320" />
+                    <GridColumn Field="@nameof(USAJOBSValidValueResponse.Acronym)" HeaderText="Acronym" Width="110" />
+                    <GridColumn Field="@nameof(USAJOBSValidValueResponse.ParentCode)" HeaderText="Parent Code" Width="120" />
+                    <GridColumn Field="@nameof(USAJOBSValidValueResponse.IsDisabled)" HeaderText="Disabled" Width="100" />
+                </GridColumns>
+            </SfGrid>
+        }
+
+        @* ── Empty result notice ── *@
+        @if (_searchPerformed && !_isLoading && _searchResultItems is not null && _searchResultItems.Count == 0 && _agencyItems is null)
+        {
+            <hr />
+            <p class="text-muted fst-italic">No results returned for the selected criteria.</p>
+        }
+
+        @* ── Error Dialog ── *@
+        <div id="usaJobsErrorDialog">
+            <SfDialog Width="380px" ShowCloseIcon="true" @bind-Visible="_errorVisible"
+                      AllowPrerender="true" IsModal="true">
+                <DialogTemplates>
+                    <Header>Search Error</Header>
+                    <Content>
+                        <span class="mit-dialogText">@_errorMessage</span>
+                    </Content>
+                </DialogTemplates>
+            </SfDialog>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    // ── Endpoint selection ─────────────────────────────────────────────
+    private string _selectedEndpoint = "keyword";
+
+    private readonly List<SelectOption> _endpointOptions =
+    [
+        new SelectOption { Value = "keyword",          Text = "Search by Keyword" },
+        new SelectOption { Value = "positiontitle",    Text = "Search by Position Title" },
+        new SelectOption { Value = "agencysubelements",Text = "Agency Sub-Elements Code List" },
+        new SelectOption { Value = "location",         Text = "Search by Location" }
+    ];
+
+    // ── Parameter inputs ───────────────────────────────────────────────
+    private string _keyword       = string.Empty;
+    private string _positionTitle = string.Empty;
+    private string _locationName  = string.Empty;
+
+    // ── Result state ───────────────────────────────────────────────────
+    private List<USAJobsGridRow>?             _searchResultItems;
+    private List<USAJOBSValidValueResponse>?  _agencyItems;
+
+    // ── UI state ──────────────────────────────────────────────────────
+    private bool   _isLoading      = false;
+    private bool   _searchPerformed = false;
+    private bool   _errorVisible   = false;
+    private string _errorMessage   = string.Empty;
+
+    // ── Event handlers ─────────────────────────────────────────────────
+
+    private void OnEndpointChanged(string endpoint)
+    {
+        _selectedEndpoint   = endpoint;
+        _searchResultItems  = null;
+        _agencyItems        = null;
+        _searchPerformed    = false;
+    }
+
+    private async Task RunSearch()
+    {
+        _errorMessage      = string.Empty;
+        _searchResultItems = null;
+        _agencyItems       = null;
+        _searchPerformed   = false;
+
+        switch (_selectedEndpoint)
+        {
+            case "keyword":
+                if (string.IsNullOrWhiteSpace(_keyword))
+                {
+                    ShowError("A keyword is required.");
+                    return;
+                }
+                break;
+
+            case "positiontitle":
+                if (string.IsNullOrWhiteSpace(_positionTitle))
+                {
+                    ShowError("A position title is required.");
+                    return;
+                }
+                break;
+
+            case "location":
+                if (string.IsNullOrWhiteSpace(_locationName))
+                {
+                    ShowError("A location is required (e.g. San Diego, California).");
+                    return;
+                }
+                break;
+        }
+
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            switch (_selectedEndpoint)
+            {
+                case "keyword":
+                    var kwResult = await USAJobsService.SearchByKeywordAsync(_keyword);
+                    _searchResultItems = MapToGridRows(kwResult);
+                    break;
+
+                case "positiontitle":
+                    var ptResult = await USAJobsService.SearchByPositionTitleAsync(_positionTitle);
+                    _searchResultItems = MapToGridRows(ptResult);
+                    break;
+
+                case "agencysubelements":
+                    var codeList = await USAJobsService.GetAgencySubElementsAsync();
+                    _agencyItems = codeList?.CodeList
+                        .SelectMany(g => g.ValidValue)
+                        .ToList();
+                    break;
+
+                case "location":
+                    var locResult = await USAJobsService.SearchByLocationAsync(_locationName);
+                    _searchResultItems = MapToGridRows(locResult);
+                    break;
+            }
+
+            _searchPerformed = true;
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Request failed: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearForm()
+    {
+        _keyword           = string.Empty;
+        _positionTitle     = string.Empty;
+        _locationName      = string.Empty;
+        _searchResultItems = null;
+        _agencyItems       = null;
+        _searchPerformed   = false;
+        _errorMessage      = string.Empty;
+    }
+
+    private void ShowError(string message)
+    {
+        _errorMessage  = message;
+        _errorVisible  = true;
+    }
+
+    // ── Projection helper — maps API response to flat grid rows ───────
+
+    private static List<USAJobsGridRow> MapToGridRows(USAJobsSearchResponse? response)
+    {
+        if (response?.SearchResult?.SearchResultItems is null)
+            return [];
+
+        var today = DateTime.UtcNow.Date;
+
+        return response.SearchResult.SearchResultItems
+            .Where(item => item.MatchedObjectDescriptor.ApplicationCloseDate == null
+                        || item.MatchedObjectDescriptor.ApplicationCloseDate.Value.Date >= today)
+            .Select(item =>
+        {
+            var d = item.MatchedObjectDescriptor;
+
+            var remuneration = d.PositionRemuneration.FirstOrDefault();
+            string salary = remuneration is not null
+                ? $"{remuneration.MinimumRange} – {remuneration.MaximumRange} {remuneration.RateIntervalCode}"
+                : string.Empty;
+
+            return new USAJobsGridRow
+            {
+                PositionTitle    = d.PositionTitle,
+                OrganizationName = d.OrganizationName,
+                DepartmentName   = d.DepartmentName,
+                LocationDisplay  = d.PositionLocationDisplay,
+                SalaryRange      = salary,
+                PositionSchedule = d.PositionSchedule.FirstOrDefault()?.Name ?? string.Empty,
+                OpenDate         = d.PublicationStartDate,
+                CloseDate        = d.ApplicationCloseDate,
+                ApplyUri         = d.ApplyUri.FirstOrDefault() ?? string.Empty,
+                PositionUri      = d.PositionUri
+            };
+        }).ToList();
+    }
+
+    // ── Local view model for the grid ─────────────────────────────────
+
+    private sealed class USAJobsGridRow
+    {
+        public string    PositionTitle    { get; set; } = string.Empty;
+        public string    OrganizationName { get; set; } = string.Empty;
+        public string    DepartmentName   { get; set; } = string.Empty;
+        public string    LocationDisplay  { get; set; } = string.Empty;
+        public string    SalaryRange      { get; set; } = string.Empty;
+        public string    PositionSchedule { get; set; } = string.Empty;
+        public DateTime? OpenDate         { get; set; }
+        public DateTime? CloseDate        { get; set; }
+        public string    ApplyUri         { get; set; } = string.Empty;
+        public string    PositionUri      { get; set; } = string.Empty;
+    }
+
+    // ── Re-used select option helper (same pattern as JobSearch page) ─
+
+    private sealed class SelectOption
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text  { get; set; } = string.Empty;
+    }
+}

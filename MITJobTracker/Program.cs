@@ -39,6 +39,13 @@ builder.Services.AddHttpClient("JSearch", client =>
 });
 builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 
+// USAJOBS API
+builder.Services.AddHttpClient("USAJobs", client =>
+{
+    client.BaseAddress = new Uri("https://data.usajobs.gov/");
+});
+builder.Services.AddScoped<IUSAJobsService, USAJobsService>();
+
 // Scoped state — persists across navigation within the same browser tab
 builder.Services.AddScoped<IJobSearchStateService, JobSearchStateService>();
 
