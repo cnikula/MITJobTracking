@@ -1,4 +1,4 @@
-# MITJobTracker — V10.27.0
+# MITJobTracker — V10.28.0
 
 **Copyright © Mesquite Information Technologies**
 A Blazor Server web application for managing job applications, tracking interviews, and discovering
@@ -63,8 +63,46 @@ and interview results. The application is deployed as an IIS sub-application und
   results are restored instantly without consuming an additional API call.
 - API credentials are stored in `appsettings.json` under the `RapidApi` section.
 
+### USAJOBS API Integration *(new in V10.28.0)*
+- The application now integrates with the **USAJOBS API** (`data.usajobs.gov`) — the official
+  U.S. federal government job portal — as a second external job source alongside JSearch.
+- Supported search modes:
+  - **Search by Keyword** — free-text keyword search across all federal listings.
+  - **Search by Position Title** — targeted search by exact or partial position title.
+  - **Search by Location** — filter listings by city/state location name.
+  - **Agency Sub-Elements Code List** — retrieve the full list of agency sub-element codes
+	for building reference dropdowns.
+- All requests are sent via a named `HttpClient` (`"USAJobs"`) with required USAJOBS
+  authentication headers (`Host`, `User-Agent`, `Authorization-Key`).
+- API credentials are stored in `appsettings.json` under the `USAJobs` section
+  (`USAJobs:Host`, `USAJobs:UserAgent`, `USAJobs:AuthorizationKey`).
+- Response models fully map the USAJOBS `/api/Search` JSON schema:
+  `USAJobsSearchResponse`, `USAJobsSearchResultResponse`, `USAJobsSearchResultItemResponse`,
+  `USAJobsPositionDescriptorResponse`, `USAJobsJobGradeResponse`, `USAJobsPositionLocationResponse`,
+  `USAJobsUserAreaResponse`, and `USAJOBSCodeListResponse` / `USAJOBSCodeListGroupResponse` /
+  `USAJOBSCodeListItemResponse`.
+- A dedicated `USAJOBSSearchByLocationCityAndStateResponse` model handles responses that
+  carry a top-level `UserArea` resolved-location wrapper.
+- Job announcement detail models (`USAJOBSJobSearchAnnouncementResponse`,
+  `USAJOBSByPositionAndTitleResponse`) are also included for richer JOA content.
+
+### Daily Job Search Log *(new in V10.28.0)*
+- A new `DailyJobSearchLog` EF Core entity (`DailyJobSearchLogs` table) tracks every external
+  job ID retrieved from the JSearch API per calendar day.
+- Duplicate suppression: before rendering JSearch results, already-retrieved job IDs for
+  today are looked up in the log. Jobs already seen today can be filtered or flagged.
+- Review tracking: each log entry has an `IsReviewed` flag and `ReviewedAtUtc` timestamp,
+  letting users mark individual jobs as reviewed.
+- `IJobSearchLogService` / `JobSearchLogService` provides:
+  - `GetTodaysRetrievedJobIdsAsync()` — returns a `HashSet` of today's retrieved IDs.
+  - `LogRetrievedJobsAsync(IEnumerable<string>)` — bulk-inserts new job IDs not yet logged today.
+  - `HasTodaysRecordsAsync()` — quick boolean check for whether any records exist for today.
+  - `ResetDayAsync()` — removes all log entries for today (used by a "Reset Day" control).
+- A composite index on `(ExternalJobId, SearchDate)` enforces fast duplicate-suppression lookups.
+- Migration `AddDailyJobSearchLog` provisions the table and index.
+
 ### Version Display
-- The application version (`10.27.0`) is read at startup from the assembly via `AppInfoService`
+- The application version (`10.28.0`) is read at startup from the assembly via `AppInfoService`
   and displayed on the home page.
 
 ### Error Handling
@@ -106,8 +144,13 @@ Pages (Blazor Razor)
 					├── EFTableManagement     ← EF Core CRUD (Jobs, Interviews)
 					└── CommonSP              ← ADO.NET stored procedure calls
 
-Pages (Job Search)
+Pages (Job Search — JSearch)
 	└── IJobSearchService / JobSearchService ← HTTP calls to JSearch RapidAPI
+			└── IJobSearchStateService        ← preserves search state across navigation
+					└── IJobSearchLogService  ← DB-backed duplicate suppression & review tracking
+
+Pages (Job Search — USAJOBS)
+	└── IUSAJobsService / USAJobsService     ← HTTP calls to USAJOBS API (data.usajobs.gov)
 ```
 
 ### Key Classes
@@ -118,10 +161,12 @@ Pages (Job Search)
 | `JobsServices` | Implements all data operations; scoped |
 | `EFTableManagement` | Wraps EF Core CRUD for `Job` and `Interview` entities |
 | `CommonSP` | Executes SQL Server stored procedures via ADO.NET (`SqlCommand`) |
-| `AppDBContext` | EF Core `DbContext`; defines `Job` and `Interview` DbSets |
+| `AppDBContext` | EF Core `DbContext`; defines `Job`, `Interview`, and `DailyJobSearchLog` DbSets |
 | `AppInfoService` | Reads assembly version at startup; singleton |
 | `JobSearchService` | Calls JSearch RapidAPI, builds query string, deserializes response; scoped |
 | `JobSearchStateService` | Scoped state container — preserves Job Search page criteria and results across Blazor navigation within the same circuit |
+| `USAJobsService` | Calls USAJOBS API endpoints (keyword, title, location, code list); scoped |
+| `JobSearchLogService` | EF Core-backed daily job-search log — duplicate suppression and reviewed tracking; scoped |
 
 ### Dependency Injection (Program.cs)
 
@@ -133,7 +178,10 @@ Pages (Job Search)
 | `IAppInfoService` / `AppInfoService` | Singleton |
 | `IJobSearchService` / `JobSearchService` | Scoped |
 | `IJobSearchStateService` / `JobSearchStateService` | Scoped |
+| `IUSAJobsService` / `USAJobsService` | Scoped |
+| `IJobSearchLogService` / `JobSearchLogService` | Scoped |
 | `HttpClient` (named: "JSearch") | Managed by `IHttpClientFactory` |
+| `HttpClient` (named: "USAJobs") | Managed by `IHttpClientFactory` |
 
 ---
 
@@ -235,8 +283,14 @@ MITJobTracker/
 │   │   └── ProspectListDTO.cs         Prospect grid row model
 │   └── Models/
 │       └── JobSearch/
-│           ├── JobSearchRequest.cs    JSearch API query parameters
-│           └── JobSearchResponse.cs   JSearch API response model (root, JobListing, ApplyOption)
+│           ├── JobSearchRequest.cs                         JSearch API query parameters
+│           ├── JobSearchResponse.cs                        JSearch API response model (root, JobListing, ApplyOption)
+│           ├── DailyJobSearchLog.cs                        Log entry model for duplicate-suppression tracking
+│           ├── USAJobsSearchResponse.cs                    USAJOBS /api/Search response model
+│           ├── USAJOBSSearchByLocationCityAndStateResponse.cs  USAJOBS location-based search response
+│           ├── USAJOBSCodeListResponse.cs                  USAJOBS agency code list response
+│           ├── USAJOBSJobSearchAnnouncementResponse.cs     USAJOBS job announcement detail model
+│           └── USAJOBSByPositionAndTitleResponse.cs        USAJOBS position/title search response
 ├── Factory/
 │   ├── Interfaces/IJobsFactory.cs
 │   └── JobsFactory.cs
@@ -245,10 +299,14 @@ MITJobTracker/
 │   │   ├── IJobsServices.cs
 │   │   ├── IJobSearchService.cs
 │   │   ├── IJobSearchStateService.cs
+│   │   ├── IJobSearchLogService.cs
+│   │   ├── IUSAJobsService.cs
 │   │   └── IAppInfoService.cs
 │   ├── JobsServices.cs
 │   ├── JobSearchService.cs
 │   ├── JobSearchStateService.cs
+│   ├── JobSearchLogService.cs
+│   ├── USAJobsService.cs
 │   └── AppInfoService.cs
 ├── Pages/
 │   ├── Index.razor                    Home / Add Job page
@@ -332,6 +390,28 @@ dotnet user-secrets set "RapidApi:JSearchKey" "YOUR_RAPID_API_KEY"
 ```
 
 The rest of the application (job management, interviews, analytics) works without this key.
+
+### 4. USAJOBS API Credentials (Optional — for USAJOBS Job Search feature)
+
+The USAJOBS integration requires a free API key from the U.S. Office of Personnel Management.
+Register at https://developer.usajobs.gov/apirequest/ and then set:
+
+```json
+"USAJobs": {
+  "Host": "data.usajobs.gov",
+  "UserAgent": "YOUR_EMAIL_ADDRESS",
+  "AuthorizationKey": "YOUR_USAJOBS_API_KEY"
+}
+```
+
+Or use **User Secrets**:
+
+```powershell
+dotnet user-secrets set "USAJobs:UserAgent" "YOUR_EMAIL_ADDRESS"
+dotnet user-secrets set "USAJobs:AuthorizationKey" "YOUR_USAJOBS_API_KEY"
+```
+
+The application runs fully without this key; only USAJOBS search features will be unavailable.
 
 > **Security Note:** Never commit real API keys, license keys, or connection strings to
 > source control. Use **User Secrets** (`dotnet user-secrets`) during development and
@@ -435,7 +515,58 @@ can be redistributed with your application at no cost.
 
 ## Version History
 
-### V10.27.0 — Bug Fixes & Database Cleanup (Current)
+### V10.28.0 — USAJOBS Integration & Daily Job Search Log (Current)
+
+**Changes from V10.27.0:**
+
+**New Feature — USAJOBS API Integration:**
+- Added `IUSAJobsService` / `USAJobsService` (Scoped) to integrate with the
+  **USAJOBS API** (`data.usajobs.gov`) — the official U.S. federal government job portal.
+- Four endpoints supported: Search by Keyword, Search by Position Title, Search by Location,
+  and Agency Sub-Elements Code List.
+- All requests use a dedicated named `HttpClient` (`"USAJobs"`) registered in `Program.cs`
+  with the base address `https://data.usajobs.gov/`.
+- USAJOBS authentication headers (`Host`, `User-Agent`, `Authorization-Key`) are applied
+  per request from configuration.
+- Complete response model hierarchy added under `Data/Models/JobSearch/`:
+  `USAJobsSearchResponse`, `USAJobsSearchResultResponse`, `USAJobsSearchResultItemResponse`,
+  `USAJobsPositionDescriptorResponse`, `USAJobsJobGradeResponse`,
+  `USAJobsPositionLocationResponse`, `USAJobsUserAreaResponse`,
+  `USAJOBSSearchByLocationCityAndStateResponse`, `USAJOBSCodeListResponse`,
+  `USAJOBSCodeListGroupResponse`, `USAJOBSCodeListItemResponse`,
+  `USAJOBSJobSearchAnnouncementResponse`, and `USAJOBSByPositionAndTitleResponse`.
+- API credentials are stored in `appsettings.json` under the `USAJobs` section:
+
+```json
+"USAJobs": {
+  "Host": "data.usajobs.gov",
+  "UserAgent": "YOUR_EMAIL_ADDRESS",
+  "AuthorizationKey": "YOUR_USAJOBS_API_KEY"
+}
+```
+
+Or use **User Secrets**:
+
+```powershell
+dotnet user-secrets set "USAJobs:UserAgent" "YOUR_EMAIL_ADDRESS"
+dotnet user-secrets set "USAJobs:AuthorizationKey" "YOUR_USAJOBS_API_KEY"
+```
+
+Register at https://developer.usajobs.gov/apirequest/ to obtain your API key.
+
+**New Feature — Daily Job Search Log:**
+- Added `DailyJobSearchLog` entity and `DailyJobSearchLogs` EF Core table.
+- Added `IJobSearchLogService` / `JobSearchLogService` (Scoped) with:
+  - `GetTodaysRetrievedJobIdsAsync()` — returns `HashSet<string>` of today's job IDs.
+  - `LogRetrievedJobsAsync(IEnumerable<string>)` — bulk-inserts new IDs not yet logged today.
+  - `HasTodaysRecordsAsync()` — boolean check for any records today.
+  - `ResetDayAsync()` — clears all log entries for today.
+- Migration `AddDailyJobSearchLog` provisions the table and composite index on
+  `(ExternalJobId, SearchDate)` for fast duplicate-suppression lookups.
+
+---
+
+### V10.27.0 — Bug Fixes & Database Cleanup
 
 **Changes from V10.26.0:**
 
