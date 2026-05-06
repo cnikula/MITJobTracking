@@ -20,20 +20,20 @@ namespace MITJobTracker.Data.DTOS
     public class ProspectListDTO
     {
             public int JobId { get; set; }
-            public string JobTitle { get; set; }
-            public string JobNo { get; set; }
+            public string? JobTitle { get; set; }
+            public string? JobNo { get; set; }
             public DateTime DateApplied { get; set; }
-            public string Status { get; set; }
-            public string JobLocation { get; set; }
-            public string RecruitingAgency { get; set; }
-            public string RecruitertName { get; set; }
-            public string RecruiterPhone { get; set; }
-            public string RecruiterEmail { get; set; }
+            public string? Status { get; set; }
+            public string? JobLocation { get; set; }
+            public string? RecruitingAgency { get; set; }
+            public string? RecruitertName { get; set; }
+            public string? RecruiterPhone { get; set; }
+            public string? RecruiterEmail { get; set; }
             public int InterviewId { get; set; }
             public DateTime InterviewDate { get; set; }
-            public string InterviewType { get; set; }
-            public string CompanyName { get; set; }
-            public string Note { get; set; }
+            public string? InterviewType { get; set; }
+            public string? CompanyName { get; set; }
+            public string? Note { get; set; }
 
     }
 }

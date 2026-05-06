@@ -17,7 +17,7 @@ namespace MITJobTracker.Data.Common
 {
     public class EmploymentType
     {
-        public string Id { get; set; }
-        public string Text { get; set; }
+        public required string Id { get; set; }
+        public string? Text { get; set; }
     }
 }

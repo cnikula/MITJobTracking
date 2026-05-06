@@ -108,22 +108,22 @@
                             Width="150">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruitingAgency)"
-                            HeaderText="Recruiting Agencyn"
+                            HeaderText="Recruiting Agency"
                             TextAlign="TextAlign.Center"
                             Width="150">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruitertName)"
-                            HeaderText="Recruitert Name"
+                            HeaderText="Recruiter Name"
                             TextAlign="TextAlign.Left"
                             Width="150">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruiterPhone)"
-                            HeaderText="Recruitert Phone No."
+                            HeaderText="Recruiter Phone No."
                             TextAlign="TextAlign.Center"
                             Width="150">
                 </GridColumn>
                 <GridColumn Field="@nameof(ProspectListDTO.RecruiterEmail)"
-                            HeaderText="Recruitert EMail"
+                            HeaderText="Recruiter Emaill"
                             TextAlign="TextAlign.Center"
                             Width="225">
                 </GridColumn>
@@ -162,7 +162,7 @@
                 <Header> @dialogHeader</Header>
                 <Content>
                     <div class="mit-dialog-content"></div>
-                    <spam class="mit-dialogText">@dialogText</spam>
+                    <span class="mit-dialogText">@dialogText</span>
                 </Content>
             </DialogTemplates>
         </SfDialog>
@@ -221,16 +221,7 @@
         }
     }
 
-    /// <summary>
-    /// Handles the days-old dropdown value change event.
-    /// </summary>
-    private void OnDaysFilterChanged(ChangeEventArgs<int, DaysFilterOption> args)
-    {
-        _selectedDays = args.Value;
-        ApplyDaysFilter();
-    }
-
-
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -254,9 +245,10 @@
         catch (InvalidCastException ex)
         {
             // Handle the DBNull exception here or object null reference exception (no record found)
-            // You can assign a default value to rospectListDTO or handle the exception in a different way
-            _allProspects = [];
-            prospectListDTO = [];
+             _allProspects = [];
+             prospectListDTO = [];
+             dialogText = "Failed to load prospects. Please try again.";
+             Visibility = true;
         }
     }
 
@@ -287,18 +279,25 @@
 
     }
 
-    private void ClearSearch()
+    // private void ClearSearch()
+    // {
+    //     searchValue = string.Empty;
+    //     _selectedDays = 0;
+    //     PpopulateGrid("N/A", true);
+    // }
+
+    private async Task ClearSearch()
     {
         searchValue = string.Empty;
         _selectedDays = 0;
-        PpopulateGrid("N/A", true);
+        await PpopulateGrid("N/A", true);
     }
 
     protected void EnterKey(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            DoSearch();
+          DoSearch();
         }
     }
 
@@ -312,7 +311,8 @@
         int expired = 0;        // Count the number of expired jobs
 
         List<int> jobIdList = new List<int>();
-        foreach (var item in prospectListDTO)
+        // foreach (var item in prospectListDTO)
+        foreach (var item in _allProspects)
         {
             if (item.Status == "Expired")
             {
