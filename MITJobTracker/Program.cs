@@ -21,6 +21,7 @@ builder.Services.AddSyncfusionBlazor();
 
 // Retrieve the connection string using the Configuration object
 builder.Services.AddDbContext<AppDBContext>(item => item.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")));
+builder.Services.AddDbContextFactory<AppDBContext>(item => item.UseSqlServer(configuration.GetConnectionString("mitLocalConnection")), ServiceLifetime.Scoped);
 //builder.Services.AddTransient<IJobsFactory, JobsFactory>();
 builder.Services.AddScoped<IJobsFactory, JobsFactory>();
 //builder.Services.AddTransient<IJobsServices, JobsServices>();
