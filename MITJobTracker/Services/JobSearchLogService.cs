@@ -24,11 +24,11 @@ namespace MITJobTracker.Services;
 
 public class JobSearchLogService : IJobSearchLogService
 {
-    private readonly AppDBContext _context;
+    private readonly IDbContextFactory<AppDBContext> _contextFactory;
 
-    public JobSearchLogService(AppDBContext context)
+    public JobSearchLogService(IDbContextFactory<AppDBContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     private static DateTime Today => DateTime.UtcNow.Date;
@@ -38,6 +38,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task<HashSet<string>> GetTodaysRetrievedJobIdsAsync()
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         var ids = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today)
             .Select(l => l.ExternalJobId)
@@ -49,8 +50,8 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task LogRetrievedJobsAsync(IEnumerable<string> externalJobIds)
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
 
-        // Only insert IDs not already logged today (handles concurrent searches)
         var existingIds = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today)
             .Select(l => l.ExternalJobId)
@@ -60,9 +61,9 @@ public class JobSearchLogService : IJobSearchLogService
             .Where(id => !string.IsNullOrWhiteSpace(id) && !existingIds.Contains(id))
             .Select(id => new DailyJobSearchLog
             {
-                SearchDate      = today,
-                ExternalJobId   = id,
-                RetrievedAtUtc  = DateTime.UtcNow
+                SearchDate     = today,
+                ExternalJobId  = id,
+                RetrievedAtUtc = DateTime.UtcNow
             })
             .ToList();
 
@@ -78,6 +79,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task<HashSet<string>> GetTodaysReviewedJobIdsAsync()
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         var ids = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate == today && l.IsReviewed)
             .Select(l => l.ExternalJobId)
@@ -89,6 +91,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task MarkJobReviewedAsync(string externalJobId)
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         var entry = await _context.DailyJobSearchLogs
             .FirstOrDefaultAsync(l => l.SearchDate == today
                                    && l.ExternalJobId == externalJobId);
@@ -97,9 +100,9 @@ public class JobSearchLogService : IJobSearchLogService
         {
             entry = new DailyJobSearchLog
             {
-                SearchDate      = today,
-                ExternalJobId   = externalJobId,
-                RetrievedAtUtc  = DateTime.UtcNow
+                SearchDate     = today,
+                ExternalJobId  = externalJobId,
+                RetrievedAtUtc = DateTime.UtcNow
             };
             _context.DailyJobSearchLogs.Add(entry);
         }
@@ -113,6 +116,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task UnmarkJobReviewedAsync(string externalJobId)
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         var entry = await _context.DailyJobSearchLogs
             .FirstOrDefaultAsync(l => l.SearchDate == today
                                    && l.ExternalJobId == externalJobId);
@@ -140,6 +144,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task<bool> HasTodaysRecordsAsync()
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         return await _context.DailyJobSearchLogs
             .AnyAsync(l => l.SearchDate <= today);
     }
@@ -160,6 +165,7 @@ public class JobSearchLogService : IJobSearchLogService
     public async Task ResetDayAsync()
     {
         var today = Today;
+        await using var _context = await _contextFactory.CreateDbContextAsync();
         var todaysRecords = await _context.DailyJobSearchLogs
             .Where(l => l.SearchDate <= today)
             .ToListAsync();

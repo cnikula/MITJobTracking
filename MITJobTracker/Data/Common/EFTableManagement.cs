@@ -32,12 +32,12 @@ namespace MITJobTracker.Data.Common
             try
             {
                 // Retrieve the existing Job entity
-                Job jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
+                Job? jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
 
                 if (jobEntity != null)
                 {
                     // Update the job entity with the new values
-                    jobEntity.JobTitle = JobsInterview.JobTitle;
+                    jobEntity.JobTitle = JobsInterview.JobTitle ?? string.Empty;
                     jobEntity.JobNo = JobsInterview.JobNo;
                     jobEntity.DateApplied = JobsInterview.DateApplied;
                     jobEntity.ResumeSendDate = JobsInterview.ResumeSendDate;
@@ -50,12 +50,12 @@ namespace MITJobTracker.Data.Common
                     jobEntity.HybridNoOfDays = JobsInterview.HybridNoOfDays;
                     jobEntity.CompanyName = JobsInterview.CompanyName;
                     jobEntity.RecruitingAgency = JobsInterview.RecruitingAgency;
-                    jobEntity.EmploymentType = JobsInterview.EmploymentType;
+                    jobEntity.EmploymentType = JobsInterview.EmploymentType ?? string.Empty;
                     jobEntity.SubContract = JobsInterview.SubContract;
                     jobEntity.ResumeSend = JobsInterview.ResumeSend;
-                    jobEntity.Requirements = JobsInterview.Requirements;
-                    jobEntity.JobDescription = JobsInterview.JobDescription;
-                    jobEntity.RecruitertName = JobsInterview.RecruitertName;
+                    jobEntity.Requirements = JobsInterview.Requirements ?? string.Empty;
+                    jobEntity.JobDescription = JobsInterview.JobDescription ?? string.Empty;
+                    jobEntity.RecruitertName = JobsInterview.RecruitertName ?? string.Empty;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
                     jobEntity.Note = JobsInterview.Note;
@@ -65,19 +65,19 @@ namespace MITJobTracker.Data.Common
                 }
 
                 // Retrieve the existing Interview entity
-                Interview InterviewEntity = await _context.Interviews.FindAsync(JobsInterview.InterviewId);
+                Interview? InterviewEntity = await _context.Interviews.FindAsync(JobsInterview.InterviewId);
 
                 if (InterviewEntity != null)
                 {
                     // Update the interview entity with the new values
                     InterviewEntity.JobId = JobsInterview.JobId;
                     InterviewEntity.InterviewDate = JobsInterview.InterviewDate;
-                    InterviewEntity.InterviewType = JobsInterview.InterviewType;
-                    InterviewEntity.InterviewerName = JobsInterview.InterviewerName;
-                    InterviewEntity.InterviewerPhone = JobsInterview.InterviewerPhone;
-                    InterviewEntity.InterviewerEmail = JobsInterview.InterviewerEmail;
-                    InterviewEntity.InterviewerNotes = JobsInterview.InterviewerNotes;
-                    InterviewEntity.InterviewerResulte = JobsInterview.InterviewerResulte;
+                    InterviewEntity.InterviewType = JobsInterview.InterviewType ?? string.Empty;
+                    InterviewEntity.InterviewerName = JobsInterview.InterviewerName ?? string.Empty;
+                    InterviewEntity.InterviewerPhone = JobsInterview.InterviewerPhone ?? string.Empty;
+                    InterviewEntity.InterviewerEmail = JobsInterview.InterviewerEmail ?? string.Empty;
+                    InterviewEntity.InterviewerNotes = JobsInterview.InterviewerNotes ?? string.Empty;
+                    InterviewEntity.InterviewerResulte = JobsInterview.InterviewerResulte ?? string.Empty;
 
                     // Mark the interview entity as modified
                     _context.Entry(InterviewEntity).State = EntityState.Modified;
@@ -99,7 +99,7 @@ namespace MITJobTracker.Data.Common
 
 
 
-        //// <summary>
+        /// <summary>
         /// Updates the job and add interview by Id.
         /// </summary>
         /// <param name="JobsInterview">The jobs interview.</param>
@@ -111,12 +111,12 @@ namespace MITJobTracker.Data.Common
             try
             {
                 // Retrieve the existing Job entity
-                Job jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
+                Job? jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
 
                 if (jobEntity != null)
                 {
                     // Update the job entity with the new values
-                    jobEntity.JobTitle = JobsInterview.JobTitle;
+                    jobEntity.JobTitle = JobsInterview.JobTitle ?? string.Empty;
                     jobEntity.JobNo = JobsInterview.JobNo;
                     jobEntity.DateApplied = JobsInterview.DateApplied;
                     jobEntity.ResumeSendDate = JobsInterview.ResumeSendDate;
@@ -129,12 +129,12 @@ namespace MITJobTracker.Data.Common
                     jobEntity.HybridNoOfDays = JobsInterview.HybridNoOfDays;
                     jobEntity.CompanyName = JobsInterview.CompanyName;
                     jobEntity.RecruitingAgency = JobsInterview.RecruitingAgency;
-                    jobEntity.EmploymentType = JobsInterview.EmploymentType;
+                    jobEntity.EmploymentType = JobsInterview.EmploymentType ?? string.Empty;
                     jobEntity.SubContract = JobsInterview.SubContract;
                     jobEntity.ResumeSend = JobsInterview.ResumeSend;
-                    jobEntity.Requirements = JobsInterview.Requirements;
-                    jobEntity.JobDescription = JobsInterview.JobDescription;
-                    jobEntity.RecruitertName = JobsInterview.RecruitertName;
+                    jobEntity.Requirements = JobsInterview.Requirements ?? string.Empty;
+                    jobEntity.JobDescription = JobsInterview.JobDescription ?? string.Empty;
+                    jobEntity.RecruitertName = JobsInterview.RecruitertName ?? string.Empty;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
                     jobEntity.Note = JobsInterview.Note;
@@ -148,12 +148,12 @@ namespace MITJobTracker.Data.Common
                 {
                     JobId = JobsInterview.JobId,
                     InterviewDate = JobsInterview.InterviewDate,
-                    InterviewType = JobsInterview.InterviewType,
-                    InterviewerName = JobsInterview.InterviewerName,
-                    InterviewerPhone = JobsInterview.InterviewerPhone,
-                    InterviewerEmail = JobsInterview.InterviewerEmail,
-                    InterviewerNotes = JobsInterview.InterviewerNotes,
-                    InterviewerResulte = JobsInterview.InterviewerResulte
+                    InterviewType = JobsInterview.InterviewType ?? string.Empty,
+                    InterviewerName = JobsInterview.InterviewerName ?? string.Empty,
+                    InterviewerPhone = JobsInterview.InterviewerPhone ?? string.Empty,
+                    InterviewerEmail = JobsInterview.InterviewerEmail ?? string.Empty,
+                    InterviewerNotes = JobsInterview.InterviewerNotes ?? string.Empty,
+                    InterviewerResulte = JobsInterview.InterviewerResulte ?? string.Empty
                 };
 
                 // Add the new Interview entity to the context
@@ -184,12 +184,12 @@ namespace MITJobTracker.Data.Common
             try
             {
                 // Retrieve the existing Job entity
-                Job jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
+                Job? jobEntity = await _context.Jobs.FindAsync(JobsInterview.JobId);
 
                 if (jobEntity != null)
                 {
                     // Update the job entity with the new values
-                    jobEntity.JobTitle = JobsInterview.JobTitle;
+                    jobEntity.JobTitle = JobsInterview.JobTitle ?? string.Empty;
                     jobEntity.JobNo = JobsInterview.JobNo;
                     jobEntity.DateApplied = JobsInterview.DateApplied;
                     jobEntity.ResumeSendDate = JobsInterview.ResumeSendDate;
@@ -202,12 +202,12 @@ namespace MITJobTracker.Data.Common
                     jobEntity.HybridNoOfDays = JobsInterview.HybridNoOfDays;
                     jobEntity.CompanyName = JobsInterview.CompanyName;
                     jobEntity.RecruitingAgency = JobsInterview.RecruitingAgency;
-                    jobEntity.EmploymentType = JobsInterview.EmploymentType;
+                    jobEntity.EmploymentType = JobsInterview.EmploymentType ?? string.Empty;
                     jobEntity.SubContract = JobsInterview.SubContract;
                     jobEntity.ResumeSend = JobsInterview.ResumeSend;
-                    jobEntity.Requirements = JobsInterview.Requirements;
-                    jobEntity.JobDescription = JobsInterview.JobDescription;
-                    jobEntity.RecruitertName = JobsInterview.RecruitertName;
+                    jobEntity.Requirements = JobsInterview.Requirements ?? string.Empty;
+                    jobEntity.JobDescription = JobsInterview.JobDescription ?? string.Empty;
+                    jobEntity.RecruitertName = JobsInterview.RecruitertName ?? string.Empty;
                     jobEntity.RecruiterPhone = JobsInterview.RecruiterPhone;
                     jobEntity.RecruiterEmail = JobsInterview.RecruiterEmail;
                     jobEntity.Note = JobsInterview.Note;
@@ -245,12 +245,12 @@ namespace MITJobTracker.Data.Common
                 {
                     JobId = JobsInterview.JobId,
                     InterviewDate = JobsInterview.InterviewDate,
-                    InterviewType = JobsInterview.InterviewType,
-                    InterviewerName = JobsInterview.InterviewerName,
-                    InterviewerPhone = JobsInterview.InterviewerPhone,
-                    InterviewerEmail = JobsInterview.InterviewerEmail,
-                    InterviewerNotes = JobsInterview.InterviewerNotes,
-                    InterviewerResulte = JobsInterview.InterviewerResulte
+                    InterviewType = JobsInterview.InterviewType ?? string.Empty,
+                    InterviewerName = JobsInterview.InterviewerName ?? string.Empty,
+                    InterviewerPhone = JobsInterview.InterviewerPhone ?? string.Empty,
+                    InterviewerEmail = JobsInterview.InterviewerEmail ?? string.Empty,
+                    InterviewerNotes = JobsInterview.InterviewerNotes ?? string.Empty,
+                    InterviewerResulte = JobsInterview.InterviewerResulte ?? string.Empty
                 };
 
                 // Add the new Interview entity to the context
@@ -281,19 +281,19 @@ namespace MITJobTracker.Data.Common
             try
             {
                 // Retrieve the existing Interview entity
-                Interview InterviewEntity = await _context.Interviews.FindAsync(JobsInterview.InterviewId);
+                Interview? InterviewEntity = await _context.Interviews.FindAsync(JobsInterview.InterviewId);
 
                 if (InterviewEntity != null)
                 {
                     // Update the interview entity with the new values
                     InterviewEntity.JobId = JobsInterview.JobId;
                     InterviewEntity.InterviewDate = JobsInterview.InterviewDate;
-                    InterviewEntity.InterviewType = JobsInterview.InterviewType;
-                    InterviewEntity.InterviewerName = JobsInterview.InterviewerName;
-                    InterviewEntity.InterviewerPhone = JobsInterview.InterviewerPhone;
-                    InterviewEntity.InterviewerEmail = JobsInterview.InterviewerEmail;
-                    InterviewEntity.InterviewerNotes = JobsInterview.InterviewerNotes;
-                    InterviewEntity.InterviewerResulte = JobsInterview.InterviewerResulte;
+                    InterviewEntity.InterviewType = JobsInterview.InterviewType ?? string.Empty;
+                    InterviewEntity.InterviewerName = JobsInterview.InterviewerName ?? string.Empty;
+                    InterviewEntity.InterviewerPhone = JobsInterview.InterviewerPhone ?? string.Empty;
+                    InterviewEntity.InterviewerEmail = JobsInterview.InterviewerEmail ?? string.Empty;
+                    InterviewEntity.InterviewerNotes = JobsInterview.InterviewerNotes ?? string.Empty;
+                    InterviewEntity.InterviewerResulte = JobsInterview.InterviewerResulte ?? string.Empty;
 
                     // Mark the interview entity as modified
                     _context.Entry(InterviewEntity).State = EntityState.Modified;
@@ -318,9 +318,9 @@ namespace MITJobTracker.Data.Common
 
             try
             {
-                Interview interviewEntity = await _context.Interviews
-                                    .Where(i => i.JobId == jobId)
-                                    .FirstOrDefaultAsync();
+                Interview? interviewEntity = await _context.Interviews
+                            .Where(i => i.JobId == jobId)
+                            .FirstOrDefaultAsync();
 
                 if (interviewEntity != null)
                 {
@@ -335,7 +335,7 @@ namespace MITJobTracker.Data.Common
                 }
 
                 // Retrieve the existing Job entity
-                Job jobEntity = await _context.Jobs.FindAsync(jobId);
+                Job? jobEntity = await _context.Jobs.FindAsync(jobId);
 
                 if (jobEntity != null)
                 {

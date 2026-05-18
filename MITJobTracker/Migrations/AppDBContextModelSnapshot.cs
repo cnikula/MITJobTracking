@@ -120,7 +120,7 @@ namespace MITJobTracker.Migrations
 
                     b.HasIndex("ExternalJobId", "SearchDate");
 
-                    b.ToTable("DailyJobSearchLogs");
+                    b.ToTable("DailyJobSearchLogs", (string)null);
                 });
 
             modelBuilder.Entity("MITJobTracker.Data.Interview", b =>
@@ -208,7 +208,7 @@ namespace MITJobTracker.Migrations
 
                     b.HasIndex("JobId");
 
-                    b.ToTable("Interviews");
+                    b.ToTable("Interviews", (string)null);
                 });
 
             modelBuilder.Entity("MITJobTracker.Data.Job", b =>
@@ -359,7 +359,7 @@ namespace MITJobTracker.Migrations
 
                     b.HasKey("JobId");
 
-                    b.ToTable("Jobs");
+                    b.ToTable("Jobs", (string)null);
                 });
 
             modelBuilder.Entity("MITJobTracker.Data.Interview", b =>
