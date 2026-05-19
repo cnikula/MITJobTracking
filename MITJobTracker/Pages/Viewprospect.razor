@@ -81,7 +81,7 @@
                             <Template>
                                 @{
                                     var changeBackColor = (context as ProspectListDTO);
-                                    if (changeBackColor.Status == "Expired")
+                                    if (changeBackColor?.Status == "Expired")
                                     {
                                         <div class="mit-gridcell-red">
                                             @changeBackColor.Status
@@ -90,7 +90,7 @@
                                     else
                                     {
                                         <div class="mit-gridcell-green">
-                                            @changeBackColor.Status
+                                            @changeBackColor?.Status
                                         </div>
                                     }
                                 }
@@ -245,6 +245,7 @@
         catch (InvalidCastException ex)
         {
             // Handle the DBNull exception here or object null reference exception (no record found)
+            ex.Message.ToString();
              _allProspects = [];
              prospectListDTO = [];
              dialogText = "Failed to load prospects. Please try again.";
