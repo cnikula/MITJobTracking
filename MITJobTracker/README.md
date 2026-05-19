@@ -1,4 +1,4 @@
-# MITJobTracker — V10.28.0
+# MITJobTracker — V10.28.1
 
 **Copyright © Mesquite Information Technologies**
 A Blazor Server web application for managing job applications, tracking interviews, and discovering
@@ -12,6 +12,24 @@ MITJobTracker is a personal job-search management tool that helps users stay org
 the entire job application lifecycle — from finding opportunities to tracking application outcomes
 and interview results. The application is deployed as an IIS sub-application under the path
 `/mitJobTracker` and is designed for single-user or small-team use backed by a SQL Server database.
+
+---
+
+## Release Notes
+
+### V10.28.1 (Current Release)
+**Bug Fixes:**
+- Fixed nullable reference warnings in `JobsServices.GetJobInterviewById()` method to properly handle null return scenarios in compliance with C# nullable reference types.
+
+### V10.28.0
+**New Features:**
+- **USAJOBS API Integration** — Added integration with the official U.S. federal government job portal API (`data.usajobs.gov`) as a second external job source alongside JSearch.
+  - Supports search by keyword, position title, location, and agency sub-elements code list retrieval.
+  - All requests use named `HttpClient` with required USAJOBS authentication headers.
+- **Daily Job Search Log** — New `DailyJobSearchLog` entity tracks external job IDs retrieved per calendar day.
+  - Duplicate suppression prevents showing already-seen jobs.
+  - Review tracking with `IsReviewed` flag and timestamp.
+  - "Reset Day" functionality to clear daily log entries.
 
 ---
 
@@ -102,7 +120,7 @@ and interview results. The application is deployed as an IIS sub-application und
 - Migration `AddDailyJobSearchLog` provisions the table and index.
 
 ### Version Display
-- The application version (`10.28.0`) is read at startup from the assembly via `AppInfoService`
+- The application version (`10.28.1`) is read at startup from the assembly via `AppInfoService`
   and displayed on the home page.
 
 ### Error Handling
