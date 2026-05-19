@@ -26,13 +26,13 @@ namespace MITJobTracker.Data
         [DataMember]
         [MaxLength(150)]
         [Required(ErrorMessage = "Interview Type is required")]
-        public string InterviewType { get; set; }
+        public required string InterviewType { get; set; }
 
         [Comment("Interviewer Name, the person full name that is interviewing you")]
         [DataMember]
         [MaxLength(150)]
         [Required(ErrorMessage = "Interviewer Name is required")]
-        public string InterviewerName { get; set; }
+        public required string InterviewerName { get; set; }
 
         [Comment("Interviewer Phone, the person phone number that is interviewing you")]
         [DataMember]

@@ -25,7 +25,7 @@ namespace MITJobTracker.Services
             var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
             // Fall back to file version and assembly version
-            string fileVersion = null;
+            string? fileVersion = null;
             try
             {
                 if (!string.IsNullOrEmpty(assembly.Location))
@@ -41,14 +41,12 @@ namespace MITJobTracker.Services
 
             var assemblyVersion = assembly.GetName().Version?.ToString();
 
-            _version = informational ?? fileVersion ?? assemblyVersion ?? "unknown";
-
-          
+            _version = informational ?? "Unknown";
             if (!string.IsNullOrEmpty(informational) && informational.Contains('+'))
             {
                 informational = informational.Split('+')[0];
             }
-            _version = informational;
+            _version = informational ?? "Unknown";
         }
 
         public string Version => _version;

@@ -1,5 +1,5 @@
 ﻿@page "/DetailView/{jobId}"
-@using Newtonsoft.Json;
+@* @using Newtonsoft.Json; *@
 @using Newtonsoft.Json.Linq
 @inject IJobsFactory JobsFactory
 @inject NavigationManager NavigationManager
@@ -85,7 +85,7 @@
                     <div class="mit-control-wrapper col-lg-2 sb-property-border">
                         <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Employment Type" DataSource="@jobTypes"
                                         @bind-Value="@selectedJobType">
-                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))" />
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData?.Text ?? string.Empty))" />
                             <DropDownListFieldSettings Value="Text" />
                         </SfDropDownList>
                     </div>
@@ -110,12 +110,12 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1 me-2">
                                         <label for="requirements">Job Requirements</label>
-                                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="on" @bind="@JobsInterview.Requirements"></textarea>
+                                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="description" wrap="soft" @bind="@JobsInterview.Requirements"></textarea>
                                         <validationmessage for="@(() => JobsInterview.Requirements)" />
                                     </div>
                                     <div class="flex-grow-1 ms-2">
                                         <label for="specialNote">Special Notes</label>
-                                        <textarea asp-for="specialNote" name="special_Note" class="form-control mit-text-ara" id="special_Note" wrap="on" @bind="@JobsInterview.Note"></textarea>
+                                        <textarea asp-for="specialNote" name="special_Note" class="form-control mit-text-ara" id="special_Note" wrap="soft" @bind="@JobsInterview.Note"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                     <div class="form-group mb-3">
                         <br />
                         <label for="jobDescription">Job Description</label>
-                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="on" @bind="@JobsInterview.JobDescription"></textarea>
+                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="soft" @bind="@JobsInterview.JobDescription"></textarea>
                         <validationmessage for="@(() => JobsInterview.JobDescription)" />
                     </div>
                 </div>
@@ -175,10 +175,10 @@
                         <label for="InterviewerResulte" class="mitcustom-margin-left-496">Interviewer Result</label>
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1 me-2">
-                                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="on" @bind="@JobsInterview.InterviewerNotes"></textarea>
+                                <textarea asp-for="InterviewerNotes" name="InterviewerNotes" class="form-control mit-text-ara" id="InterviewerNotes" wrap="soft" @bind="@JobsInterview.InterviewerNotes"></textarea>
                             </div>
                             <div class="flex-grow-1 ms-2" style="margin-right: 800px;">
-                                <textarea asp-for="InterviewerResulte" name="InterviewerResulte" class="form-control mit-text-ara" id="InterviewerResulte" wrap="on" @bind="@JobsInterview.InterviewerResulte"></textarea>
+                                <textarea asp-for="InterviewerResulte" name="InterviewerResulte" class="form-control mit-text-ara" id="InterviewerResulte" wrap="soft" @bind="@JobsInterview.InterviewerResulte"></textarea>
                             </div>
                         </div>
                         <validationmessage for="@(() => JobsInterview.InterviewerNotes)"/>
@@ -212,10 +212,10 @@
 
 @code {
     [Parameter]
-    public string jobId { get; set; }
+    public string? jobId { get; set; }
 
     private JobsInterviewDTO JobsInterview = new JobsInterviewDTO();
-    private JobsInterviewDTO ClonedJobsInterview;
+    private JobsInterviewDTO? ClonedJobsInterview;
     private string dialogText = string.Empty;
     private string dialogHeader = "Application Error";
     private bool visibility = false;
@@ -245,7 +245,7 @@
         try
         {
             JobsInterview = (await JobsFactory.GetJobInterviewById(key));
-            selectedJobType = JobsInterview.EmploymentType;
+            selectedJobType = JobsInterview.EmploymentType ?? string.Empty;
             
             ClonedJobsInterview = JobsInterview.Clone();
         }
@@ -262,19 +262,19 @@
     
     private void OnChaneRadioValue(ChangeEventArgs e)
     {
-        if (e.Value.ToString() == "onSite")
+        if (e.Value?.ToString() == "onSite")
         {
             JobsInterview.OnSite = true;
             JobsInterview.Hybrid = false;
             JobsInterview.Remote = false;
         }
-        else if (e.Value.ToString() == "hybrid")
+        else if (e.Value?.ToString() == "hybrid")
         {
             JobsInterview.OnSite = false;
             JobsInterview.Hybrid = true;
             JobsInterview.Remote = false;
         }
-        else if (e.Value.ToString() == "remote")
+        else if (e.Value?.ToString() == "remote")
         {
             JobsInterview.OnSite = false;
             JobsInterview.Hybrid = false;
@@ -298,7 +298,7 @@
 
         if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
         {
-            // Save the data to the database, eighter to the Jobs or Interview table or both.
+            // Save the data to the database, eitter to the Jobs or Interview table or both.
             interview = differences.Any(s => s.StartsWith("Interview", StringComparison.OrdinalIgnoreCase));
 
             if (!job)
@@ -405,17 +405,14 @@
     }
 
     
-    private bool AreObjectsEqual(JobsInterviewDTO obj1, JobsInterviewDTO obj2)
+    private bool AreObjectsEqual(JobsInterviewDTO? obj1, JobsInterviewDTO? obj2)
     {
-        string json1 = JsonConvert.SerializeObject(obj1);
-        string json2 = JsonConvert.SerializeObject(obj2);
-
-        if (json1 != json2)
-        {
-            GetObjectDifferences(json1, json2);
-        }
-
-        return json1 == json2;
+        if (obj1 is null && obj2 is null) return true;
+        if (obj1 is null || obj2 is null) return false;
+        
+        // Existing comparison logic here
+        return obj1.Equals(obj2) || 
+               System.Text.Json.JsonSerializer.Serialize(obj1) == System.Text.Json.JsonSerializer.Serialize(obj2);
     }
 
 

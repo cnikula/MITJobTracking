@@ -118,7 +118,13 @@ namespace MITJobTracker.Services
         {
             try
             {
-                return await _commonSP.GetJobInterviewById(id);
+                //return await _commonSP.GetJobInterviewById(id);
+                var result = await _commonSP.GetJobInterviewById(id);
+                if (result is null)
+                {
+                    throw new KeyNotFoundException($"Job interview with ID {id} not found.");
+                }
+                return result;
             }
             catch (Exception e)
             {

@@ -81,7 +81,7 @@
                             <Template>
                                 @{
                                     var changeBackColor = (context as ProspectListDTO);
-                                    if (changeBackColor.Status == "Expired")
+                                    if (changeBackColor?.Status == "Expired")
                                     {
                                         <div class="mit-gridcell-red">
                                             @changeBackColor.Status
@@ -90,7 +90,7 @@
                                     else
                                     {
                                         <div class="mit-gridcell-green">
-                                            @changeBackColor.Status
+                                            @changeBackColor?.Status
                                         </div>
                                     }
                                 }
@@ -245,6 +245,7 @@
         catch (InvalidCastException ex)
         {
             // Handle the DBNull exception here or object null reference exception (no record found)
+            ex.Message.ToString();
              _allProspects = [];
              prospectListDTO = [];
              dialogText = "Failed to load prospects. Please try again.";
@@ -279,13 +280,7 @@
 
     }
 
-    // private void ClearSearch()
-    // {
-    //     searchValue = string.Empty;
-    //     _selectedDays = 0;
-    //     PpopulateGrid("N/A", true);
-    // }
-
+    
     private async Task ClearSearch()
     {
         searchValue = string.Empty;
@@ -293,13 +288,26 @@
         await PpopulateGrid("N/A", true);
     }
 
-    protected void EnterKey(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-          DoSearch();
-        }
-    }
+    // Method to trigger search on Enter key press
+    // Ticket #31 v10.28.01 - Was update on 5/18/2026 to be async to avoid potential 
+    // issues with async event handlers and state updates in Blazor
+     protected async Task EnterKey(KeyboardEventArgs e)
+ {
+     if (e.Key == "Enter")
+     {
+       await DoSearch();
+     }
+ }
+
+    // protected void EnterKey(KeyboardEventArgs e)
+    // {
+    //     if (e.Key == "Enter")
+    //     {
+    //       DoSearch();
+    //     }
+    // }
+
+    // End Tag #31 v10.28.01
 
 
     /// <summary>

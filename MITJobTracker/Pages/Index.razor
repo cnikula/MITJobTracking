@@ -83,7 +83,7 @@
                     <span>&nbsp;&nbsp;</span>
                     <div class="mit-control-wrapper col-lg-2 sb-property-border">
                         <SfDropDownList ID="employmentType" TItem="EmploymentType" TValue="string" PopupHeight="230px" Placeholder="Select Employment Type" DataSource="@jobTypes">
-                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e.ItemData.Text))"/>
+                            <DropDownListEvents TItem="EmploymentType" TValue="string" OnValueSelect="@((e)=>OnSelectJobType(e?.ItemData?.Text ?? string.Empty))"/>
                             <DropDownListFieldSettings Text="Text" Value="ID"/>
                         </SfDropDownList>
   
@@ -109,12 +109,12 @@
                                 <div class="d-flex">
                                     <div class="flex-grow-1 me-2">
                                         <label for="requirements">Job Requirements</label>
-                                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="requirements" wrap="on" @bind="@JobModel.Requirements"></textarea>
+                                        <textarea asp-for="requirements" name="requirements" class="form-control mit-text-ara" id="requirements" wrap="soft" @bind="@JobModel.Requirements"></textarea>
                                         <validationmessage for="@(() => JobModel.Requirements)" />
                                     </div>
                                     <div class="flex-grow-1 ms-2">
                                         <label for="specialNote">Special Notes </label>
-                                        <textarea asp-for="specialNote" name="special_Note" class="form-control mit-text-ara" id="special_Note" wrap="on" @bind="@JobModel.Note"></textarea>
+                                        <textarea asp-for="specialNote" name="special_Note" class="form-control mit-text-ara" id="special_Note" wrap="soft" @bind="@JobModel.Note"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                     <div class="form-group mb-3">
                         <br />
                         <label for="jobDescription">Job Description</label>
-                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="on" @bind="@JobModel.JobDescription"></textarea>
+                        <textarea asp-for="jobDescription" name="jobDescription" class="form-control mit-text-ara" id="jobDescription" wrap="soft" @bind="@JobModel.JobDescription"></textarea>
                         <validationmessage for="@(() => JobModel.JobDescription)" />
                     </div>
                </div>
@@ -168,7 +168,7 @@
 @code {
 
     private Job JobModel { get; set; } = new Job();
-    protected string selectJobType;
+    protected string? selectJobType;
     //protected bool isChecked = true;
     //protected bool isDisabledChecked = false;
     protected bool Visibility { get; set; } = false;
@@ -231,19 +231,19 @@
 
     private void OnChaneRadioValue(ChangeEventArgs e)
     {
-        if (e.Value.ToString() == "onSite")
+        if (e.Value?.ToString() == "onSite")
         {
             JobModel.OnSite = true;
             JobModel.Hybrid = false;
             JobModel.Remote = false;
         }
-        else if (e.Value.ToString() == "hybrid")
+        else if (e.Value?.ToString() == "hybrid")
         {
             JobModel.OnSite = false;
             JobModel.Hybrid = true;
             JobModel.Remote = false;
         }
-        else if (e.Value.ToString() == "remote")
+        else if (e.Value?.ToString() == "remote")
         {
             JobModel.OnSite = false;
             JobModel.Hybrid = false;

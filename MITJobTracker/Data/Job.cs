@@ -33,6 +33,12 @@ namespace MITJobTracker.Data
             JobNo = GenerateUniqueJobNumber();
             Salary = "0";
             Duration = "N/A";
+            JobTitle = string.Empty; // Fix for CS8618
+            RecruitertName = "UK";   // Pre-populate with default as per Required attribute
+            JobDescription = string.Empty;
+            Requirements = string.Empty;
+            EmploymentType = string.Empty;
+            Interviews = new List<Interview>();
         }
 
         /// <summary>
