@@ -1,3 +1,5 @@
+[USER dOCUMENT](https://github.com/cnikula/MITJobTracking/blob/master/JobTrackerUserDoc.md)
+
 # MITJobTracker — V10.28.1
 
 **Copyright © Mesquite Information Technologies**
