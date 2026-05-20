@@ -1,4 +1,4 @@
-[USER dOCUMENT](https://github.com/cnikula/MITJobTracking/blob/master/JobTrackerUserDoc.md)
+[USER DOCUMENT](https://github.com/cnikula/MITJobTracking/blob/master/JobTrackerUserDoc.md)
 
 # MITJobTracker — V10.28.1
 
