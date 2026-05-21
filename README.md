@@ -1,6 +1,6 @@
 [USER DOCUMENT](https://github.com/cnikula/MITJobTracking/blob/master/JobTrackerUserDoc.md)
 
-# MITJobTracker — V10.28.1
+# MITJobTracker — V10.28.2
 
 **Copyright © Mesquite Information Technologies**
 A Blazor Server web application for managing job applications, tracking interviews, and discovering
@@ -15,11 +15,16 @@ the entire job application lifecycle — from finding opportunities to tracking 
 and interview results. The application is deployed as an IIS sub-application under the path
 `/mitJobTracker` and is designed for single-user or small-team use backed by a SQL Server database.
 
+
 ---
 
 ## Release Notes
 
-### V10.28.1 (Current Release)
+### V10.28.2 (Current Release)
+**Bug Fixes:**
+- Fixed critical data-save regression in `DetailView.SaveToDBC()` (Ticket #35) — `GetObjectDifferences()` was never being called, leaving the `differences` list empty on every save. As a result, the `job` and `interview` change-detection flags were always `false` and `UpdateJobAndInterview()` was called with both flags set to `false`, meaning no data was ever persisted to the database. The fix serializes both the current and cloned `JobsInterviewDTO` objects to JSON and passes them to `GetObjectDifferences()` before evaluating which table(s) need to be updated.
+
+### V10.28.1
 **Bug Fixes:**
 - Fixed nullable reference warnings in `JobsServices.GetJobInterviewById()` method to properly handle null return scenarios in compliance with C# nullable reference types.
 
