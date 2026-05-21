@@ -13,6 +13,7 @@ the entire job application lifecycle — from finding opportunities to tracking 
 and interview results. The application is deployed as an IIS sub-application under the path
 `/mitJobTracker` and is designed for single-user or small-team use backed by a SQL Server database.
 
+
 ---
 
 ## Release Notes
