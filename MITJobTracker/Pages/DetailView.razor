@@ -298,6 +298,11 @@
 
         if (!AreObjectsEqual(JobsInterview, ClonedJobsInterview))
         {
+            // ✅ FIX: Serialize and compare both objects to populate differences list
+            string currentJson  = System.Text.Json.JsonSerializer.Serialize(JobsInterview);
+            string originalJson = System.Text.Json.JsonSerializer.Serialize(ClonedJobsInterview);
+            GetObjectDifferences(originalJson, currentJson);
+
             // Save the data to the database, eitter to the Jobs or Interview table or both.
             interview = differences.Any(s => s.StartsWith("Interview", StringComparison.OrdinalIgnoreCase));
 

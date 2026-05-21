@@ -79,6 +79,7 @@ namespace MITJobTracker.Data.DTOS
                 RecruitertName = this.RecruitertName,
                 RecruiterPhone = this.RecruiterPhone,
                 RecruiterEmail = this.RecruiterEmail,
+                Note = this.Note,
                 InterviewId = this.InterviewId,
                 InterviewDate = this.InterviewDate,
                 InterviewType = this.InterviewType,
